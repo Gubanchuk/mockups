@@ -245,7 +245,7 @@ input.a2-ans-inp:focus { outline: none; border-color: #1E5290; box-shadow: 0 0 0
 /* Question groups (mode "Groups"): a group folds its questions, a question folds its details */
 .a2-qgroup { border: 1px solid #eef2f8; border-radius: 6px; margin-bottom: 8px; }
 .a2-qgroup-row { display: flex; align-items: center; gap: 12px; padding: 8px 10px; cursor: pointer; background: #fafbfd; border-radius: 6px; }
-.a2-qgroup-name { font-weight: 600; flex: 1; }
+.a2-qgroup-name { font-weight: 600; flex: none; }
 .a2-qgroup-count { color: #777777; font-size: 12px; }
 .a2-qdep { font-size: 12px; color: #777777; }
 .a2-qdep input { width: 13px; height: 13px; }
@@ -374,16 +374,21 @@ input.a2-ansgroup-name { flex: 1; height: 28px; padding: 4px 8px; font-size: 13p
 .a2-imgq-pt.picked .a2-imgq-size { display: block; }
 
 /* The name of a group is edited where it is written, not from a button below it (Tima 11.09) */
-input.a2-qgroup-name { width: 280px; max-width: 40%; flex: none; height: 28px; padding: 4px 8px; font-family: inherit; font-size: 14px; font-weight: 600; color: #183261; background: transparent; border: 1px solid transparent; border-radius: 4px; }
-input.a2-qgroup-name:hover { border-color: #dfe5ee; background: #ffffff; }
-input.a2-qgroup-name:focus { outline: none; border-color: #1E5290; background: #ffffff; box-shadow: 0 0 0 2px rgba(30,82,144,0.12); }
+input.a2-qgroup-rename { width: 280px; max-width: 40%; flex: none; height: 28px; padding: 4px 8px; font-family: inherit; font-size: 14px; font-weight: 600; color: #183261; background: #ffffff; border: 1px solid #1E5290; border-radius: 4px; }
+input.a2-qgroup-rename:focus { outline: none; box-shadow: 0 0 0 2px rgba(30,82,144,0.12); }
+.a2-qpen { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; flex: none; border-radius: 4px; color: #b6c2d6; }
+.a2-qgroup-row:hover .a2-qpen { color: #5a6f92; }
+.a2-qpen:hover { background: #eef3fa; color: #1E5290; }
 
 /* A changed order of questions waits for Save, as the order of the tree does */
-.a2-qorder { display: flex; align-items: center; gap: 8px; margin: 12px 0 2px 0; padding: 8px 10px; font-size: 12px; color: #5a6f92; background: #f4f7fb; border: 1px solid #dbe4f0; border-radius: 6px; }
+.a2-changebar { display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-size: 12px; color: #5a6f92; background: #f4f7fb; border: 1px solid #dbe4f0; border-radius: 6px; }
+.a2-changebar .a2-btn { padding: 4px 10px; font-size: 12px; background: #ffffff; }
+.a2-qorder { margin: 12px 0 2px 0; }
+.a2-qans-foot { margin-top: 8px; }
+.a2-qinstr-foot { margin-top: 8px; }
 
 /* The block of answers in the form saves on its own, once something in it changed */
-.a2-qans-foot { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
-.a2-qans-foot .a2-field-note { margin-top: 0; }
+
 
 /* The picture of a study card is just a picture: it takes no points */
 .a2-imgq-flat { cursor: default; }

@@ -263,6 +263,20 @@
 
   // Questions block: the head folds the whole block, a question row folds its details, a group folds its questions.
   // Both modes start folded (10.09): a lesson opens as a short page, questions are opened when they are the point.
+  // The instruction text is typed straight into the page, so it says when it was changed and kept.
+  function instrBox(v) { return qs(v, '.a2-qinstr-text'); }
+
+  function keepInstr(v) {
+    v.__instr = instrBox(v).innerHTML;
+    qs(v, '.a2-qinstr-foot').hidden = true;
+  }
+
+  function settleInstr(v, keep) {
+    if (!keep) instrBox(v).innerHTML = v.__instr;
+    else v.__instr = instrBox(v).innerHTML;
+    qs(v, '.a2-qinstr-foot').hidden = true;
+  }
+
   function resetQuestions(v) {
     var block = qs(v, '.a2-qblock');
     qsa(block, '.a2-q').forEach(function (q) {
@@ -275,6 +289,7 @@
     qsa(block, '.a2-q-detail').forEach(function (d) { d.hidden = true; });
     qsa(block, '.a2-q').forEach(function (q) { q.classList.remove('open'); });
     qsa(block, '.a2-qgroup').forEach(function (g) { g.classList.add('collapsed'); });
+    keepInstr(v);
   }
 
   function saveLesson(tree) {
@@ -363,6 +378,26 @@
     v.__qorder = null;
     orderBar(v).hidden = true;
     renumberQuestions(v);
+  }
+
+  // Clicking the name of a group has to open it; the pencil beside it is what renames (11.09).
+  function startRename(group) {
+    var label = qs(group, '.a2-qgroup-name'), field = qs(group, '.a2-qgroup-rename');
+    field.value = label.textContent;
+    label.hidden = true;
+    qs(group, '.a2-qpen').hidden = true;
+    field.hidden = false;
+    field.focus();
+    field.select();
+  }
+
+  function stopRename(field, keep) {
+    var group = field.closest('.a2-qgroup'), label = qs(group, '.a2-qgroup-name');
+    var name = field.value.trim();
+    if (keep && name) label.textContent = name;
+    field.hidden = true;
+    label.hidden = false;
+    qs(group, '.a2-qpen').hidden = false;
   }
 
   function renumberQuestions(v) {
@@ -595,6 +630,22 @@
     if (foot && !qs(m, '.a2-field-qans').hidden) foot.hidden = false;
   }
 
+  function keepAnswersSnapshot(m) {
+    var ed = qs(m, '.a2-qans-slot > .a2-q-editor');
+    if (!ed) { m.__ans = null; return; }
+    freezeFields(ed);
+    m.__ans = ed.cloneNode(true);
+  }
+
+  function revertAnswersBlock(m) {
+    if (!m.__ans) return;
+    var back = m.__ans.cloneNode(true);
+    back.hidden = false;
+    qs(m, '.a2-qans-slot').replaceChildren(back);
+    renumberAnswers(back);
+    qs(m, '.a2-qans-foot').hidden = true;
+  }
+
   function saveAnswersBlock(tree, m) {
     var st = modalState, edited = qs(m, '.a2-qans-slot > .a2-q-editor');
     if (st && st.qnode && edited) { // the question keeps them at once, the form stays open
@@ -605,6 +656,7 @@
       renumberAnswers(qs(st.qnode, '.a2-q-editor'));
       renderPreview(st.qnode);
     }
+    keepAnswersSnapshot(m); // Cancel now goes back to what was just saved
     var btn = qs(m, '[data-ans-save]'), was = btn.textContent;
     btn.textContent = 'Saved';
     setTimeout(function () { btn.textContent = was; qs(m, '.a2-qans-foot').hidden = true; }, 900);
@@ -622,6 +674,7 @@
     renumberAnswers(ed);
     qs(m, '.a2-field-qans').hidden = false;
     qs(m, '.a2-qans-foot').hidden = true;
+    keepAnswersSnapshot(m);
   }
 
   // Modal: part form, question form and delete confirmations ---------------------------------
@@ -753,11 +806,11 @@
       var gname = qs(m, '.a2-field-title input').value.trim();
       if (!gname) { qs(m, '.a2-field-title input').focus(); return; }
       if (st.gnode) {
-        qs(st.gnode, '.a2-qgroup-name').value = gname;
+        qs(st.gnode, '.a2-qgroup-name').textContent = gname;
       } else {
         var proto = qs(lvgn, '.a2-qgroup').cloneNode(true);
         proto.classList.add('collapsed');
-        qs(proto, '.a2-qgroup-name').value = gname;
+        qs(proto, '.a2-qgroup-name').textContent = gname;
         qsa(proto, '.a2-q').forEach(function (q) { q.remove(); });
         qs(lvgn, '.a2-qgrouped').appendChild(proto);
       }
@@ -876,6 +929,7 @@
     }
     if (e.target.closest('.a2-modal')) {
       if (e.target.closest('[data-ans-save]')) { e.preventDefault(); saveAnswersBlock(tree, qs(tree, '.a2-modal')); return; }
+      if (e.target.closest('[data-ans-revert]')) { e.preventDefault(); revertAnswersBlock(qs(tree, '.a2-modal')); return; }
       if (answerClick(tree, e)) markAnswersChanged(qs(tree, '.a2-modal'));
       return;
     }
@@ -952,6 +1006,16 @@
       qs(tree, '.a2-qblock').classList.toggle('folded');
       return;
     }
+    if ((a = e.target.closest('[data-qgroup-edit]'))) {
+      e.preventDefault();
+      startRename(a.closest('.a2-qgroup'));
+      return;
+    }
+    if ((a = e.target.closest('[data-instr]'))) {
+      e.preventDefault();
+      settleInstr(qs(tree, '.a2-view-lesson'), a.getAttribute('data-instr') === 'save');
+      return;
+    }
     if ((a = e.target.closest('[data-qorder]'))) {
       e.preventDefault();
       settleOrder(qs(tree, '.a2-view-lesson'), a.getAttribute('data-qorder') === 'save');
@@ -961,7 +1025,7 @@
       e.preventDefault();
       var gd = a.closest('.a2-qgroup'), qn2 = qsa(gd, '.a2-q').length;
       openModal(tree, { kind: 'delete', type: 'qgroup', gnode: gd, title: 'Delete group',
-        text: 'Delete \u201c' + qs(gd, '.a2-qgroup-name').value + '\u201d?',
+        text: 'Delete \u201c' + qs(gd, '.a2-qgroup-name').textContent + '\u201d?',
         note: qn2 ? 'Its ' + qn2 + ' questions will be deleted with it.' : '' });
       return;
     }
@@ -978,7 +1042,10 @@
       return;
     }
     if ((a = e.target.closest('[data-qgroup-open]'))) {
-      if (e.target.closest('.a2-qdep, .a2-qgroup-name')) { if (e.target.closest('a')) e.preventDefault(); return; }
+      if (e.target.closest('.a2-qdep, .a2-qpen, .a2-qgroup-rename')) {
+        if (e.target.closest('a')) e.preventDefault();
+        return;
+      }
       e.preventDefault();
       a.closest('.a2-qgroup').classList.toggle('collapsed');
       return;
@@ -1211,8 +1278,17 @@
       tree.addEventListener('drop', onDrop);
       tree.addEventListener('dragend', finishDrag);
       tree.addEventListener('mousedown', arm);
+      tree.addEventListener('focusout', function (e) {
+        if (e.target.classList && e.target.classList.contains('a2-qgroup-rename') && !e.target.hidden) {
+          stopRename(e.target, true);
+        }
+      });
       tree.addEventListener('input', function (e) {
         if (e.target.closest('.a2-qans-slot')) markAnswersChanged(qs(tree, '.a2-modal'));
+        if (e.target.classList && e.target.classList.contains('a2-qinstr-text')) {
+          var lvi = e.target.closest('.a2-view-lesson');
+          qs(lvi, '.a2-qinstr-foot').hidden = instrBox(lvi).innerHTML === lvi.__instr;
+        }
       });
       tree.addEventListener('change', function (e) {
         if (e.target.closest('.a2-qans-slot')) markAnswersChanged(qs(tree, '.a2-modal'));
@@ -1265,6 +1341,10 @@
     document.addEventListener('mousemove', onPointMove);
     document.addEventListener('mouseup', function (e) { onPointUp(e); disarm(); });
     document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && e.target.classList && e.target.classList.contains('a2-qgroup-rename')) {
+        stopRename(e.target, false);
+        return;
+      }
       if (e.key === 'Escape') {
         if (modalState) closeModal();
         else if (pageState) backToTree(pageState.tree);
@@ -1272,11 +1352,8 @@
       }
       if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
         // a field of an answer or of an answer group belongs to the questions block, not to the lesson form
-        if (e.target.closest('.a2-q-ans, .a2-ansgroup-head') || e.target.classList.contains('a2-qgroup-name')) {
-          e.preventDefault();
-          e.target.blur();
-          return;
-        }
+        if (e.target.classList.contains('a2-qgroup-rename')) { e.preventDefault(); stopRename(e.target, true); return; }
+        if (e.target.closest('.a2-q-ans, .a2-ansgroup-head')) { e.preventDefault(); e.target.blur(); return; }
         if (modalState) { e.preventDefault(); confirmModal(); }
         else if (pageState && e.target.closest('.a2-view-lesson, .a2-view-section')) { e.preventDefault(); (pageState.type === 'lesson' ? saveLesson : saveSection)(pageState.tree); }
       }
