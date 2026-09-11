@@ -300,3 +300,40 @@
 .a2-lesson-new .a2-qinstr, .a2-lesson-new .a2-qlist, .a2-lesson-new .a2-qcount, .a2-qblock.folded .a2-lesson-new .a2-qshow { display: none; }
 .a2-lesson-new .a2-qblock .a2-qshow { display: none; }
 .a2-lesson-new .a2-qempty { display: block; }
+
+/* Variants 2-4: A2 reached from the menu, content browsed as flat lists.
+   The look follows the old admin (Helvetica tables, Bootstrap 3 tabs), not the tree of variant 1. */
+.a2-lists { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; }
+.a2-lists a { color: #337ab7; }
+.a2-lists a:hover { color: #23527c; text-decoration: underline; }
+.a2-data { display: none !important; }
+.a2-lh { font-size: 36px; font-weight: 500; line-height: 1.1; margin: 0 0 18px 0; }
+.a2-lh2 { font-size: 26px; font-weight: 500; line-height: 1.1; margin: 34px 0 10px 0; }
+.a2-view-list, .a2-view-hub { padding: 26px 20px 40px 20px; }
+.a2-ltools { margin-bottom: 10px; font-size: 14px; }
+.a2-ltable, .a2-hubtable { border-collapse: collapse; width: 100%; font-size: 14px; }
+.a2-hubtable { max-width: 620px; }
+.a2-ltable td, .a2-ltable th, .a2-hubtable td { padding: 6px 8px; border-top: 1px solid #dddddd; text-align: left; }
+.a2-ltable th { border-top: 0; border-bottom: 2px solid #dddddd; font-weight: 700; color: #555555; }
+.a2-ltable tr:hover td { background: #f9f9f9; }
+.a2-hubtable tr:last-child td { border-bottom: 1px solid #dddddd; }
+.a2-hubtable td:last-child { color: #777777; text-align: right; }
+.a2-lacts { white-space: nowrap; text-align: right; }
+.a2-yes { color: #3c763d; }
+.a2-dash { color: #bbbbbb; }
+
+/* The three ways in: a hub page, a dropdown of the navbar, a row of tabs */
+.a2-tabs { border-bottom: 1px solid #dddddd; padding: 0 20px; display: flex; gap: 2px; background: #ffffff; }
+.a2-tabs a { padding: 10px 15px; font-size: 14px; color: #337ab7; border: 1px solid transparent; border-bottom: 0; margin-bottom: -1px; border-radius: 4px 4px 0 0; }
+.a2-tabs a:hover { background: #eeeeee; text-decoration: none; }
+.a2-tabs a.current { color: #555555; background: #ffffff; border-color: #dddddd; }
+.a2-drop { position: absolute; top: 50px; left: 0; min-width: 185px; background: #ffffff; border: 1px solid rgba(0,0,0,0.15); border-radius: 4px; box-shadow: 0 6px 12px rgba(0,0,0,0.175); padding: 5px 0; z-index: 10; }
+.a2-drop a { display: block; color: #333333; padding: 3px 20px; line-height: 1.42857; white-space: nowrap; }
+.a2-drop a:hover { background: #f5f5f5; text-decoration: none; }
+.a2-drop a.current { background: #337ab7; color: #ffffff; }
+
+/* A flat list has nowhere to drag a lesson, so its form asks where the lesson lives */
+.a2-field-where { display: none; }
+.a2-lists .a2-field-where { display: block; }
+.a2-whererow { display: flex; gap: 10px; }
+.a2-qicon-off { width: 22px; }

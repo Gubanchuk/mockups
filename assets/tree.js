@@ -83,7 +83,49 @@
     qsa(tree, ':scope > .a2-view').forEach(function (v) { v.hidden = !v.classList.contains('a2-view-' + name); });
     closeMenus(tree);
   }
-  function backToTree(tree) { pageState = null; showView(tree, 'tree'); }
+
+  // Variants 2-4 browse the same data as flat lists. The tree is still in the page, hidden: it holds the
+  // lessons, sections and parts, and a row of a list points at its node by id.
+  function isLists(tree) { return tree.classList.contains('a2-lists'); }
+
+  // The navbar of a variant sits above its .a2tree, and the one-page build holds every variant at
+  // once, so both are found by walking up from the element that was clicked, never by taking the first.
+  function upFrom(el, sel) {
+    for (var n = el; n && n !== document.body; n = n.parentElement) {
+      var hit = n.querySelector && n.querySelector(sel);
+      if (hit) return hit;
+    }
+    return document.querySelector(sel);
+  }
+
+  function a2Drop(tree) { return upFrom(tree, '.a2-drop'); }
+
+  function showList(tree, key) {
+    qsa(tree, ':scope > .a2-view').forEach(function (v) { v.hidden = true; });
+    var view = key === 'hub' ? qs(tree, '.a2-view-hub') : qs(tree, '.a2-view-list[data-list="' + key + '"]');
+    if (!view) return;
+    view.hidden = false;
+    tree.__list = key;
+    qsa(tree, '.a2-tabs a, .a2-drop a').forEach(function (a) {
+      a.classList.toggle('current', a.getAttribute('data-list') === key);
+    });
+    var drop = a2Drop(tree);
+    if (drop) drop.hidden = true;
+    closeMenus(tree);
+    recount(tree);
+  }
+
+  function nodeById(tree, id) {
+    return qs(tree, '.a2-data [data-lid="' + id + '"], .a2-data [data-sid="' + id + '"], .a2-data [data-pid="' + id + '"]');
+  }
+
+  function dropRows(tree, id) { qsa(tree, '[data-row="' + id + '"]').forEach(function (r) { r.remove(); }); }
+
+  function backToTree(tree) {
+    pageState = null;
+    if (isLists(tree)) { showList(tree, tree.__list || tree.getAttribute('data-home')); return; }
+    showView(tree, 'tree');
+  }
 
   // What Cancel has to answer for: the fields of the lesson itself, snapshotted when the page opened.
   function lessonSnapshot(v) {
@@ -96,6 +138,89 @@
   }
 
   function lessonsList(node) { return qs(node, ':scope > .a2-body > .a2-lessons'); }
+
+  function idOf(node) {
+    return node.getAttribute('data-lid') || node.getAttribute('data-sid') || node.getAttribute('data-pid');
+  }
+
+  // A lesson shows up in three lists (Lessons, Videos, Lesson Questions); a rename has to reach all of them.
+  function syncLessonRow(tree, node) {
+    if (!isLists(tree)) return;
+    var lid = idOf(node);
+    if (!lid) { lid = 'l' + Date.now(); node.setAttribute('data-lid', lid); }
+    var name = nameOf(node), sec = nameOf(sectionOf(node)), part = partOf(node);
+    var body = qs(tree, '.a2-view-list[data-list="lessons"] tbody');
+    var row = qs(body, '[data-row="' + lid + '"]');
+    if (!row) {
+      row = qs(body, '[data-row]').cloneNode(true);
+      row.setAttribute('data-row', lid);
+      qsa(row, '[data-open-lesson]').forEach(function (a) { a.setAttribute('data-open-lesson', lid); });
+      qsa(row, '[data-del-node]').forEach(function (a) { a.setAttribute('data-del-node', lid); });
+      body.appendChild(row);
+    }
+    var tds = qsa(row, 'td');
+    qs(tds[0], 'a').textContent = name;
+    tds[1].textContent = sec;
+    tds[2].textContent = part ? nameOf(part) : '\u2014';
+    qsa(tree, '[data-row="' + lid + '"]').forEach(function (r) {
+      if (r === row) return; // a video and a question set are named "Section - Lesson", then the lesson itself
+      var links = qsa(r, '[data-open-lesson]');
+      if (links[0]) links[0].textContent = sec + ' - ' + name;
+      if (links[1]) links[1].textContent = name;
+    });
+  }
+
+  function syncSectionRows(tree, node) {
+    if (!isLists(tree)) return;
+    var row = qs(tree, '.a2-view-list[data-list="sections"] [data-row="' + idOf(node) + '"]');
+    if (row) qs(row, 'td a').textContent = nameOf(node);
+    qsa(node, '.a2-lesson').forEach(function (l) { syncLessonRow(tree, l); });
+    qsa(node, '.a2-part').forEach(function (p) { syncPartRow(tree, p); });
+  }
+
+  function syncPartRow(tree, node) {
+    if (!isLists(tree)) return;
+    var row = qs(tree, '.a2-view-list[data-list="parts"] [data-row="' + idOf(node) + '"]');
+    if (row) qs(row, 'td a').textContent = nameOf(node);
+    qsa(node, '.a2-lesson').forEach(function (l) { syncLessonRow(tree, l); });
+  }
+
+  // Deleting a node takes the rows of everything inside it with it
+  function dropRowsOf(tree, node) {
+    if (!isLists(tree)) return;
+    var ids = [idOf(node)];
+    qsa(node, '[data-lid], [data-pid]').forEach(function (n) { ids.push(idOf(n)); });
+    ids.forEach(function (id) { if (id) dropRows(tree, id); });
+  }
+
+  // The tree moves a lesson by dragging; a flat list has nowhere to drag, so the form asks instead.
+  function fillWhereParts(tree, v, part) {
+    var ss = qs(v, '[data-f="where-section"]'), ps = qs(v, '[data-f="where-part"]');
+    var section = qs(tree, '.a2-data [data-sid="' + ss.value + '"]');
+    ps.innerHTML = '<option value="">No part</option>';
+    qsa(section, '.a2-part').forEach(function (p) {
+      var o = document.createElement('option');
+      o.value = idOf(p);
+      o.textContent = nameOf(p);
+      o.selected = p === part;
+      ps.appendChild(o);
+    });
+    ps.disabled = ps.options.length < 2;
+  }
+
+  function fillWhere(tree, v, section, part) {
+    var ss = qs(v, '[data-f="where-section"]');
+    if (!ss) return;
+    ss.innerHTML = '';
+    qsa(tree, '.a2-data .a2-section').forEach(function (sn) {
+      var o = document.createElement('option');
+      o.value = idOf(sn);
+      o.textContent = nameOf(sn);
+      o.selected = sn === section;
+      ss.appendChild(o);
+    });
+    fillWhereParts(tree, v, part);
+  }
 
   // Lesson page ------------------------------------------------------------------------------
   // Reworked after the 08.09 call: no Section / Part (dragging in the tree moves a lesson), no Page type (a lesson
@@ -129,6 +254,7 @@
     resetQuestions(v);
     qs(v, '[data-f="status"]').checked = cfg.node ? isPub(cfg.node) : true;
     qs(v, '[data-page-delete]').hidden = !cfg.node;
+    if (isLists(tree)) fillWhere(tree, v, section, part);
     v.__snapshot = lessonSnapshot(v);
     pageState = { tree: tree, type: 'lesson', node: cfg.node || null, listEl: cfg.listEl || null };
     showView(tree, 'lesson');
@@ -162,6 +288,13 @@
     } else {
       qs(node, ':scope > .a2-row .a2-name').textContent = title;
       node.setAttribute('data-published', pub);
+    }
+    if (isLists(tree)) { // the selects of the form decide where the lesson ends up
+      var sid = qs(v, '[data-f="where-section"]').value, pid = qs(v, '[data-f="where-part"]').value;
+      var target = pid ? qs(tree, '.a2-data [data-pid="' + pid + '"]') : qs(tree, '.a2-data [data-sid="' + sid + '"]');
+      var dst = target ? lessonsList(target) : null;
+      if (dst && node.parentElement !== dst) dst.appendChild(node);
+      syncLessonRow(tree, node);
     }
     recount(tree);
     backToTree(tree);
@@ -197,6 +330,7 @@
       node.setAttribute('data-published', pub);
       var ic = qs(node, ':scope > .a2-row .a2-icon'); if (ic) ic.innerHTML = qs(v, '[data-f="icon"]').innerHTML;
     }
+    syncSectionRows(tree, node);
     recount(tree);
     backToTree(tree);
   }
@@ -495,12 +629,20 @@
       return;
     }
     if (st.kind === 'delete') {
-      if (st.type === 'part') { var dst = lessonsList(sectionOf(st.node)); qsa(st.node, '.a2-lesson').forEach(function (l) { dst.appendChild(l); }); }
+      var moved = [];
+      if (st.type === 'part') { // the lessons of a part move up to its section, they are not deleted
+        var dst = lessonsList(sectionOf(st.node));
+        moved = qsa(st.node, '.a2-lesson');
+        moved.forEach(function (l) { dst.appendChild(l); });
+      }
+      dropRowsOf(tree, st.node);
       st.node.remove();
+      moved.forEach(function (l) { syncLessonRow(tree, l); });
       if (pageState && pageState.node === st.node) backToTree(tree);
     } else if (st.kind === 'edit') {
       if (!title) return;
       qs(st.node, ':scope > .a2-row .a2-name').textContent = title;
+      if (typeOf(st.node) === 'part') syncPartRow(tree, st.node);
     } else {
       if (!title) return;
       var node = makeNode(tree, st.type, title, '1');
@@ -526,6 +668,45 @@
       return;
     }
     if (e.target.closest('.a2-modal')) return;
+    // Variants 2-4: rows of the lists point at a node of the hidden tree (the navbar is handled below)
+    if ((a = e.target.closest('[data-open-lesson]'))) {
+      e.preventDefault();
+      var ln = nodeById(tree, a.getAttribute('data-open-lesson'));
+      if (ln) openLesson(tree, { node: ln });
+      return;
+    }
+    if ((a = e.target.closest('[data-open-section]'))) {
+      e.preventDefault();
+      var sn = nodeById(tree, a.getAttribute('data-open-section'));
+      if (sn) openSection(tree, { node: sn });
+      return;
+    }
+    if ((a = e.target.closest('[data-edit-part]'))) {
+      e.preventDefault();
+      var pn = nodeById(tree, a.getAttribute('data-edit-part'));
+      if (pn) openModal(tree, { kind: 'edit', type: 'part', node: pn, name: nameOf(pn), title: 'Edit part' });
+      return;
+    }
+    if ((a = e.target.closest('[data-del-node]'))) {
+      e.preventDefault();
+      var dn = nodeById(tree, a.getAttribute('data-del-node'));
+      if (dn) openConfirm(tree, dn);
+      return;
+    }
+    if ((a = e.target.closest('[data-list-new]'))) {
+      e.preventDefault();
+      var kind = a.getAttribute('data-list-new'), first = qs(tree, '.a2-data .a2-section');
+      if (kind === 'lesson') openLesson(tree, { listEl: lessonsList(first) });
+      else if (kind === 'section') openSection(tree, {});
+      else openModal(tree, { kind: 'add', type: 'part', title: 'New part',
+        listEl: qs(first, ':scope > .a2-body > .a2-parts') });
+      return;
+    }
+    if ((a = e.target.closest('a[data-list]'))) { // an anchor, not the list view that carries the same attribute
+      e.preventDefault();
+      showList(tree, a.getAttribute('data-list'));
+      return;
+    }
     // Pages
     if (e.target.closest('[data-back]')) {
       e.preventDefault();
@@ -877,6 +1058,7 @@
       tree.addEventListener('change', function (e) {
         if (e.target.matches('.a2-hide input')) tree.classList.toggle('hide-unpub', e.target.checked);
         else if (e.target.matches('.a2-field-qtype select')) syncQuestionForm(qs(tree, '.a2-modal'));
+        else if (e.target.matches('[data-f="where-section"]')) fillWhereParts(tree, qs(tree, '.a2-view-lesson'), null);
         else if (e.target.matches('[data-study-mode]')) { // a study card holds pairs of words or a set of pictures
           var pics = e.target.value === 'Pictures', qst = e.target.closest('.a2-q');
           qs(qst, '[data-study-list]').hidden = pics;
@@ -885,8 +1067,27 @@
         }
       });
       recount(tree);
+      if (isLists(tree)) showList(tree, tree.getAttribute('data-home'));
     });
+    // The navbar of variants 2-4 is above .a2tree in the page, so its A2 entry is handled here:
+    // it opens the dropdown (variant 3) or goes back to the home list (variants 2 and 4).
     document.addEventListener('click', function (e) {
+      var tree = upFrom(e.target, '.a2tree.a2-lists');
+      if (tree) {
+        var drop = a2Drop(tree);
+        if (e.target.closest('[data-a2menu]')) {
+          e.preventDefault();
+          if (drop) drop.hidden = !drop.hidden;
+          return;
+        }
+        var link = e.target.closest('a[data-list]');
+        if (link && !link.closest('.a2-view')) { // a view carries the same attribute on itself
+          e.preventDefault();
+          showList(tree, link.getAttribute('data-list'));
+          return;
+        }
+        if (drop && !drop.hidden && !e.target.closest('.a2-drop')) drop.hidden = true;
+      }
       var sw = e.target.closest('.a2-switch');
       if (sw && !sw.closest('.a2-toggle')) {
         sw.classList.toggle('on');
