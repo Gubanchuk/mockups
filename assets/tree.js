@@ -387,6 +387,7 @@
     label.hidden = true;
     qs(group, '.a2-qpen').hidden = true;
     field.hidden = false;
+    qs(group, '.a2-rename-acts').hidden = false;
     field.focus();
     field.select();
   }
@@ -396,6 +397,7 @@
     var name = field.value.trim();
     if (keep && name) label.textContent = name;
     field.hidden = true;
+    qs(group, '.a2-rename-acts').hidden = true;
     label.hidden = false;
     qs(group, '.a2-qpen').hidden = false;
   }
@@ -1024,6 +1026,11 @@
       qs(tree, '.a2-qblock').classList.toggle('folded');
       return;
     }
+    if ((a = e.target.closest('[data-rename]'))) {
+      e.preventDefault();
+      stopRename(qs(a.closest('.a2-qgroup'), '.a2-qgroup-rename'), a.getAttribute('data-rename') === 'save');
+      return;
+    }
     if ((a = e.target.closest('[data-qgroup-edit]'))) {
       e.preventDefault();
       startRename(a.closest('.a2-qgroup'));
@@ -1060,7 +1067,7 @@
       return;
     }
     if ((a = e.target.closest('[data-qgroup-open]'))) {
-      if (e.target.closest('.a2-qdep, .a2-qpen, .a2-qgroup-rename')) {
+      if (e.target.closest('.a2-qdep, .a2-qpen, .a2-qgroup-rename, .a2-rename-acts')) {
         if (e.target.closest('a')) e.preventDefault();
         return;
       }
@@ -1181,6 +1188,7 @@
   }
 
   function arm(e) {
+    if (e.target.closest('.a2-rename-acts')) { e.preventDefault(); return; } // keep the focus in the field
     var g = e.target.closest('[data-drag-ans]');
     if (g) { armed = g.closest('.a2-ans'); armed.draggable = true; return; }
     g = e.target.closest('[data-drag-q]');

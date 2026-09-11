@@ -395,7 +395,8 @@ input.a2-qgroup-rename:focus { outline: none; box-shadow: 0 0 0 2px rgba(30,82,1
 /* A changed order of questions waits for Save, as the order of the tree does */
 .a2-changebar { display: flex; align-items: center; gap: 8px; padding: 9px 12px; font-size: 13px; color: #183261; background: #eff4fb; border: 1px solid #ccdaee; border-radius: 6px; }
 .a2-changebar .a2-btn { padding: 4px 10px; font-size: 12px; background: #ffffff; }
-.a2-qorder { margin: 12px 0 2px 0; }
+/* the bar sits under the list, next to where the dragging happened (11.09) */
+.a2-qorder { margin: 12px 0 0 0; }
 .a2-qans-foot { margin-top: 8px; }
 .a2-qinstr-foot { margin-top: 8px; }
 
@@ -407,3 +408,11 @@ input.a2-qgroup-rename:focus { outline: none; box-shadow: 0 0 0 2px rgba(30,82,1
 
 /* A title does not need the whole width of the page; the editors and the questions do */
 .a2-page [data-f="title"], .a2-page [data-f="video-name"], .a2-whererow select { max-width: 640px; }
+
+/* Renaming a group says plainly how to keep the new name or leave the old one (11.09) */
+.a2-rename-acts { display: inline-flex; align-items: center; gap: 4px; flex: none; }
+.a2-rename-acts a { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border: 1px solid #b8c6db; border-radius: 4px; background: #ffffff; }
+.a2-rename-ok { color: #1E5290; }
+.a2-rename-no { color: #a32b26; border-color: #dda9a6 !important; }
+.a2tree .a2-rename-ok:hover { background: #eef3fa; border-color: #1E5290; text-decoration: none; }
+.a2tree .a2-rename-no:hover { background: #fbecec; border-color: #a32b26 !important; text-decoration: none; }
