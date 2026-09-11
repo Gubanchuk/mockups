@@ -1,0 +1,302 @@
+/* Course tree (variants 1 and 1.1). State classes on .a2tree: data-variant="kebab|mode", .reorder = Reorder on, .on = Edit mode on (variant 1.1). */
+.a2tree { width: 1080px; margin: 0 auto; padding: 26px 0 34px 0; }
+.a2tree a { text-decoration: none; }
+.a2-title { font-size: 32px; font-weight: 600; color: #183261; }
+.a2-counts { font-size: 13px; color: #98a7c0; margin-top: 2px; }
+.a2-cols { display: flex; gap: 48px; align-items: flex-start; }
+.a2-left { width: 620px; }
+.a2-right { width: 400px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #333333; margin-top: 26px; }
+.a2-right h2 { font-size: 26px; font-weight: 500; line-height: 1.1; color: #333333; margin: 28px 0 10px 0; }
+.a2-right h2:first-child { margin-top: 0; }
+.a2-right table { border-collapse: collapse; width: 100%; }
+.a2-right td { padding: 6px 2px; border-top: 1px solid #dddddd; }
+.a2-right tr:last-child td { border-bottom: 1px solid #dddddd; }
+.a2-right td:last-child { color: #777777; text-align: right; }
+
+.a2-blockhead { display: flex; align-items: flex-end; justify-content: space-between; margin: 26px 0 12px 0; }
+.a2-blockhead h2 { font-size: 26px; font-weight: 500; line-height: 1.1; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; margin: 0; }
+.a2-controls { font-size: 13px; display: flex; align-items: center; gap: 18px; }
+.a2-hide { display: inline-flex; align-items: center; gap: 6px; color: #183261; cursor: pointer; }
+.a2-hide input { margin: 0; width: 14px; height: 14px; cursor: pointer; }
+.a2tree.hide-unpub .a2-node[data-published="0"] { display: none; }
+.a2-toggle { display: inline-flex; align-items: center; gap: 8px; color: #183261; }
+.a2-btn { border: 1px solid #c3cfe0; border-radius: 6px; padding: 5px 12px; color: #183261; background: #ffffff; cursor: pointer; }
+.a2-btn-primary { border-color: #183261; background: #183261; color: #ffffff; }
+.a2-btn-danger { border-color: #d9534f; background: #d9534f; color: #ffffff; }
+/* buttons are links in the mockup, so the page-wide a:hover has to be kept off them:
+   it repainted the label in the colour of the button and the text vanished */
+.a2tree a.a2-btn:hover { text-decoration: none; }
+.a2tree a.a2-btn:hover { background: #f3f7fc; color: #183261; }
+.a2tree a.a2-btn-primary:hover { background: #1E5290; border-color: #1E5290; color: #ffffff; }
+.a2tree a.a2-btn-danger:hover { background: #c9302c; border-color: #c9302c; color: #ffffff; }
+
+.a2-reorder-bar { display: none; justify-content: space-between; align-items: center; margin: -2px 0 10px 0; font-size: 13px; }
+.a2tree.reorder .a2-reorder-bar { display: flex; }
+.a2-reorder-bar .a2-hint { font-size: 12px; color: #98a7c0; }
+.a2-reorder-btns { display: inline-flex; gap: 8px; }
+
+/* Nodes */
+.a2-section { border: 1px solid #dfe7f2; border-radius: 10px; background: #ffffff; margin-bottom: 8px; }
+.a2-section:not(.collapsed) { border-color: #c8d6ea; }
+.a2-row { display: flex; align-items: center; }
+.a2-section > .a2-row { padding: 10px 14px; cursor: pointer; }
+.a2-section:not(.collapsed) > .a2-row { background: #f7fafd; border-bottom: 1px solid #eef2f8; border-radius: 10px 10px 0 0; }
+.a2-section > .a2-row .a2-name { font-size: 14px; font-weight: 600; color: #183261; }
+.a2-section > .a2-body { padding: 2px 14px 8px 14px; }
+.a2-node.collapsed > .a2-body { display: none; }
+.a2-part > .a2-row { padding: 8px 0 7px 2px; border-top: 1px solid #eef2f8; cursor: pointer; }
+.a2-part > .a2-row .a2-name { font-size: 13px; font-weight: 600; color: #183261; }
+.a2-lesson > .a2-row { padding: 7px 0 7px 20px; border-top: 1px solid #eef2f8; cursor: pointer; }
+.a2-lesson > .a2-row:hover, .a2-part > .a2-row:hover { background: #f3f7fc; }
+.a2-section.collapsed > .a2-row:hover { background: #f7fafd; }
+.a2-lesson > .a2-row:hover .a2-name { text-decoration: underline; }
+.a2-row .a2-name { user-select: none; }
+/* Variant 1.1: lessons open only in Edit mode */
+.a2tree[data-variant="mode"]:not(.on) .a2-lesson > .a2-row { cursor: default; }
+.a2tree[data-variant="mode"]:not(.on) .a2-lesson > .a2-row:hover { background: transparent; }
+.a2tree[data-variant="mode"]:not(.on) .a2-lesson > .a2-row:hover .a2-name { text-decoration: none; }
+.a2-part .a2-lesson > .a2-row { padding-left: 42px; }
+.a2-lesson .a2-name { font-size: 13px; color: #1E5290; }
+.a2-node[data-published="0"] > .a2-row .a2-name { color: #98a7c0; }
+.a2-name { flex: 1; }
+.a2-count { font-size: 12px; color: #98a7c0; }
+.a2-chev { display: inline-flex; width: 18px; height: 18px; align-items: center; justify-content: center; color: #1E5290; margin-right: 4px; flex: none; }
+.a2-chev svg { transform: rotate(90deg); }
+.a2-node.collapsed > .a2-row .a2-chev svg { transform: none; }
+.a2-icon { display: inline-flex; width: 26px; color: #1E5290; flex: none; }
+.a2-part-icon { width: 22px; }
+.a2-sp { width: 22px; flex: none; }
+.a2-sp18 { width: 18px; flex: none; }
+.a2-ico { display: inline-flex; width: 22px; justify-content: center; color: #1E5290; }
+.a2-dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px; margin-left: 10px; flex: none; background: #3c763d; }
+.a2-node[data-published="0"] > .a2-row .a2-dot { background: none; border: 1.5px solid #98a7c0; box-sizing: border-box; }
+
+/* Drag handles: only while reordering */
+.a2-grip { display: none; width: 18px; justify-content: center; color: #98a7c0; cursor: grab; flex: none; }
+.a2-lesson .a2-grip { width: 22px; }
+.a2tree.reorder .a2-grip { display: inline-flex; }
+.a2tree.reorder .a2-lesson .a2-sp { display: none; }
+.a2-node.dragging { opacity: 0.4; }
+.a2-node.drop-above > .a2-row { box-shadow: inset 0 2px 0 #1E5290; }
+.a2-node.drop-below > .a2-row { box-shadow: inset 0 -2px 0 #1E5290; }
+
+/* Row actions */
+.a2-acts { margin-left: 8px; flex: none; position: relative; }
+.a2-acts-links { font-size: 12px; margin-left: 14px; white-space: nowrap; }
+.a2-kebab { display: inline-flex; width: 22px; height: 18px; align-items: center; justify-content: center; color: #98a7c0; }
+.a2-acts-kebab.open .a2-kebab { color: #183261; }
+.a2-menu { display: none; position: absolute; right: 0; top: 100%; z-index: 5; min-width: 130px; background: #ffffff; border: 1px solid rgba(0,0,0,0.15); border-radius: 4px; box-shadow: 0 6px 12px rgba(0,0,0,0.175); padding: 5px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; text-align: left; }
+.a2-menu a { display: block; padding: 3px 20px; color: #333333; white-space: nowrap; }
+.a2-menu a:hover { background: #f5f5f5; text-decoration: none; }
+.a2-acts-kebab.open .a2-menu { display: block; }
+.a2tree[data-variant="kebab"] .a2-acts-links { display: none; }
+.a2tree[data-variant="mode"] .a2-acts-kebab { display: none; }
+.a2tree[data-variant="mode"]:not(.on) .a2-acts-links, .a2tree[data-variant="mode"]:not(.on) .a2-add { display: none; }
+
+/* Add rows */
+.a2-add { padding: 7px 0 3px 20px; border-top: 1px solid #eef2f8; font-size: 12px; }
+.a2-part .a2-add { padding-left: 42px; }
+.a2-add-section { padding: 8px 14px 0 14px; border-top: 0; font-size: 13px; }
+
+/* Premoderation switch (also used in the hub) */
+.a2-switch { display: inline-block; position: relative; width: 34px; height: 18px; border-radius: 9px; background: #cccccc; vertical-align: middle; cursor: pointer; }
+.a2-switch.on { background: #5cb85c; }
+.a2-knob { position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 7px; background: #ffffff; transition: left .15s; }
+.a2-switch.on .a2-knob { left: 18px; }
+.a2-switch-label { font-size: 12px; }
+
+/* Modal for Edit / Add / Delete */
+.a2-modal { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4); display: flex; align-items: flex-start; justify-content: center; padding-top: 120px; }
+.a2-modal[hidden], .a2-field[hidden], .a2-modal-text[hidden] { display: none; }
+.a2-modal-box { width: 420px; background: #ffffff; border: 1px solid rgba(0,0,0,0.2); border-radius: 6px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); padding: 18px 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; }
+.a2-modal-title { font-size: 18px; margin-bottom: 14px; }
+.a2-field { display: block; margin-bottom: 12px; font-size: 14px; }
+.a2-field > span { display: block; font-weight: 700; margin-bottom: 5px; }
+.a2-field textarea { width: 100%; box-sizing: border-box; padding: 6px 12px; font-size: 14px; border: 1px solid #cccccc; border-radius: 4px; font-family: inherit; line-height: 1.45; resize: vertical; }
+.a2-field input, .a2-field select { width: 100%; box-sizing: border-box; height: 34px; padding: 6px 12px; font-size: 14px; border: 1px solid #cccccc; border-radius: 4px; font-family: inherit; background: #ffffff; }
+.a2-modal-text { font-size: 14px; margin: 0 0 14px 0; }
+.a2-modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; font-size: 13px; }
+.a2-modal-actions .a2-btn { padding: 6px 14px; }
+.a2-modal-spacer { flex: 1; }
+.a2-modal-delete { color: #a94442; align-self: center; }
+.a2-modal-delete[hidden] { display: none; }
+.a2-modal-note { font-size: 13px; color: #777777; margin: -8px 0 14px 0; }
+.a2-modal-check { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 0 0 14px 0; cursor: pointer; }
+.a2-modal-check input { margin: 0; }
+.a2tree [hidden] { display: none !important; }
+
+/* Drill-in pages: lesson (.a2-view-lesson) and section (.a2-view-section) replace the tree inside the same frame */
+.a2-crumbs { font-size: 13px; color: #98a7c0; margin-bottom: 4px; }
+.a2-crumbs .a2-crumb-cur { color: #183261; }
+.a2-pagehead { display: flex; align-items: flex-end; justify-content: space-between; }
+.a2-page { width: 720px; margin-top: 22px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #333333; }
+.a2-page .a2-field { margin-bottom: 18px; }
+.a2-vbox { display: flex; gap: 14px; align-items: flex-start; border: 1px solid #dddddd; border-radius: 4px; padding: 12px; background: #fafbfd; }
+.a2-thumb { width: 120px; height: 68px; border-radius: 4px; background: #0f1c33; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85); font-size: 18px; flex: none; }
+.a2-video-info { flex: 1; font-size: 13px; line-height: 1.45; }
+.a2-video-name { font-size: 14px; font-weight: 700; }
+.a2-video-sub { margin-top: 8px; }
+.a2-video-acts { margin-top: 4px; font-size: 13px; }
+.a2-video-acts a + a::before { content: '\00b7'; color: #777777; margin: 0 8px; }
+.a2-editor { border: 1px solid #cccccc; border-radius: 4px; background: #ffffff; }
+.a2-toolbar { display: flex; gap: 4px; padding: 6px 8px; border-bottom: 1px solid #e5e5e5; background: #f8f8f8; font-size: 12px; color: #555555; }
+.a2-toolbar span { padding: 2px 7px; border-radius: 3px; border: 1px solid #dddddd; background: #ffffff; min-width: 14px; text-align: center; }
+.a2-editor-body { min-height: 150px; padding: 10px 12px; font-size: 14px; line-height: 1.55; outline: none; }
+.a2-editor-sm .a2-editor-body { min-height: 62px; font-size: 13px; }
+.a2-editor-sm .a2-toolbar { flex-wrap: wrap; }
+.a2-editor-body p { margin: 0 0 8px 0; }
+.a2-actions { display: flex; gap: 8px; align-items: center; margin-top: 4px; padding-top: 16px; border-top: 1px solid #dddddd; font-size: 13px; }
+.a2-actions .a2-btn { padding: 6px 14px; }
+.a2-icon-box { display: flex; align-items: center; gap: 16px; }
+.a2-icon-preview { width: 64px; height: 64px; border: 1px solid #dddddd; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #1E5290; background: #f7fafd; flex: none; }
+.a2-icon-preview svg { width: 40px; height: 40px; }
+.a2-icon-acts { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.a2-page h2 { font-size: 26px; font-weight: 500; line-height: 1.1; margin: 30px 0 10px 0; }
+
+/* --- 08.09 call: lesson page rework ------------------------------------------------------- */
+
+/* Comments button: right after the questions */
+.a2-headbtns { margin: 18px 0 20px 0; }
+.a2-btn-wide { padding: 8px 18px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+.a2-badge { display: inline-flex; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #ef561f; color: #ffffff; font-size: 11px; align-items: center; justify-content: center; }
+
+/* Status checkbox (two states do not need a dropdown) */
+.a2-check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
+.a2-check input { width: 15px; height: 15px; margin: 0; }
+
+/* Video "Details": tooltip variant (the modal variant reuses the same rows) */
+.a2-video-info { position: relative; }
+.a2-vdet { position: absolute; z-index: 6; left: 0; top: 100%; margin-top: 6px; width: 330px; padding: 10px 12px; background: #ffffff; border: 1px solid #c3cfe0; border-radius: 6px; box-shadow: 0 6px 16px rgba(24,50,97,0.16); }
+.a2-vdet-row { display: flex; justify-content: space-between; gap: 14px; padding: 3px 0; font-size: 12px; }
+.a2-vdet-row span { color: #777777; }
+.a2-vdet-row b { font-weight: 600; text-align: right; word-break: break-all; }
+
+/* Lesson questions: the A2 test of this lesson, edited in place */
+.a2-qbox { border: 1px solid #dddddd; border-radius: 4px; background: #ffffff; }
+.a2-qhead { display: flex; align-items: center; gap: 10px; padding: 10px 12px; cursor: pointer; background: #fafbfd; border-radius: 4px 4px 0 0; }
+.a2-qblock.folded .a2-qhead { border-radius: 4px; }
+.a2-qchev { display: inline-flex; color: #1E5290; flex: none; }
+.a2-qchev svg { transform: rotate(90deg); }
+.a2-qblock.folded .a2-qhead .a2-qchev svg, .a2-qgroup.collapsed > .a2-qgroup-row .a2-qchev svg, .a2-q:not(.open) > .a2-q-row .a2-qchev svg { transform: none; }
+.a2-qname { font-weight: 700; flex: 1; }
+.a2-qcount { color: #777777; font-size: 13px; }
+.a2-qshow { display: none; font-size: 13px; color: #1E5290; }
+.a2-qblock.folded .a2-qshow { display: inline; }
+.a2-qbody { padding: 12px; border-top: 1px solid #eeeeee; }
+.a2-qblock.folded .a2-qbody { display: none; }
+.a2-qinstr b { display: block; font-size: 12px; color: #777777; margin-bottom: 4px; }
+.a2-qinstr-text { border: 1px solid #e5e5e5; border-radius: 4px; padding: 8px 10px; font-size: 13px; line-height: 1.5; background: #fcfcfc; outline: none; }
+.a2-qlist { margin-top: 14px; }
+.a2-q { border-top: 1px solid #eeeeee; }
+.a2-qflat > .a2-q:first-child, .a2-qgroup-body > .a2-q:first-child { border-top: 0; }
+.a2-q-row { display: flex; align-items: baseline; gap: 8px; padding: 7px 2px; cursor: pointer; }
+.a2-q-row:hover { background: #f7fafd; }
+.a2-q-row .a2-qchev { align-self: center; }
+.a2-q-idx { color: #98a7c0; font-size: 13px; }
+.a2-q-text { flex: 1; font-size: 13px; line-height: 1.45; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.a2-q.open .a2-q-text { white-space: normal; }
+.a2-q-type { font-size: 11px; color: #5a6f92; background: #eef3fa; border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
+.a2-q-acts { font-size: 12px; white-space: nowrap; }
+.a2-q-detail { padding: 2px 2px 12px 32px; font-size: 13px; }
+.a2-q-sub { margin-top: 10px; }
+.a2-q-sub b { font-size: 12px; color: #777777; }
+.a2-q-rat { margin-top: 2px; }
+.a2-q-rat-none { color: #999999; }
+.a2-q-sub b { display: block; font-size: 12px; color: #777777; margin-bottom: 2px; }
+.a2-q-ans { border-collapse: collapse; width: 100%; margin-top: 2px; table-layout: fixed; }
+.a2-q-ans td { border-top: 1px solid #eeeeee; padding: 5px 4px; vertical-align: middle; }
+.a2-q-ans tr:first-child td { border-top: 0; }
+.a2-ans-idx { color: #777777; width: 56px; }
+.a2-ans-inp { width: 100%; box-sizing: border-box; height: 28px; padding: 4px 8px; font-size: 13px; font-family: inherit; color: inherit; border: 1px solid #dfe5ee; border-radius: 4px; background: #ffffff; }
+.a2-ans-inp:hover { border-color: #c3cfe0; }
+.a2-ans-inp:focus { outline: none; border-color: #1E5290; box-shadow: 0 0 0 2px rgba(30,82,144,0.12); }
+.a2-ans-correct { width: 26px; text-align: left; }
+.a2-ans-flag { width: 130px; text-align: right; }
+.a2-ans-badge { display: none; font-size: 11px; font-weight: 600; color: #3c763d; background: #eaf4ea; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+.a2-ans.correct .a2-ans-badge { display: inline-block; }
+.a2-ans.correct .a2-ans-inp { font-weight: 600; }
+.a2-ans-hint { font-size: 12px; color: #98a7c0; margin-bottom: 2px; }
+.a2-q:not(.a2-q-choice) .a2-ans-hint-correct, .a2-q:not(.a2-q-choice) .a2-ans-flag { display: none; }
+.a2-ans-correct input { width: 14px; height: 14px; margin: 0; }
+.a2-q:not(.a2-q-choice) .a2-ans-correct { display: none; }
+.a2-q-ans-acts { text-align: right; white-space: nowrap; width: 34px; }
+.a2-ans-empty { color: #999999; font-size: 12px; padding: 6px 4px; border-top: 1px solid #eeeeee; }
+
+/* One grip to set the order, one cross to drop the row: the row itself is the field (Tima 11.09) */
+.a2-gripdots { fill: #c3cfe0; display: block; }
+.a2-ans-drag, .a2-q-drag { width: 20px; cursor: grab; user-select: none; }
+.a2-ans-drag:hover .a2-gripdots, .a2-q-drag:hover .a2-gripdots { fill: #5a6f92; }
+.a2-q-drag { display: inline-flex; align-items: center; align-self: center; flex: none; }
+.a2-x { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; color: #98a7c0; font-size: 17px; line-height: 1; text-decoration: none; }
+.a2-x:hover { background: #fbecec; color: #b03030; text-decoration: none; }
+.a2-ans.dragging, .a2-q.dragging { opacity: 0.45; }
+.a2-ans.drop-above td { box-shadow: inset 0 2px 0 #1E5290; }
+.a2-ans.drop-below td { box-shadow: inset 0 -2px 0 #1E5290; }
+.a2-q.drop-above { box-shadow: inset 0 2px 0 #1E5290; }
+.a2-q.drop-below { box-shadow: inset 0 -2px 0 #1E5290; }
+.a2-qgroup-row.drop-into, .a2-qgroup-body.drop-into { outline: 2px dashed #1E5290; outline-offset: -2px; border-radius: 6px; }
+.a2-q-addans { display: inline-block; margin-top: 6px; font-size: 12px; }
+.a2-qfoot { display: flex; align-items: center; gap: 16px; margin-top: 14px; font-size: 13px; }
+.a2-qfoot .a2-btn { padding: 5px 12px; }
+.a2-qempty { display: none; color: #999999; font-size: 13px; }
+
+/* Question groups (mode "Groups"): a group folds its questions, a question folds its details */
+.a2-qgroup { border: 1px solid #eef2f8; border-radius: 6px; margin-bottom: 8px; }
+.a2-qgroup-row { display: flex; align-items: center; gap: 12px; padding: 8px 10px; cursor: pointer; background: #fafbfd; border-radius: 6px; }
+.a2-qgroup-name { font-weight: 600; flex: 1; }
+.a2-qgroup-count { color: #777777; font-size: 12px; }
+.a2-qdep { font-size: 12px; color: #777777; }
+.a2-qdep input { width: 13px; height: 13px; }
+.a2-qgroup-body { padding: 0 10px 6px 10px; }
+.a2-qgroup.collapsed .a2-qgroup-body { display: none; }
+
+/* Answer editors that differ by question type: blocks, answer groups, picture, study card */
+.a2-ansblock, .a2-ansgroup { border: 1px solid #eef2f8; border-radius: 6px; padding: 8px 10px; margin-top: 8px; }
+.a2-ansblock-head { font-size: 12px; font-weight: 600; color: #777777; }
+.a2-ansgroup-head { display: flex; align-items: center; gap: 10px; }
+.a2-ansgroup-name { flex: 1; height: 28px; padding: 4px 8px; font-size: 13px; border: 1px solid #cccccc; border-radius: 4px; font-family: inherit; }
+.a2-ansgroup-del, .a2-ansgroup-add { font-size: 12px; }
+.a2-ansgroup-add { display: inline-block; margin-top: 10px; }
+.a2-ans-none { font-size: 13px; color: #999999; padding: 4px 0; }
+.a2-ans-kind { width: 110px; }
+.a2-ans-kind select { width: 100%; height: 28px; font-size: 12px; border: 1px solid #dfe5ee; border-radius: 4px; font-family: inherit; background: #ffffff; }
+
+/* Image Question: points are put, moved and resized on the picture, each one is an answer below it */
+.a2-imgq { display: flex; gap: 14px; align-items: flex-end; margin: 4px 0 10px 0; }
+.a2-imgq-stage { position: relative; width: 380px; height: 214px; flex: none; border: 1px solid #dddddd; border-radius: 4px; overflow: hidden; cursor: crosshair; }
+.a2-imgq-img { display: block; width: 100%; height: 100%; }
+.a2-imgq-pt { position: absolute; border: 1px dashed #1E5290; background: rgba(255,255,255,0.55); border-radius: 3px; cursor: move; }
+.a2-imgq-pt.dragging { background: rgba(30,82,144,0.15); }
+.a2-imgq-num { position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: #ffffff; border: 1px solid #1E5290; color: #183261; font-size: 10px; font-style: normal; font-weight: 600; line-height: 15px; text-align: center; }
+.a2-imgq-size { position: absolute; right: -4px; bottom: -4px; width: 9px; height: 9px; background: #ffffff; border: 1px solid #1E5290; border-radius: 2px; cursor: nwse-resize; }
+.a2-imgq-acts { font-size: 12px; }
+.a2-ans-key { width: 30%; }
+.a2-ans-mode { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #777777; margin: 4px 0 6px 0; }
+.a2-ans-mode select { width: 200px; height: 28px; font-size: 12px; border: 1px solid #dfe5ee; border-radius: 4px; font-family: inherit; background: #ffffff; }
+.a2-studypics { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 4px; }
+.a2-studypic { display: inline-flex; align-items: center; gap: 4px; }
+.a2-studypic-thumb { display: inline-block; width: 64px; height: 44px; border-radius: 4px; background: #dfe7f2; border: 1px solid #cfdae9; }
+.a2-studypics .a2-q-addans { margin-top: 0; }
+
+/* A group of questions carries its own "Add question"; the block below it saves the whole set */
+.a2-qgroup-foot { padding: 8px 0 2px 0; }
+.a2-qgroup-foot .a2-btn { padding: 4px 10px; font-size: 12px; }
+.a2-qfoot-note { font-size: 12px; color: #98a7c0; }
+
+/* Status and Comments sit under the title, delete is a button like the rest */
+.a2-headbtns { display: flex; align-items: center; gap: 22px; }
+.a2-headstatus { font-size: 14px; }
+.a2-aftercomments { margin: -4px 0 20px 0; }
+
+/* Question form: explanation of the type, placeholder hint, image rows */
+.a2-field-note { display: block; font-size: 12px; color: #98a7c0; font-weight: 400; margin-top: 4px; }
+.a2-hintbox { font-size: 12px; color: #5a6f92; background: #f4f7fb; border: 1px solid #e2e9f3; border-radius: 4px; padding: 8px 10px; line-height: 1.5; }
+.a2-hintbox code { display: block; margin-top: 4px; font-size: 12px; color: #183261; }
+.a2-filerow { display: flex; align-items: center; gap: 12px; }
+.a2-file-thumb { width: 54px; height: 36px; border-radius: 4px; background: #eef3fa; border: 1px solid #dddddd; }
+.a2-file-acts { font-size: 13px; }
+
+/* A new lesson has no questions yet */
+.a2-lesson-new .a2-qinstr, .a2-lesson-new .a2-qlist, .a2-lesson-new .a2-qcount, .a2-qblock.folded .a2-lesson-new .a2-qshow { display: none; }
+.a2-lesson-new .a2-qblock .a2-qshow { display: none; }
+.a2-lesson-new .a2-qempty { display: block; }

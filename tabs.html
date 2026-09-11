@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tabs &middot; A2 admin mockup</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+  <style>
+    :root { --ink: #183261; --link: #1E5290; --ground: #E6EDF6; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--ground); font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; color: var(--ink); }
+    .mk-bar { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 18px; padding: 0 20px; background: #183261; color: #ffffff; font-size: 13px; }
+    .mk-bar a { color: rgba(255,255,255,0.72); text-decoration: none; padding: 11px 0; }
+    .mk-bar a:hover { color: #ffffff; }
+    .mk-home { font-weight: 600; color: #ffffff !important; margin-right: 6px; }
+    .mk-bar a[aria-current] { color: #ffffff; box-shadow: inset 0 -2px 0 #ffffff; }
+    .mk-screen { max-width: 1440px; margin: 0 auto; background: #ffffff; }
+  </style>
+  <style>
+    body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+    a { color: #337ab7; text-decoration: none; } a:hover { color: #23527c; text-decoration: underline; }
+  </style>
+</head>
+<body>
+<nav class="mk-bar"><a class="mk-home" href="/">A2 admin mockup</a><a href="/tree">Course tree</a><a href="/edit-mode">Edit mode</a><a href="/hub">Hub page</a><a href="/dropdown">Dropdown</a><a href="/tabs" aria-current="page">Tabs</a></nav>
+<div class="mk-screen">
+<div style="width: 100%; max-width: 1440px; min-height: 900px; background: #ffffff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #333333;  box-sizing: border-box;">
+
+  <!-- Bootstrap 3 navbar-default; A2 is a plain link, active -->
+  <div style="background: #f8f8f8; border-bottom: 1px solid #e7e7e7; min-height: 50px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 15px;">
+      <div style="display: flex; align-items: center;">
+        <a href="#" style="font-size: 18px; color: #777777; padding: 15px 15px 15px 0; line-height: 20px; white-space: nowrap;">Your Best Grade Admin</a>
+        <div style="display: flex; align-items: stretch;">
+          <a href="#" style="color: #777777; padding: 15px 12px; line-height: 20px;">Tests</a>
+          <a href="#" style="color: #777777; padding: 15px 12px; line-height: 20px;">Statistics</a>
+          <a href="#" style="color: #777777; padding: 15px 12px; line-height: 20px;">Users</a>
+          <a href="#" style="color: #777777; padding: 15px 12px; line-height: 20px;">Catalog<span style="display: inline-block; margin-left: 5px; vertical-align: middle; border-top: 4px solid; border-right: 4px solid transparent; border-left: 4px solid transparent;"></span></a>
+          <a href="#" style="color: #777777; padding: 15px 12px; line-height: 20px;">Content<span style="display: inline-block; margin-left: 5px; vertical-align: middle; border-top: 4px solid; border-right: 4px solid transparent; border-left: 4px solid transparent;"></span></a>
+          <a href="#" style="color: #777777; padding: 15px 12px; line-height: 20px;">Logs<span style="display: inline-block; margin-left: 5px; vertical-align: middle; border-top: 4px solid; border-right: 4px solid transparent; border-left: 4px solid transparent;"></span></a>
+          <a href="#" style="color: #777777; padding: 15px 12px; line-height: 20px;">Suspicious<span style="display: inline-block; margin-left: 5px; vertical-align: middle; border-top: 4px solid; border-right: 4px solid transparent; border-left: 4px solid transparent;"></span></a>
+          <a href="#" style="color: #777777; padding: 15px 12px; line-height: 20px;">Problem Reports</a>
+          <a href="#" style="color: #777777; padding: 15px 12px; line-height: 20px;">Schools</a>
+          <a href="#" style="color: #555555; background: #e7e7e7; padding: 15px 12px; line-height: 20px;">A2</a>
+          <a href="#" style="color: #777777; padding: 15px 12px; line-height: 20px;">Dev Tools<span style="display: inline-block; margin-left: 5px; vertical-align: middle; border-top: 4px solid; border-right: 4px solid transparent; border-left: 4px solid transparent;"></span></a>
+        </div>
+      </div>
+      <a href="#" style="color: #777777; padding: 15px 0 15px 12px; line-height: 20px;">Logout</a>
+    </div>
+  </div>
+
+  <!-- A2 section tabs (only on A2 pages) -->
+  <div style="padding: 12px 15px 0 15px;">
+    <div style="display: flex; align-items: flex-end; border-bottom: 1px solid #dddddd;">
+      <a href="#" style="display: block; color: #555555; background: #ffffff; border: 1px solid #dddddd; border-bottom: 1px solid #ffffff; border-radius: 4px 4px 0 0; padding: 10px 15px; margin-bottom: -1px; line-height: 1.42857;">Lessons</a>
+      <a href="#" style="display: block; color: #337ab7; padding: 10px 15px; line-height: 1.42857;">Sections</a>
+      <a href="#" style="display: block; color: #337ab7; padding: 10px 15px; line-height: 1.42857;">Parts</a>
+      <a href="#" style="display: block; color: #337ab7; padding: 10px 15px; line-height: 1.42857;">Videos</a>
+      <a href="#" style="display: block; color: #337ab7; padding: 10px 15px; line-height: 1.42857;">Lesson Questions</a>
+      <a href="#" style="display: block; color: #337ab7; padding: 10px 15px; line-height: 1.42857;">Comments</a>
+    </div>
+  </div>
+
+  <!-- Page content under the tabs -->
+  <div style="padding: 0 15px;">
+    <h1 style="font-size: 36px; font-weight: 500; margin: 20px 0 10px 0; line-height: 1.1;">A2 Lessons</h1>
+    <div style="margin-bottom: 4px;">Section:
+      <span style="font-weight: 700;">All</span> |
+      <a href="#">Introduction</a> |
+      <a href="#">Biology</a> |
+      <a href="#">Chemistry</a> |
+      <a href="#">Grammar</a> |
+      <a href="#">…</a>
+      &nbsp;&nbsp;<a href="#">New Lesson</a>
+    </div>
+
+    <div style="width: 1000px;">
+      <table style="border-collapse: collapse; width: 100%; margin-top: 14px;">
+        <tbody>
+        <tr>
+          <th style="text-align: left; padding: 2px; border-bottom: 2px solid #dddddd;">Title</th>
+          <th style="text-align: left; padding: 2px; border-bottom: 2px solid #dddddd;">Section</th>
+          <th style="text-align: left; padding: 2px; border-bottom: 2px solid #dddddd;">Part</th>
+          <th style="text-align: left; padding: 2px; border-bottom: 2px solid #dddddd;">Video</th>
+          <th style="text-align: left; padding: 2px; border-bottom: 2px solid #dddddd;">Lesson Questions</th>
+          <th style="padding: 2px; border-bottom: 2px solid #dddddd;"></th>
+          <th style="padding: 2px; border-bottom: 2px solid #dddddd;"></th>
+        </tr>
+        <tr>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; height: 1.5em;">Atoms</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;">Chemistry</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #999999;">—</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #3c763d;">&#10003;</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #3c763d;">&#10003;</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;"><a href="#">Edit</a></td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;"><a href="#">Destroy</a></td>
+        </tr>
+        <tr>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; height: 1.5em;">Matter</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;">Chemistry</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #999999;">—</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #3c763d;">&#10003;</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #3c763d;">&#10003;</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;"><a href="#">Edit</a></td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;"><a href="#">Destroy</a></td>
+        </tr>
+        <tr>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; height: 1.5em;">Diagnostic Test</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;">Introduction</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #999999;">—</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #3c763d;">&#10003;</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #3c763d;">&#10003;</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;"><a href="#">Edit</a></td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;"><a href="#">Destroy</a></td>
+        </tr>
+        <tr>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; height: 1.5em;">Punctuation I</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;">Grammar</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;">Punctuation</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #3c763d;">&#10003;</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #3c763d;">&#10003;</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;"><a href="#">Edit</a></td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;"><a href="#">Destroy</a></td>
+        </tr>
+        <tr>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; height: 1.5em;">Passive Voice</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;">Grammar</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;">Verbs</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #3c763d;">&#10003;</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #3c763d;">&#10003;</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;"><a href="#">Edit</a></td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;"><a href="#">Destroy</a></td>
+        </tr>
+        <tr>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; height: 1.5em;">Pronouns I</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;">Grammar</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;">Pronouns and Prepositions</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #8a6d3b;">processing</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd; color: #999999;">—</td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;"><a href="#">Edit</a></td>
+          <td style="padding: 2px; border-top: 1px solid #dddddd;"><a href="#">Destroy</a></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+</div>
+</body>
+</html>
