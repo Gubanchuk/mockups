@@ -550,7 +550,8 @@
 
   function onPointDown(e) {
     var pt = e.target.closest('.a2-imgq-pt');
-    if (!pt) return;
+    // a preview only shows where the points are; they are moved in the form (11.09)
+    if (!pt || !pt.closest('.a2-q-editor')) return;
     e.preventDefault();
     var stage = pt.parentElement, r = stage.getBoundingClientRect();
     ptDrag = { pt: pt, r: r, size: !!e.target.closest('[data-pt-size]'), x: e.clientX, y: e.clientY, moved: false,

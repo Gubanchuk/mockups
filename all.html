@@ -221,7 +221,7 @@
 .a2-q-sub { margin-top: 10px; }
 .a2-q-sub b { font-size: 12px; color: #777777; }
 .a2-q-rat { margin-top: 2px; }
-.a2-q-rat-none { color: #999999; }
+.a2-q-rat-none { color: #777777; }
 .a2-q-sub b { display: block; font-size: 12px; color: #777777; margin-bottom: 2px; }
 .a2-q-ans { border-collapse: collapse; width: 100%; margin-top: 2px; table-layout: fixed; }
 .a2-q-ans td { border-top: 1px solid #eeeeee; padding: 5px 4px; vertical-align: middle; }
@@ -235,13 +235,13 @@ input.a2-ans-inp:focus { outline: none; border-color: #1E5290; box-shadow: 0 0 0
 .a2-ans-badge { display: none; font-size: 11px; font-weight: 600; color: #3c763d; background: #eaf4ea; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
 .a2-ans.correct .a2-ans-badge { display: inline-block; }
 .a2-ans.correct .a2-ans-inp { font-weight: 600; }
-.a2-ans-hint { font-size: 12px; color: #98a7c0; margin-bottom: 2px; }
+.a2-ans-hint { font-size: 12px; color: #5a6f92; margin-bottom: 4px; line-height: 1.5; }
 .a2-q-editor:not(.choice) .a2-ans-hint-correct, .a2-q-editor:not(.choice) .a2-ans-flag,
 .a2-preview-body:not(.choice) .a2-ans-flag { display: none; }
 .a2-ans-correct input { width: 14px; height: 14px; margin: 0; }
 .a2-q-editor:not(.choice) .a2-ans-correct { display: none; }
 .a2-q-ans-acts { text-align: right; white-space: nowrap; width: 34px; }
-.a2-ans-empty { color: #999999; font-size: 12px; padding: 6px 4px; border-top: 1px solid #eeeeee; }
+.a2-ans-empty { color: #777777; font-size: 12px; padding: 6px 4px; border-top: 1px solid #eeeeee; }
 
 /* One grip to set the order, one cross to drop the row: the row itself is the field (Tima 11.09) */
 .a2-gripdots { fill: #c3cfe0; display: block; }
@@ -278,7 +278,7 @@ input.a2-ans-inp:focus { outline: none; border-color: #1E5290; box-shadow: 0 0 0
 input.a2-ansgroup-name { flex: 1; height: 28px; padding: 4px 8px; font-size: 13px; border: 1px solid #cccccc; border-radius: 4px; font-family: inherit; }
 .a2-ansgroup-del, .a2-ansgroup-add { font-size: 12px; }
 .a2-ansgroup-add { display: inline-block; margin-top: 10px; }
-.a2-ans-none { font-size: 13px; color: #999999; padding: 4px 0; }
+.a2-ans-none { font-size: 13px; color: #777777; padding: 4px 0; }
 .a2-ans-kind { width: 110px; }
 .a2-ans-kind select { width: 100%; height: 28px; font-size: 12px; border: 1px solid #dfe5ee; border-radius: 4px; font-family: inherit; background: #ffffff; }
 
@@ -302,7 +302,7 @@ input.a2-ansgroup-name { flex: 1; height: 28px; padding: 4px 8px; font-size: 13p
 /* A group of questions carries its own "Add question"; the block below it saves the whole set */
 .a2-qgroup-foot { padding: 8px 0 2px 0; }
 .a2-qgroup-foot .a2-btn { padding: 4px 10px; font-size: 12px; }
-.a2-qfoot-note { font-size: 12px; color: #98a7c0; }
+.a2-qfoot-note { font-size: 12px; color: #5a6f92; }
 
 /* Status and Comments sit under the title, delete is a button like the rest */
 .a2-headbtns { display: flex; align-items: center; gap: 22px; }
@@ -310,8 +310,8 @@ input.a2-ansgroup-name { flex: 1; height: 28px; padding: 4px 8px; font-size: 13p
 .a2-aftercomments { margin: -4px 0 20px 0; }
 
 /* Question form: explanation of the type, placeholder hint, image rows */
-.a2-field-note { display: block; font-size: 12px; color: #98a7c0; font-weight: 400; margin-top: 4px; }
-.a2-hintbox { font-size: 12px; color: #5a6f92; background: #f4f7fb; border: 1px solid #e2e9f3; border-radius: 4px; padding: 8px 10px; line-height: 1.5; }
+.a2-field-note { display: block; font-size: 12px; color: #5a6f92; font-weight: 400; margin-top: 4px; line-height: 1.5; }
+.a2-hintbox { font-size: 12px; color: #40598a; background: #f4f7fb; border: 1px solid #e2e9f3; border-radius: 4px; padding: 8px 10px; line-height: 1.5; }
 .a2-hintbox code { display: block; margin-top: 4px; font-size: 12px; color: #183261; }
 .a2-filerow { display: flex; align-items: center; gap: 12px; }
 .a2-file-thumb { width: 54px; height: 36px; border-radius: 4px; background: #eef3fa; border: 1px solid #dddddd; }
@@ -368,14 +368,15 @@ input.a2-ansgroup-name { flex: 1; height: 28px; padding: 4px 8px; font-size: 13p
 .a2-preview-body .a2-ansgroup-head { margin-bottom: 2px; }
 .a2-preview-body .a2-imgq { margin-bottom: 0; }
 .a2-preview-body .a2-imgq-stage { cursor: default; }
+.a2-preview-body .a2-imgq-pt { cursor: default; }
 .a2-qed-library { display: none !important; }
 
 /* Footer of an open question and of a group: the same order everywhere, Delete on the left */
 .a2-foot { display: flex; align-items: center; gap: 8px; margin-top: 14px; padding-top: 10px; border-top: 1px solid #eeeeee; font-size: 12px; }
 .a2-qgroup-foot { display: flex; align-items: center; gap: 8px; padding: 10px 0 4px 0; border-top: 1px solid #eef2f8; margin-top: 6px; }
-.a2-btn-soft { padding: 4px 10px; font-size: 12px; border-color: #dfe5ee; color: #5a6f92; background: #ffffff; }
-.a2tree a.a2-btn-soft:hover { background: #f3f7fc; color: #183261; border-color: #c3cfe0; }
-.a2-foot [data-q-del], .a2-qgroup-foot [data-qgroup-del] { color: #a5433f; border-color: #ecd3d2; }
+.a2-btn-soft { padding: 5px 12px; font-size: 12px; font-weight: 500; border-color: #b8c6db; color: #183261; background: #ffffff; }
+.a2tree a.a2-btn-soft:hover { background: #eef3fa; color: #183261; border-color: #1E5290; }
+.a2-foot [data-q-del], .a2-qgroup-foot [data-qgroup-del] { color: #a32b26; border-color: #dda9a6; }
 .a2tree a.a2-foot-danger:hover, .a2tree .a2-foot a[data-q-del]:hover,
 .a2tree .a2-qgroup-foot a[data-qgroup-del]:hover { background: #fbecec; color: #8f2f2c; border-color: #e0b7b5; }
 
@@ -400,7 +401,7 @@ input.a2-qgroup-rename:focus { outline: none; box-shadow: 0 0 0 2px rgba(30,82,1
 .a2-qpen:hover { background: #eef3fa; color: #1E5290; }
 
 /* A changed order of questions waits for Save, as the order of the tree does */
-.a2-changebar { display: flex; align-items: center; gap: 8px; padding: 8px 10px; font-size: 12px; color: #5a6f92; background: #f4f7fb; border: 1px solid #dbe4f0; border-radius: 6px; }
+.a2-changebar { display: flex; align-items: center; gap: 8px; padding: 9px 12px; font-size: 13px; color: #183261; background: #eff4fb; border: 1px solid #ccdaee; border-radius: 6px; }
 .a2-changebar .a2-btn { padding: 4px 10px; font-size: 12px; background: #ffffff; }
 .a2-qorder { margin: 12px 0 2px 0; }
 .a2-qans-foot { margin-top: 8px; }
@@ -1794,7 +1795,8 @@ input.a2-qgroup-rename:focus { outline: none; box-shadow: 0 0 0 2px rgba(30,82,1
 
   function onPointDown(e) {
     var pt = e.target.closest('.a2-imgq-pt');
-    if (!pt) return;
+    // a preview only shows where the points are; they are moved in the form (11.09)
+    if (!pt || !pt.closest('.a2-q-editor')) return;
     e.preventDefault();
     var stage = pt.parentElement, r = stage.getBoundingClientRect();
     ptDrag = { pt: pt, r: r, size: !!e.target.closest('[data-pt-size]'), x: e.clientX, y: e.clientY, moved: false,
