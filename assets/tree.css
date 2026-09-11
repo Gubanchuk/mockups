@@ -106,9 +106,9 @@
 .a2-switch-label { font-size: 12px; }
 
 /* Modal for Edit / Add / Delete */
-.a2-modal { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4); display: flex; align-items: flex-start; justify-content: center; padding-top: 120px; }
+.a2-modal { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4); display: flex; align-items: flex-start; justify-content: center; padding: 60px 16px; overflow-y: auto; }
 .a2-modal[hidden], .a2-field[hidden], .a2-modal-text[hidden] { display: none; }
-.a2-modal-box { width: 420px; background: #ffffff; border: 1px solid rgba(0,0,0,0.2); border-radius: 6px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); padding: 18px 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; }
+.a2-modal-box { width: 420px; max-width: 100%; background: #ffffff; border: 1px solid rgba(0,0,0,0.2); border-radius: 6px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); padding: 18px 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; }
 .a2-modal-title { font-size: 18px; margin-bottom: 14px; }
 .a2-field { display: block; margin-bottom: 12px; font-size: 14px; }
 .a2-field > span { display: block; font-weight: 700; margin-bottom: 5px; }
@@ -216,9 +216,10 @@
 .a2-ans.correct .a2-ans-badge { display: inline-block; }
 .a2-ans.correct .a2-ans-inp { font-weight: 600; }
 .a2-ans-hint { font-size: 12px; color: #98a7c0; margin-bottom: 2px; }
-.a2-q:not(.a2-q-choice) .a2-ans-hint-correct, .a2-q:not(.a2-q-choice) .a2-ans-flag { display: none; }
+.a2-q-editor:not(.choice) .a2-ans-hint-correct, .a2-q-editor:not(.choice) .a2-ans-flag,
+.a2-preview-body:not(.choice) .a2-ans-flag { display: none; }
 .a2-ans-correct input { width: 14px; height: 14px; margin: 0; }
-.a2-q:not(.a2-q-choice) .a2-ans-correct { display: none; }
+.a2-q-editor:not(.choice) .a2-ans-correct { display: none; }
 .a2-q-ans-acts { text-align: right; white-space: nowrap; width: 34px; }
 .a2-ans-empty { color: #999999; font-size: 12px; padding: 6px 4px; border-top: 1px solid #eeeeee; }
 
@@ -337,3 +338,36 @@
 .a2-lists .a2-field-where { display: block; }
 .a2-whererow { display: flex; gap: 10px; }
 .a2-qicon-off { width: 22px; }
+
+/* The open question shows what it holds; everything is changed in its form (call 11.09) */
+.a2-q-preview { margin-top: 2px; }
+.a2-pv-text, .a2-pv-group { display: inline-block; }
+.a2-pv-group { font-weight: 600; }
+.a2-preview-body .a2-q-ans td { padding: 4px 4px; }
+.a2-preview-body .a2-ansgroup, .a2-preview-body .a2-ansblock { padding: 6px 10px; }
+.a2-preview-body .a2-ansgroup-head { margin-bottom: 2px; }
+.a2-preview-body .a2-imgq { margin-bottom: 0; }
+.a2-preview-body .a2-imgq-stage { cursor: default; }
+.a2-qed-library { display: none !important; }
+
+/* Footer of an open question and of a group: the same order everywhere, Delete on the left */
+.a2-foot { display: flex; align-items: center; gap: 8px; margin-top: 14px; padding-top: 10px; border-top: 1px solid #eeeeee; font-size: 12px; }
+.a2-qgroup-foot { display: flex; align-items: center; gap: 8px; padding: 10px 0 4px 0; border-top: 1px solid #eef2f8; margin-top: 6px; }
+.a2-btn-soft { padding: 4px 10px; font-size: 12px; border-color: #dfe5ee; color: #5a6f92; background: #ffffff; }
+.a2tree a.a2-btn-soft:hover { background: #f3f7fc; color: #183261; border-color: #c3cfe0; }
+.a2-foot [data-q-del], .a2-qgroup-foot [data-qgroup-del] { color: #a5433f; border-color: #ecd3d2; }
+.a2tree a.a2-foot-danger:hover, .a2tree .a2-foot a[data-q-del]:hover,
+.a2tree .a2-qgroup-foot a[data-qgroup-del]:hover { background: #fbecec; color: #8f2f2c; border-color: #e0b7b5; }
+
+/* The form of a question is wide: the answers of every type have to fit into it */
+.a2-modal-box.a2-modal-wide { width: 760px; }
+.a2-qans-slot { border: 1px solid #e5e5e5; border-radius: 4px; padding: 10px 12px; background: #fcfcfc; }
+.a2-qans-slot .a2-q-editor { display: block; }
+
+/* A point of a picture reads as the student sees it; the box for moving and resizing appears on the one picked */
+.a2-imgq-pt { border: 0; background: none; }
+.a2-imgq-pt .a2-imgq-num { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; border-radius: 50%; background: #ffffff; border: 1.5px solid #1E5290; color: #183261; font-size: 11px; font-style: normal; font-weight: 600; line-height: 17px; text-align: center; }
+.a2-imgq-pt .a2-imgq-size { display: none; }
+.a2-q-editor .a2-imgq-pt:hover, .a2-imgq-pt.picked { border: 1px dashed #1E5290; background: rgba(255,255,255,0.5); border-radius: 3px; }
+.a2-imgq-pt.picked .a2-imgq-num { left: 3px; top: 3px; transform: none; }
+.a2-imgq-pt.picked .a2-imgq-size { display: block; }

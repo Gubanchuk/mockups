@@ -265,7 +265,12 @@
   // Both modes start folded (10.09): a lesson opens as a short page, questions are opened when they are the point.
   function resetQuestions(v) {
     var block = qs(v, '.a2-qblock');
-    qsa(block, '.a2-q').forEach(function (q) { renumberAnswers(q); syncRationale(q); });
+    qsa(block, '.a2-q').forEach(function (q) {
+      var ed = qs(q, '.a2-q-editor');
+      if (ed) { ed.setAttribute('data-qtype', q.getAttribute('data-qtype')); renumberAnswers(ed); }
+      renderPreview(q);
+      syncRationale(q);
+    });
     block.classList.add('folded');
     qsa(block, '.a2-q-detail').forEach(function (d) { d.hidden = true; });
     qsa(block, '.a2-q').forEach(function (q) { q.classList.remove('open'); });
@@ -369,8 +374,59 @@
     if (none) none.hidden = !!text;
   }
 
+  // Live values live on the DOM properties, not the attributes, so a clone would lose them.
+  function freezeFields(root) {
+    qsa(root, 'input, select').forEach(function (f) {
+      if (f.tagName === 'SELECT') {
+        qsa(f, 'option').forEach(function (o) {
+          if (o.selected) o.setAttribute('selected', 'selected'); else o.removeAttribute('selected');
+        });
+      } else if (f.type === 'checkbox' || f.type === 'radio') {
+        if (f.checked) f.setAttribute('checked', 'checked'); else f.removeAttribute('checked');
+      } else {
+        f.setAttribute('value', f.value);
+      }
+    });
+  }
+
+  // The preview is built from the editor of the question, so what is shown and what is edited
+  // can never say different things.
+  var PV_DROP = '.a2-ans-drag, .a2-q-ans-acts, .a2-ans-correct, .a2-ans-hint, .a2-q-addans, ' +
+                '.a2-ansgroup-del, .a2-ansgroup-add, .a2-imgq-acts, .a2-imgq-size, .a2-ans-mode, .a2-studypics';
+
+  function renderPreview(q) {
+    var ed = qs(q, '.a2-q-editor'), pv = qs(q, '.a2-q-preview');
+    if (!ed || !pv) return;
+    freezeFields(ed);
+    var out = ed.cloneNode(true);
+    out.hidden = false;
+    out.className = 'a2-preview-body' + (ed.classList.contains('choice') ? ' choice' : '');
+    qsa(out, PV_DROP).forEach(function (n) { n.remove(); });
+    qsa(out, 'input[type="text"], select').forEach(function (f) {
+      var span = document.createElement('span');
+      span.className = f.classList.contains('a2-ansgroup-name') ? 'a2-pv-group' : 'a2-pv-text';
+      span.textContent = f.tagName === 'SELECT'
+        ? (f.options[f.selectedIndex] ? f.options[f.selectedIndex].text : '')
+        : f.value;
+      f.replaceWith(span);
+    });
+    pv.replaceChildren(out);
+  }
+
+  // Every type of question has a blank editor kept in the page, so changing the type in the form
+  // swaps in the right one instead of pretending every type is a list of answers.
+  function protoEditor(tree, qtype) {
+    var proto = qs(tree, '.a2-qed-library [data-qtype="' + qtype + '"]');
+    if (!proto) return null;
+    var node = proto.cloneNode(true);
+    node.className = 'a2-q-editor';
+    node.hidden = false;
+    return node;
+  }
+
   function renumberAnswers(q) {
     var qtype = q.getAttribute('data-qtype'), choice = isChoice(q);
+    q.classList.toggle('choice', choice);
     q.classList.toggle('a2-q-choice', choice);
     // every table numbers its own rows: blocks and answer groups each start from one
     qsa(q, '.a2-q-ans tbody').forEach(function (body, ti) {
@@ -392,7 +448,7 @@
 
   // A point of an Image Question and its answer are one thing: the row number is the number on the picture.
   function pointOf(tr) {
-    var q = tr.closest('.a2-q'), i = qsa(q, '.a2-ans').indexOf(tr);
+    var q = tr.closest('.a2-q-editor'), i = q ? qsa(q, '.a2-ans').indexOf(tr) : -1;
     return qsa(q, '.a2-imgq-pt')[i] || null;
   }
 
@@ -415,7 +471,8 @@
   }
 
   function makeAnswerRow(q, tbody) {
-    var proto = qs(tbody, '.a2-ans') || qs(q, '.a2-ans') || qs(q.closest('.a2-view-lesson'), '.a2-ans');
+    // the last resort must come from an editor: a row of a preview carries text, not fields
+    var proto = qs(tbody, '.a2-ans') || qs(q, '.a2-ans') || qs(q.closest('.a2tree'), '.a2-q-editor .a2-ans');
     var row = proto.cloneNode(true);
     qsa(row, 'input[type="text"]').forEach(function (i) { i.value = ''; });
     var c = qs(row, '.a2-ans-correct input');
@@ -463,7 +520,7 @@
     ptDrag = null;
   }
 
-  function makeQuestion(v, key, text, type, rat) {
+  function makeQuestion(v, key, text, type, rat, editor) {
     var node = qs(v, '.a2-q').cloneNode(true);
     node.setAttribute('data-qkey', key);
     node.classList.remove('open');
@@ -471,9 +528,13 @@
     qs(node, '.a2-q-type').textContent = type;
     qs(node, '.a2-q-rat').textContent = rat || '';
     node.setAttribute('data-qtype', type);
-    qs(node, '.a2-q-ans tbody').innerHTML = ''; // a new question starts without answers
+    var ed = editor || protoEditor(v.closest('.a2tree'), type);
+    if (ed) qs(node, '.a2-q-editor').replaceWith(ed);
+    qs(node, '.a2-q-editor').hidden = true;
+    qs(node, '.a2-q-editor').setAttribute('data-qtype', type);
     qs(node, '.a2-q-detail').hidden = true;
-    renumberAnswers(node);
+    renumberAnswers(qs(node, '.a2-q-editor'));
+    renderPreview(node);
     syncRationale(node);
     return node;
   }
@@ -482,7 +543,6 @@
   // types that put answers inside the text, the picture to the types built around one.
   var DRAW_TYPES = ['Text'];
   var BLOCK_TYPES = ['Underline Incorrect', 'Drag And Drop'];
-  var IMAGE_TYPES = ['Image Question', 'Study Question'];
 
   function syncQuestionForm(m) {
     var type = qs(m, '.a2-field-qtype select').value;
@@ -491,15 +551,31 @@
     qs(m, '[data-f="qtype-note"]').textContent = note ? note.textContent : '';
     qs(m, '.a2-field-qdraw').hidden = DRAW_TYPES.indexOf(type) < 0;
     qs(m, '.a2-field-qblockhint').hidden = BLOCK_TYPES.indexOf(type) < 0;
-    qs(m, '.a2-field-qimage').hidden = IMAGE_TYPES.indexOf(type) < 0;
     qs(m, '.a2-field-qratimg').hidden = false;
   }
 
   // A question is moved to another group by dragging it there, so the form has no "Group" select (Tima 11.09).
   function openQuestionForm(tree, q) {
+    var ed = qs(q, '.a2-q-editor');
+    freezeFields(ed);
+    var copy = ed.cloneNode(true);
+    copy.hidden = false;
     openModal(tree, { kind: 'question', title: 'Edit question', okText: 'Save', qnode: q,
       qtext: qs(q, '.a2-q-text').textContent, qtype: qs(q, '.a2-q-type').textContent,
-      qrat: qs(q, '.a2-q-rat').textContent });
+      qrat: qs(q, '.a2-q-rat').textContent, editor: copy });
+  }
+
+  // The answers of the form: a copy of the editor, or a blank one of the chosen type
+  function fillFormAnswers(tree, m, editor, qtype) {
+    var slot = qs(m, '.a2-qans-slot'), ed = editor || protoEditor(tree, qtype);
+    slot.replaceChildren();
+    if (!ed) { qs(m, '.a2-field-qans').hidden = true; return; }
+    ed.className = 'a2-q-editor';
+    ed.hidden = false;
+    ed.setAttribute('data-qtype', qtype);
+    slot.appendChild(ed);
+    renumberAnswers(ed);
+    qs(m, '.a2-field-qans').hidden = false;
   }
 
   // Modal: part form, question form and delete confirmations ---------------------------------
@@ -522,9 +598,12 @@
       qs(m, '.a2-field-qtype select').value = cfg.qtype || 'Fill In Blank';
       qs(m, '.a2-field-qtext .a2-editor-body').textContent = cfg.qtext || '';
       qs(m, '.a2-field-qrat .a2-editor-body').textContent = cfg.qrat || '';
+      fillFormAnswers(tree, m, cfg.editor, cfg.qtype || 'Fill In Blank');
       syncQuestionForm(m);
     }
-    qsa(m, '.a2-field-qblockhint, .a2-field-qdraw, .a2-field-qimage, .a2-field-qratimg')
+    qs(m, '.a2-modal-box').classList.toggle('a2-modal-wide', isQ);
+    if (!isQ) qs(m, '.a2-field-qans').hidden = true;
+    qsa(m, '.a2-field-qblockhint, .a2-field-qdraw, .a2-field-qratimg')
       .forEach(function (f) { if (!isQ) f.hidden = true; });
     var text = qs(m, '.a2-modal-text');
     text.hidden = !cfg.text; text.textContent = cfg.text || '';
@@ -580,6 +659,8 @@
       var qtype = qs(m, '.a2-field-qtype select').value;
       var qrat = qs(m, '.a2-field-qrat .a2-editor-body').textContent.trim();
       if (!qtext) { qs(m, '.a2-field-qtext .a2-editor-body').focus(); return; }
+      var edited = qs(m, '.a2-qans-slot > .a2-q-editor');
+      if (edited) { freezeFields(edited); edited = edited.cloneNode(true); edited.hidden = true; }
       if (st.qnode) {
         var n = st.qnode;
         qs(n, '.a2-q-text').textContent = qtext;
@@ -587,10 +668,13 @@
         qs(n, '.a2-q-rat').textContent = qrat;
         syncRationale(n);
         n.setAttribute('data-qtype', qtype); // the answer table follows the type: letters vs blanks, correct column
-        renumberAnswers(n);
+        if (edited) qs(n, '.a2-q-editor').replaceWith(edited);
+        qs(n, '.a2-q-editor').setAttribute('data-qtype', qtype);
+        renumberAnswers(qs(n, '.a2-q-editor'));
+        renderPreview(n);
       } else {
         var body = st.groupBody || qsa(lvw, '.a2-qgroup-body').slice(-1)[0];
-        var node = makeQuestion(lvw, 'q' + Date.now(), qtext, qtype, qrat);
+        var node = makeQuestion(lvw, 'q' + Date.now(), qtext, qtype, qrat, edited);
         body.insertBefore(node, qs(body, '.a2-qgroup-foot'));
       }
       renumberQuestions(lvw);
@@ -655,6 +739,76 @@
     closeModal();
   }
 
+  // Everything inside the answers editor, which now lives in the form: add and remove a row,
+  // answer groups, points of a picture, the two modes of a study card.
+  function answerClick(tree, e) {
+    var a;
+    if ((a = e.target.closest('[data-ans-remove]'))) {
+      e.preventDefault();
+      var qr = a.closest('.a2-q-editor'), trr = a.closest('.a2-ans'), ptr = pointOf(trr);
+      if (ptr) ptr.remove(); // an answer of an Image Question takes its point off the picture
+      trr.remove();
+      renumberAnswers(qr);
+      return true;
+    }
+    if ((a = e.target.closest('[data-ans-add]'))) {
+      e.preventDefault();
+      var qa = a.closest('.a2-q-editor');
+      var boxa = a.closest('.a2-ansblock, .a2-ansgroup') || qa; // a block and an answer group own their table
+      var tba = qs(boxa, '.a2-q-ans tbody');
+      var rowa = makeAnswerRow(qa, tba);
+      tba.appendChild(rowa);
+      renumberAnswers(qa);
+      focusRow(rowa);
+      return true;
+    }
+    // Answer groups of the matching types: a named column of answers is added and dropped here
+    if ((a = e.target.closest('.a2-ansgroup-del'))) {
+      e.preventDefault();
+      var qg = a.closest('.a2-q-editor');
+      a.closest('.a2-ansgroup').remove();
+      renumberAnswers(qg);
+      return true;
+    }
+    if ((a = e.target.closest('.a2-ansgroup-add'))) {
+      e.preventDefault();
+      var qag = a.closest('.a2-q-editor'), proto = qs(qag, '.a2-ansgroup').cloneNode(true);
+      qs(proto, '.a2-ansgroup-name').value = '';
+      qsa(proto, '.a2-ans').slice(1).forEach(function (r) { r.remove(); });
+      qsa(proto, 'input[type="text"]').forEach(function (i) { i.value = ''; });
+      a.parentElement.insertBefore(proto, a);
+      renumberAnswers(qag);
+      qs(proto, '.a2-ansgroup-name').focus();
+      return true;
+    }
+    // Image Question: a click on the picture puts a new point and the answer that belongs to it
+    if ((a = e.target.closest('.a2-imgq-pt'))) { // picking a point shows the box that moves and resizes it
+      e.preventDefault();
+      var was = a.classList.contains('picked');
+      qsa(a.parentElement, '.a2-imgq-pt').forEach(function (p) { p.classList.remove('picked'); });
+      a.classList.toggle('picked', !was);
+      return true;
+    }
+    if ((a = e.target.closest('[data-imgq]'))) {
+      e.preventDefault();
+      if (skipStageClick) { skipStageClick = false; return true; }
+      qsa(a, '.a2-imgq-pt').forEach(function (p) { p.classList.remove('picked'); });
+      var qi = a.closest('.a2-q-editor'), ri = a.getBoundingClientRect();
+      addPoint(qi, (e.clientX - ri.left) / ri.width, (e.clientY - ri.top) / ri.height);
+      var tbi = qs(qi, '.a2-q-ans tbody'), rowi = makeAnswerRow(qi, tbi);
+      tbi.appendChild(rowi);
+      renumberAnswers(qi);
+      focusRow(rowi);
+      return true;
+    }
+    if (e.target.closest('.a2-ans-correct')) { // ticking the correct answer stays inside the row
+      var qm = e.target.closest('.a2-q-editor');
+      setTimeout(function () { renumberAnswers(qm); }, 0);
+      return true;
+    }
+    return false;
+  }
+
   // Clicks ------------------------------------------------------------------------------------
   function onClick(e) {
     var tree = e.currentTarget, a, node, v;
@@ -667,7 +821,7 @@
       else closeModal();
       return;
     }
-    if (e.target.closest('.a2-modal')) return;
+    if (e.target.closest('.a2-modal')) { answerClick(tree, e); return; } // answers are edited in the form now
     // Variants 2-4: rows of the lists point at a node of the hidden tree (the navbar is handled below)
     if ((a = e.target.closest('[data-open-lesson]'))) {
       e.preventDefault();
@@ -744,7 +898,7 @@
     if ((a = e.target.closest('[data-qgroup-edit]'))) {
       e.preventDefault();
       var gn = a.closest('.a2-qgroup');
-      openModal(tree, { kind: 'qgroup', title: 'Edit group', okText: 'Save', gnode: gn,
+      openModal(tree, { kind: 'qgroup', title: 'Rename group', okText: 'Save', gnode: gn,
         name: qs(gn, '.a2-qgroup-name').textContent });
       return;
     }
@@ -772,61 +926,6 @@
       if (e.target.closest('.a2-q-acts, .a2-qdep')) { if (e.target.closest('a')) e.preventDefault(); return; }
       e.preventDefault();
       a.closest('.a2-qgroup').classList.toggle('collapsed');
-      return;
-    }
-    if ((a = e.target.closest('[data-ans-remove]'))) {
-      e.preventDefault();
-      var qr = a.closest('.a2-q'), trr = a.closest('.a2-ans'), ptr = pointOf(trr);
-      if (ptr) ptr.remove(); // an answer of an Image Question takes its point off the picture
-      trr.remove();
-      renumberAnswers(qr);
-      return;
-    }
-    if ((a = e.target.closest('[data-ans-add]'))) {
-      e.preventDefault();
-      var qa = a.closest('.a2-q');
-      var boxa = a.closest('.a2-ansblock, .a2-ansgroup') || qa; // a block and an answer group own their table
-      var tba = qs(boxa, '.a2-q-ans tbody');
-      var rowa = makeAnswerRow(qa, tba);
-      tba.appendChild(rowa);
-      renumberAnswers(qa);
-      focusRow(rowa);
-      return;
-    }
-    // Answer groups of the matching types: a named column of answers is added and dropped here
-    if ((a = e.target.closest('.a2-ansgroup-del'))) {
-      e.preventDefault();
-      var qg = a.closest('.a2-q');
-      a.closest('.a2-ansgroup').remove();
-      renumberAnswers(qg);
-      return;
-    }
-    if ((a = e.target.closest('.a2-ansgroup-add'))) {
-      e.preventDefault();
-      var qag = a.closest('.a2-q'), proto = qs(qag, '.a2-ansgroup').cloneNode(true);
-      qs(proto, '.a2-ansgroup-name').value = '';
-      qsa(proto, '.a2-ans').slice(1).forEach(function (r) { r.remove(); });
-      qsa(proto, 'input[type="text"]').forEach(function (i) { i.value = ''; });
-      a.parentElement.insertBefore(proto, a);
-      renumberAnswers(qag);
-      qs(proto, '.a2-ansgroup-name').focus();
-      return;
-    }
-    // Image Question: a click on the picture puts a new point and the answer that belongs to it
-    if ((a = e.target.closest('[data-imgq]'))) {
-      e.preventDefault();
-      if (e.target.closest('.a2-imgq-pt') || skipStageClick) { skipStageClick = false; return; }
-      var qi = a.closest('.a2-q'), ri = a.getBoundingClientRect();
-      addPoint(qi, (e.clientX - ri.left) / ri.width, (e.clientY - ri.top) / ri.height);
-      var tbi = qs(qi, '.a2-q-ans tbody'), rowi = makeAnswerRow(qi, tbi);
-      tbi.appendChild(rowi);
-      renumberAnswers(qi);
-      focusRow(rowi);
-      return;
-    }
-    if (e.target.closest('.a2-ans-correct')) { // ticking the correct answer stays inside the row
-      var qm = e.target.closest('.a2-q');
-      setTimeout(function () { renumberAnswers(qm); }, 0);
       return;
     }
     if ((a = e.target.closest('[data-q-add]'))) {
@@ -1010,7 +1109,7 @@
       if (oa && oa !== dragged && oa.parentElement === dragged.parentElement) {
         e.preventDefault();
         oa.parentElement.insertBefore(dragged, oa.classList.contains('drop-above') ? oa : oa.nextSibling);
-        renumberAnswers(dragged.closest('.a2-q'));
+        renumberAnswers(dragged.closest('.a2-q-editor'));
       }
       finishDrag();
       return;
@@ -1057,10 +1156,15 @@
       tree.addEventListener('mousedown', arm);
       tree.addEventListener('change', function (e) {
         if (e.target.matches('.a2-hide input')) tree.classList.toggle('hide-unpub', e.target.checked);
-        else if (e.target.matches('.a2-field-qtype select')) syncQuestionForm(qs(tree, '.a2-modal'));
+        else if (e.target.matches('.a2-field-qtype select')) {
+          var mm = qs(tree, '.a2-modal');
+          fillFormAnswers(tree, mm, null, e.target.value); // another type means another kind of answers
+          syncQuestionForm(mm);
+        }
         else if (e.target.matches('[data-f="where-section"]')) fillWhereParts(tree, qs(tree, '.a2-view-lesson'), null);
         else if (e.target.matches('[data-study-mode]')) { // a study card holds pairs of words or a set of pictures
-          var pics = e.target.value === 'Pictures', qst = e.target.closest('.a2-q');
+          var pics = e.target.value === 'Pictures', qst = e.target.closest('.a2-q-editor');
+          if (!qst) return;
           qs(qst, '[data-study-list]').hidden = pics;
           qs(qst, '[data-study-add]').hidden = pics;
           qs(qst, '.a2-studypics').hidden = !pics;
