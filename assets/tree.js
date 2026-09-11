@@ -995,11 +995,11 @@
     // Pages
     if (e.target.closest('[data-back]')) {
       e.preventDefault();
-      // Cancel drops the fields of the lesson only; questions and answers are saved by their own block
+      // Cancel drops the fields of the lesson only; everything in the questions block keeps its own Save
       if (pageState && pageState.type === 'lesson' && lessonChanged(tree)) {
         openModal(tree, { kind: 'discard', title: 'Discard changes?', okText: 'Discard',
           text: 'The title, body, video or status of this lesson were changed.',
-          note: 'Questions and answers are not affected: they are saved with their own block.' });
+          note: 'Questions and answers are not affected: each of them is kept by its own Save.' });
         return;
       }
       backToTree(tree);
@@ -1079,14 +1079,6 @@
       e.preventDefault();
       openModal(tree, { kind: 'question', title: 'New question', okText: 'Add',
         groupBody: a.closest('.a2-qgroup-body') });
-      return;
-    }
-    if (e.target.closest('[data-q-save]')) { // the questions block saves on its own: it is another entity in the base
-      e.preventDefault();
-      var qsave = qs(tree, '[data-q-save]');
-      var was = qsave.textContent;
-      qsave.textContent = 'Saved';
-      setTimeout(function () { qsave.textContent = was; }, 1200);
       return;
     }
     if (e.target.closest('[data-qgroup-add]')) {
