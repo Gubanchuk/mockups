@@ -289,6 +289,7 @@
     qsa(block, '.a2-q-detail').forEach(function (d) { d.hidden = true; });
     qsa(block, '.a2-q').forEach(function (q) { q.classList.remove('open'); });
     qsa(block, '.a2-qgroup').forEach(function (g) { g.classList.add('collapsed'); });
+    setQReorder(v, false);
     keepInstr(v);
   }
 
@@ -360,23 +361,46 @@
   // "почему нету кнопки сейв или отмена, они должны появиться когда я случайно переместил").
   function orderBar(v) { return qs(v, '.a2-qorder'); }
 
-  function snapshotOrder(v) {
-    if (v.__qorder) return;
-    v.__qorder = qsa(v, '.a2-qgroup-body').map(function (b) {
-      return { body: b, kids: qsa(b, ':scope > .a2-q') };
+  function qReorderOn(v) { return qs(v, '.a2-qblock').classList.contains('reorder'); }
+
+  // Turning it on remembers the order of the groups and of the questions inside each of them,
+  // so Cancel has something to go back to.
+  function applyQDraggable(v) {
+    var on = qs(v, '.a2-qblock').classList.contains('reorder');
+    qsa(v, '.a2-qgroup, .a2-q').forEach(function (n) {
+      if (on) n.setAttribute('draggable', 'true'); else n.removeAttribute('draggable');
     });
-    orderBar(v).hidden = false;
+  }
+
+  function setQReorder(v, on) {
+    var block = qs(v, '.a2-qblock');
+    block.classList.toggle('reorder', on);
+    applyQDraggable(v);
+    var sw = qs(block, '.a2-qreorder .a2-switch');
+    if (sw) sw.classList.toggle('on', on);
+    if (on) {
+      var list = qs(v, '.a2-qgrouped');
+      v.__qorder = {
+        list: list,
+        groups: qsa(list, ':scope > .a2-qgroup'),
+        bodies: qsa(v, '.a2-qgroup-body').map(function (b) {
+          return { body: b, kids: qsa(b, ':scope > .a2-q') };
+        })
+      };
+    } else {
+      v.__qorder = null;
+    }
   }
 
   function settleOrder(v, keep) {
-    if (!v.__qorder) return;
-    if (!keep) {
-      v.__qorder.forEach(function (e) {
+    var snap = v.__qorder;
+    if (snap && !keep) {
+      snap.groups.forEach(function (grp) { snap.list.appendChild(grp); });
+      snap.bodies.forEach(function (e) {
         e.kids.forEach(function (k) { e.body.insertBefore(k, qs(e.body, '.a2-qgroup-foot')); });
       });
     }
-    v.__qorder = null;
-    orderBar(v).hidden = true;
+    setQReorder(v, false);
     renumberQuestions(v);
   }
 
@@ -412,6 +436,7 @@
       if (dep) dep.hidden = i === 0;
     });
     qs(v, '.a2-qcount').textContent = qsa(v, '.a2-q').length + ' questions';
+    applyQDraggable(v); // a question added while the switch is on has to be draggable too
   }
 
   // Answers behave as they do in the A2 admin: the text cell is edited in place, Remove drops the row,
@@ -1021,6 +1046,12 @@
       return;
     }
     // Questions block: head folds the block, a group folds its questions, a row folds the details of one question.
+    if (e.target.closest('[data-qreorder]')) {
+      e.preventDefault();
+      var lvr = qs(tree, '.a2-view-lesson');
+      if (qReorderOn(lvr)) settleOrder(lvr, false); else setQReorder(lvr, true);
+      return;
+    }
     if (e.target.closest('[data-qhead]')) {
       e.preventDefault();
       qs(tree, '.a2-qblock').classList.toggle('folded');
@@ -1183,8 +1214,7 @@
     if (e.target.closest('.a2-rename-acts')) { e.preventDefault(); return; } // keep the focus in the field
     var g = e.target.closest('[data-drag-ans]');
     if (g) { armed = g.closest('.a2-ans'); armed.draggable = true; return; }
-    g = e.target.closest('[data-drag-q]');
-    if (g) { armed = g.closest('.a2-q'); armed.draggable = true; return; }
+    if (e.target.closest('[data-drag-qgroup], [data-drag-q]')) return; // draggable while Reorder is on
     onPointDown(e);
   }
 
@@ -1203,8 +1233,11 @@
     if (!t) return;
     var ans = t.closest('.a2-ans');
     if (ans && ans.draggable) { startDrag(e, ans, 'ans'); return; }
+    // a question sits inside a group and both are draggable, so the question has to be asked about first
     var qn = t.closest('.a2-q');
     if (qn && qn.draggable) { startDrag(e, qn, 'q'); return; }
+    var gn = t.closest('.a2-qgroup');
+    if (gn && gn.draggable) { startDrag(e, gn, 'qgroup'); return; }
     var node = t.closest('.a2-node');
     if (!tree.classList.contains('reorder') || !node) { e.preventDefault(); return; }
     startDrag(e, node, 'node');
@@ -1224,6 +1257,11 @@
     if (dragKind === 'ans') {
       var oa = t.closest('.a2-ans'); // an answer stays in its own table
       if (oa && oa !== dragged && oa.parentElement === dragged.parentElement) markHalf(e, oa, oa.getBoundingClientRect());
+      return;
+    }
+    if (dragKind === 'qgroup') {
+      var og = t.closest('.a2-qgroup');
+      if (og && og !== dragged && !dragged.contains(og)) markHalf(e, og, qs(og, '.a2-qgroup-row').getBoundingClientRect());
       return;
     }
     if (dragKind === 'q') {
@@ -1255,9 +1293,18 @@
       finishDrag();
       return;
     }
+    if (dragKind === 'qgroup') {
+      var lvg = dragged.closest('.a2-view-lesson'), og = t.closest('.a2-qgroup');
+      if (og && og !== dragged && !dragged.contains(og)) {
+        e.preventDefault();
+        og.parentElement.insertBefore(dragged, og.classList.contains('drop-above') ? og : og.nextSibling);
+      }
+      if (lvg) renumberQuestions(lvg);
+      finishDrag();
+      return;
+    }
     if (dragKind === 'q') {
       var lv = dragged.closest('.a2-view-lesson'), oq = t.closest('.a2-q'), grow = t.closest('.a2-qgroup-row');
-      if (lv) snapshotOrder(lv); // the new order waits for Save, as it does in the tree
       var gbody = grow ? qs(grow.closest('.a2-qgroup'), '.a2-qgroup-body') : t.closest('.a2-qgroup-body');
       if (oq && oq !== dragged) {
         e.preventDefault();
