@@ -106,7 +106,8 @@
 .a2-switch-label { font-size: 12px; }
 
 /* Modal for Edit / Add / Delete */
-.a2-modal { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4); display: flex; align-items: flex-start; justify-content: center; padding: 60px 16px; overflow-y: auto; }
+.a2-modal { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: 40px 16px; overflow-y: auto; }
+.a2-modal.wide { align-items: flex-start; }
 .a2-modal[hidden], .a2-field[hidden], .a2-modal-text[hidden] { display: none; }
 .a2-modal-box { width: 420px; max-width: 100%; background: #ffffff; border: 1px solid rgba(0,0,0,0.2); border-radius: 6px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); padding: 18px 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; }
 .a2-modal-title { font-size: 18px; margin-bottom: 14px; }
@@ -207,9 +208,9 @@
 .a2-q-ans td { border-top: 1px solid #eeeeee; padding: 5px 4px; vertical-align: middle; }
 .a2-q-ans tr:first-child td { border-top: 0; }
 .a2-ans-idx { color: #777777; width: 56px; }
-.a2-ans-inp { width: 100%; box-sizing: border-box; height: 28px; padding: 4px 8px; font-size: 13px; font-family: inherit; color: inherit; border: 1px solid #dfe5ee; border-radius: 4px; background: #ffffff; }
-.a2-ans-inp:hover { border-color: #c3cfe0; }
-.a2-ans-inp:focus { outline: none; border-color: #1E5290; box-shadow: 0 0 0 2px rgba(30,82,144,0.12); }
+input.a2-ans-inp { width: 100%; box-sizing: border-box; height: 28px; padding: 4px 8px; font-size: 13px; font-family: inherit; color: inherit; border: 1px solid #dfe5ee; border-radius: 4px; background: #ffffff; }
+input.a2-ans-inp:hover { border-color: #c3cfe0; }
+input.a2-ans-inp:focus { outline: none; border-color: #1E5290; box-shadow: 0 0 0 2px rgba(30,82,144,0.12); }
 .a2-ans-correct { width: 26px; text-align: left; }
 .a2-ans-flag { width: 130px; text-align: right; }
 .a2-ans-badge { display: none; font-size: 11px; font-weight: 600; color: #3c763d; background: #eaf4ea; border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
@@ -255,7 +256,7 @@
 .a2-ansblock, .a2-ansgroup { border: 1px solid #eef2f8; border-radius: 6px; padding: 8px 10px; margin-top: 8px; }
 .a2-ansblock-head { font-size: 12px; font-weight: 600; color: #777777; }
 .a2-ansgroup-head { display: flex; align-items: center; gap: 10px; }
-.a2-ansgroup-name { flex: 1; height: 28px; padding: 4px 8px; font-size: 13px; border: 1px solid #cccccc; border-radius: 4px; font-family: inherit; }
+input.a2-ansgroup-name { flex: 1; height: 28px; padding: 4px 8px; font-size: 13px; border: 1px solid #cccccc; border-radius: 4px; font-family: inherit; }
 .a2-ansgroup-del, .a2-ansgroup-add { font-size: 12px; }
 .a2-ansgroup-add { display: inline-block; margin-top: 10px; }
 .a2-ans-none { font-size: 13px; color: #999999; padding: 4px 0; }
@@ -371,3 +372,18 @@
 .a2-q-editor .a2-imgq-pt:hover, .a2-imgq-pt.picked { border: 1px dashed #1E5290; background: rgba(255,255,255,0.5); border-radius: 3px; }
 .a2-imgq-pt.picked .a2-imgq-num { left: 3px; top: 3px; transform: none; }
 .a2-imgq-pt.picked .a2-imgq-size { display: block; }
+
+/* The name of a group is edited where it is written, not from a button below it (Tima 11.09) */
+input.a2-qgroup-name { width: 280px; max-width: 40%; flex: none; height: 28px; padding: 4px 8px; font-family: inherit; font-size: 14px; font-weight: 600; color: #183261; background: transparent; border: 1px solid transparent; border-radius: 4px; }
+input.a2-qgroup-name:hover { border-color: #dfe5ee; background: #ffffff; }
+input.a2-qgroup-name:focus { outline: none; border-color: #1E5290; background: #ffffff; box-shadow: 0 0 0 2px rgba(30,82,144,0.12); }
+
+/* A changed order of questions waits for Save, as the order of the tree does */
+.a2-qorder { display: flex; align-items: center; gap: 8px; margin: 12px 0 2px 0; padding: 8px 10px; font-size: 12px; color: #5a6f92; background: #f4f7fb; border: 1px solid #dbe4f0; border-radius: 6px; }
+
+/* The block of answers in the form saves on its own, once something in it changed */
+.a2-qans-foot { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.a2-qans-foot .a2-field-note { margin-top: 0; }
+
+/* The picture of a study card is just a picture: it takes no points */
+.a2-imgq-flat { cursor: default; }

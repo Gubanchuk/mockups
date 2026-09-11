@@ -341,6 +341,30 @@
   }
 
   // Questions live inside groups: a lesson has one group by default and can have more (Tima, 10.09).
+  // The order of questions is kept only when it is confirmed, as in the tree (Tima 11.09:
+  // "почему нету кнопки сейв или отмена, они должны появиться когда я случайно переместил").
+  function orderBar(v) { return qs(v, '.a2-qorder'); }
+
+  function snapshotOrder(v) {
+    if (v.__qorder) return;
+    v.__qorder = qsa(v, '.a2-qgroup-body').map(function (b) {
+      return { body: b, kids: qsa(b, ':scope > .a2-q') };
+    });
+    orderBar(v).hidden = false;
+  }
+
+  function settleOrder(v, keep) {
+    if (!v.__qorder) return;
+    if (!keep) {
+      v.__qorder.forEach(function (e) {
+        e.kids.forEach(function (k) { e.body.insertBefore(k, qs(e.body, '.a2-qgroup-foot')); });
+      });
+    }
+    v.__qorder = null;
+    orderBar(v).hidden = true;
+    renumberQuestions(v);
+  }
+
   function renumberQuestions(v) {
     qsa(v, '.a2-qgroup-body').forEach(function (list) {
       qsa(list, ':scope > .a2-q').forEach(function (q, i) { qs(q, '.a2-q-idx').textContent = (i + 1) + '.'; });
@@ -565,6 +589,27 @@
       qrat: qs(q, '.a2-q-rat').textContent, editor: copy });
   }
 
+  // Tima 11.09: the block of answers gets its own Save, shown once something in it changed.
+  function markAnswersChanged(m) {
+    var foot = qs(m, '.a2-qans-foot');
+    if (foot && !qs(m, '.a2-field-qans').hidden) foot.hidden = false;
+  }
+
+  function saveAnswersBlock(tree, m) {
+    var st = modalState, edited = qs(m, '.a2-qans-slot > .a2-q-editor');
+    if (st && st.qnode && edited) { // the question keeps them at once, the form stays open
+      freezeFields(edited);
+      var keep = edited.cloneNode(true);
+      keep.hidden = true;
+      qs(st.qnode, '.a2-q-editor').replaceWith(keep);
+      renumberAnswers(qs(st.qnode, '.a2-q-editor'));
+      renderPreview(st.qnode);
+    }
+    var btn = qs(m, '[data-ans-save]'), was = btn.textContent;
+    btn.textContent = 'Saved';
+    setTimeout(function () { btn.textContent = was; qs(m, '.a2-qans-foot').hidden = true; }, 900);
+  }
+
   // The answers of the form: a copy of the editor, or a blank one of the chosen type
   function fillFormAnswers(tree, m, editor, qtype) {
     var slot = qs(m, '.a2-qans-slot'), ed = editor || protoEditor(tree, qtype);
@@ -576,6 +621,7 @@
     slot.appendChild(ed);
     renumberAnswers(ed);
     qs(m, '.a2-field-qans').hidden = false;
+    qs(m, '.a2-qans-foot').hidden = true;
   }
 
   // Modal: part form, question form and delete confirmations ---------------------------------
@@ -602,6 +648,7 @@
       syncQuestionForm(m);
     }
     qs(m, '.a2-modal-box').classList.toggle('a2-modal-wide', isQ);
+    m.classList.toggle('wide', isQ); // a tall form starts at the top, a short confirmation is centred
     if (!isQ) qs(m, '.a2-field-qans').hidden = true;
     qsa(m, '.a2-field-qblockhint, .a2-field-qdraw, .a2-field-qratimg')
       .forEach(function (f) { if (!isQ) f.hidden = true; });
@@ -620,8 +667,14 @@
     cfg.tree = tree;
     modalState = cfg;
     m.hidden = false;
-    if (cfg.kind === 'edit' || cfg.kind === 'add' || cfg.kind === 'qgroup') { var inp = qs(fTitle, 'input'); inp.focus(); inp.select(); }
-    if (cfg.kind === 'question') qs(m, '.a2-field-qtext .a2-editor-body').focus();
+    // focus must not scroll the form: the title was being pulled above the top of the window
+    m.scrollTop = 0;
+    if (cfg.kind === 'edit' || cfg.kind === 'add' || cfg.kind === 'qgroup') {
+      var inp = qs(fTitle, 'input');
+      inp.focus({ preventScroll: true });
+      inp.select();
+    }
+    if (cfg.kind === 'question') qs(m, '.a2-field-qtext .a2-editor-body').focus({ preventScroll: true });
   }
 
   function closeModal() {
@@ -700,11 +753,11 @@
       var gname = qs(m, '.a2-field-title input').value.trim();
       if (!gname) { qs(m, '.a2-field-title input').focus(); return; }
       if (st.gnode) {
-        qs(st.gnode, '.a2-qgroup-name').textContent = gname;
+        qs(st.gnode, '.a2-qgroup-name').value = gname;
       } else {
         var proto = qs(lvgn, '.a2-qgroup').cloneNode(true);
         proto.classList.add('collapsed');
-        qs(proto, '.a2-qgroup-name').textContent = gname;
+        qs(proto, '.a2-qgroup-name').value = gname;
         qsa(proto, '.a2-q').forEach(function (q) { q.remove(); });
         qs(lvgn, '.a2-qgrouped').appendChild(proto);
       }
@@ -821,7 +874,11 @@
       else closeModal();
       return;
     }
-    if (e.target.closest('.a2-modal')) { answerClick(tree, e); return; } // answers are edited in the form now
+    if (e.target.closest('.a2-modal')) {
+      if (e.target.closest('[data-ans-save]')) { e.preventDefault(); saveAnswersBlock(tree, qs(tree, '.a2-modal')); return; }
+      if (answerClick(tree, e)) markAnswersChanged(qs(tree, '.a2-modal'));
+      return;
+    }
     // Variants 2-4: rows of the lists point at a node of the hidden tree (the navbar is handled below)
     if ((a = e.target.closest('[data-open-lesson]'))) {
       e.preventDefault();
@@ -895,18 +952,16 @@
       qs(tree, '.a2-qblock').classList.toggle('folded');
       return;
     }
-    if ((a = e.target.closest('[data-qgroup-edit]'))) {
+    if ((a = e.target.closest('[data-qorder]'))) {
       e.preventDefault();
-      var gn = a.closest('.a2-qgroup');
-      openModal(tree, { kind: 'qgroup', title: 'Rename group', okText: 'Save', gnode: gn,
-        name: qs(gn, '.a2-qgroup-name').textContent });
+      settleOrder(qs(tree, '.a2-view-lesson'), a.getAttribute('data-qorder') === 'save');
       return;
     }
     if ((a = e.target.closest('[data-qgroup-del]'))) {
       e.preventDefault();
       var gd = a.closest('.a2-qgroup'), qn2 = qsa(gd, '.a2-q').length;
       openModal(tree, { kind: 'delete', type: 'qgroup', gnode: gd, title: 'Delete group',
-        text: 'Delete \u201c' + qs(gd, '.a2-qgroup-name').textContent + '\u201d?',
+        text: 'Delete \u201c' + qs(gd, '.a2-qgroup-name').value + '\u201d?',
         note: qn2 ? 'Its ' + qn2 + ' questions will be deleted with it.' : '' });
       return;
     }
@@ -923,7 +978,7 @@
       return;
     }
     if ((a = e.target.closest('[data-qgroup-open]'))) {
-      if (e.target.closest('.a2-q-acts, .a2-qdep')) { if (e.target.closest('a')) e.preventDefault(); return; }
+      if (e.target.closest('.a2-qdep, .a2-qgroup-name')) { if (e.target.closest('a')) e.preventDefault(); return; }
       e.preventDefault();
       a.closest('.a2-qgroup').classList.toggle('collapsed');
       return;
@@ -1110,12 +1165,14 @@
         e.preventDefault();
         oa.parentElement.insertBefore(dragged, oa.classList.contains('drop-above') ? oa : oa.nextSibling);
         renumberAnswers(dragged.closest('.a2-q-editor'));
+        if (dragged.closest('.a2-qans-slot')) markAnswersChanged(qs(dragged.closest('.a2tree'), '.a2-modal'));
       }
       finishDrag();
       return;
     }
     if (dragKind === 'q') {
       var lv = dragged.closest('.a2-view-lesson'), oq = t.closest('.a2-q'), grow = t.closest('.a2-qgroup-row');
+      if (lv) snapshotOrder(lv); // the new order waits for Save, as it does in the tree
       var gbody = grow ? qs(grow.closest('.a2-qgroup'), '.a2-qgroup-body') : t.closest('.a2-qgroup-body');
       if (oq && oq !== dragged) {
         e.preventDefault();
@@ -1154,7 +1211,11 @@
       tree.addEventListener('drop', onDrop);
       tree.addEventListener('dragend', finishDrag);
       tree.addEventListener('mousedown', arm);
+      tree.addEventListener('input', function (e) {
+        if (e.target.closest('.a2-qans-slot')) markAnswersChanged(qs(tree, '.a2-modal'));
+      });
       tree.addEventListener('change', function (e) {
+        if (e.target.closest('.a2-qans-slot')) markAnswersChanged(qs(tree, '.a2-modal'));
         if (e.target.matches('.a2-hide input')) tree.classList.toggle('hide-unpub', e.target.checked);
         else if (e.target.matches('.a2-field-qtype select')) {
           var mm = qs(tree, '.a2-modal');
@@ -1211,7 +1272,11 @@
       }
       if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
         // a field of an answer or of an answer group belongs to the questions block, not to the lesson form
-        if (e.target.closest('.a2-q-ans, .a2-ansgroup-head')) { e.preventDefault(); e.target.blur(); return; }
+        if (e.target.closest('.a2-q-ans, .a2-ansgroup-head') || e.target.classList.contains('a2-qgroup-name')) {
+          e.preventDefault();
+          e.target.blur();
+          return;
+        }
         if (modalState) { e.preventDefault(); confirmModal(); }
         else if (pageState && e.target.closest('.a2-view-lesson, .a2-view-section')) { e.preventDefault(); (pageState.type === 'lesson' ? saveLesson : saveSection)(pageState.tree); }
       }
