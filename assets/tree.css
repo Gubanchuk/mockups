@@ -130,7 +130,7 @@
 .a2-crumbs { font-size: 13px; color: #98a7c0; margin-bottom: 4px; }
 .a2-crumbs .a2-crumb-cur { color: #183261; }
 .a2-pagehead { display: flex; align-items: flex-end; justify-content: space-between; }
-.a2-page { width: 720px; margin-top: 22px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #333333; }
+.a2-page { width: 100%; margin-top: 22px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #333333; }
 .a2-page .a2-field { margin-bottom: 18px; }
 .a2-vbox { display: flex; gap: 14px; align-items: flex-start; border: 1px solid #dddddd; border-radius: 4px; padding: 12px; background: #fafbfd; }
 .a2-thumb { width: 120px; height: 68px; border-radius: 4px; background: #0f1c33; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85); font-size: 18px; flex: none; }
@@ -264,8 +264,11 @@ input.a2-ansgroup-name { flex: 1; height: 28px; padding: 4px 8px; font-size: 13p
 .a2-ans-kind select { width: 100%; height: 28px; font-size: 12px; border: 1px solid #dfe5ee; border-radius: 4px; font-family: inherit; background: #ffffff; }
 
 /* Image Question: points are put, moved and resized on the picture, each one is an answer below it */
-.a2-imgq { display: flex; gap: 14px; align-items: flex-end; margin: 4px 0 10px 0; }
-.a2-imgq-stage { position: relative; width: 380px; height: 214px; flex: none; border: 1px solid #dddddd; border-radius: 4px; overflow: hidden; cursor: crosshair; }
+/* The picture takes the width it is given: a point is placed in per cent of it, so a small picture
+   makes every point land wrong on the real one (Tima, 11.09). The links sit under it, not beside it. */
+.a2-imgq { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin: 4px 0 10px 0; }
+.a2-imgq-stage { position: relative; width: 100%; max-width: 760px; aspect-ratio: 380 / 214; border: 1px solid #dddddd; border-radius: 4px; overflow: hidden; cursor: crosshair; }
+.a2-preview-body .a2-imgq-stage { max-width: 420px; }
 .a2-imgq-img { display: block; width: 100%; height: 100%; }
 .a2-imgq-pt { position: absolute; border: 1px dashed #1E5290; background: rgba(255,255,255,0.55); border-radius: 3px; cursor: move; }
 .a2-imgq-pt.dragging { background: rgba(30,82,144,0.15); }
@@ -362,7 +365,15 @@ input.a2-ansgroup-name { flex: 1; height: 28px; padding: 4px 8px; font-size: 13p
 .a2tree .a2-qgroup-foot a[data-qgroup-del]:hover { background: #fbecec; color: #8f2f2c; border-color: #e0b7b5; }
 
 /* The form of a question is wide: the answers of every type have to fit into it */
-.a2-modal-box.a2-modal-wide { width: 760px; }
+.a2-modal-box.a2-modal-wide { width: 1040px; }
+.a2-modal.full { padding: 16px; }
+.a2-modal-box.a2-modal-full { width: 100%; max-width: none; }
+.a2-modal-head { display: flex; align-items: flex-start; gap: 12px; }
+.a2-modal-head .a2-modal-title { flex: 1; }
+.a2-modal-grow { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; flex: none; border: 1px solid #c3cfe0; border-radius: 4px; color: #5a6f92; background: #ffffff; }
+.a2-modal-grow:hover { border-color: #1E5290; color: #1E5290; text-decoration: none; }
+.a2-modal-grow .a2-ico-shrink, .a2-modal.full .a2-modal-grow .a2-ico-grow { display: none; }
+.a2-modal.full .a2-modal-grow .a2-ico-shrink { display: block; }
 .a2-qans-slot { border: 1px solid #e5e5e5; border-radius: 4px; padding: 10px 12px; background: #fcfcfc; }
 .a2-qans-slot .a2-q-editor { display: block; }
 
@@ -393,3 +404,6 @@ input.a2-qgroup-rename:focus { outline: none; box-shadow: 0 0 0 2px rgba(30,82,1
 
 /* The picture of a study card is just a picture: it takes no points */
 .a2-imgq-flat { cursor: default; }
+
+/* A title does not need the whole width of the page; the editors and the questions do */
+.a2-page [data-f="title"], .a2-page [data-f="video-name"], .a2-whererow select { max-width: 640px; }

@@ -703,6 +703,8 @@
     }
     qs(m, '.a2-modal-box').classList.toggle('a2-modal-wide', isQ);
     m.classList.toggle('wide', isQ); // a tall form starts at the top, a short confirmation is centred
+    qs(m, '.a2-modal-grow').hidden = !isQ; // only a form has enough in it to need the whole screen
+    setModalFull(m, false);
     if (!isQ) qs(m, '.a2-field-qans').hidden = true;
     qsa(m, '.a2-field-qblockhint, .a2-field-qdraw, .a2-field-qratimg')
       .forEach(function (f) { if (!isQ) f.hidden = true; });
@@ -729,6 +731,15 @@
       inp.select();
     }
     if (cfg.kind === 'question') qs(m, '.a2-field-qtext .a2-editor-body').focus({ preventScroll: true });
+  }
+
+  // Tima and Max on the call of 11.09: a form of a question is cramped, especially a picture one.
+  // It opens wide and can take the whole window.
+  function setModalFull(m, on) {
+    m.classList.toggle('full', on);
+    qs(m, '.a2-modal-box').classList.toggle('a2-modal-full', on);
+    var btn = qs(m, '.a2-modal-grow');
+    if (btn) btn.title = on ? 'Back to the normal size' : 'Full screen';
   }
 
   function closeModal() {
@@ -920,6 +931,12 @@
   function onClick(e) {
     var tree = e.currentTarget, a, node, v;
     if (e.target.classList.contains('a2-modal')) { closeModal(); return; }
+    if (e.target.closest('[data-modal-full]')) {
+      e.preventDefault();
+      var mfull = qs(tree, '.a2-modal');
+      setModalFull(mfull, !mfull.classList.contains('full'));
+      return;
+    }
     if ((a = e.target.closest('[data-modal]'))) {
       e.preventDefault();
       var what = a.getAttribute('data-modal');
