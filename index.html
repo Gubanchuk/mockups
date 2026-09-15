@@ -3,19 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>A2 inside the current admin panel</title>
+  <title>Your Best Grade mockups</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
   <style>
     :root { --ink: #183261; --link: #1E5290; --ground: #E6EDF6; }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--ground); font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; color: var(--ink); }
-    .mk-bar { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 18px; padding: 0 20px; background: #183261; color: #ffffff; font-size: 13px; }
-    .mk-bar a { color: rgba(255,255,255,0.72); text-decoration: none; padding: 11px 0; }
-    .mk-bar a:hover { color: #ffffff; }
-    .mk-home { font-weight: 600; color: #ffffff !important; margin-right: 6px; }
-    .mk-bar a[aria-current] { color: #ffffff; box-shadow: inset 0 -2px 0 #ffffff; }
-    .mk-screen { max-width: 1440px; margin: 0 auto; background: #ffffff; }
     .mk-wrap { max-width: 940px; margin: 0 auto; padding: 56px 20px 80px 20px; }
+    .mk-back { margin: 0 0 18px 0; font-size: 13px; }
+    .mk-back a { color: var(--link); text-decoration: none; }
     h1 { font-size: 30px; font-weight: 600; margin: 0 0 8px 0; }
     .mk-sub { color: #5a6f92; font-size: 15px; margin: 0 0 34px 0; }
     .mk-card { display: flex; gap: 16px; align-items: flex-start; padding: 20px 22px; margin-bottom: 12px; background: #ffffff; border: 1px solid #d7e0ee; border-radius: 12px; color: inherit; text-decoration: none; }
@@ -24,17 +20,25 @@
     .mk-card-body { display: block; }
     .mk-card-body b { display: block; font-size: 16px; margin-bottom: 5px; }
     .mk-card-body span { display: block; font-size: 13px; line-height: 1.55; color: #5a6f92; }
-    .mk-foot { margin-top: 26px; font-size: 13px; color: #5a6f92; }
-    .mk-foot a { color: var(--link); }
+    .mk-center { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; max-width: 900px; margin: 0 auto; padding: 48px 20px; }
+    .mk-center h1 { text-align: center; }
+    .mk-center .mk-sub { text-align: center; }
+    .mk-choice { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .mk-choice .mk-card { flex-direction: column; gap: 10px; min-height: 180px; margin: 0; padding: 28px 28px; }
+    .mk-choice .mk-card-body b { font-size: 22px; margin-bottom: 8px; }
+    .mk-choice .mk-card-body span { font-size: 14px; }
+    .mk-go { margin-top: auto; color: var(--link); font-size: 14px; font-weight: 600; }
+    @media (max-width: 640px) { .mk-choice { grid-template-columns: minmax(0, 1fr); } }
   </style>
 </head>
 <body>
-<nav class="mk-bar"><span class="mk-home">YBG mockups</span><a href="/" aria-current="page">A2 inside the admin panel</a><a href="/affiliate">Affiliate program</a></nav>
-<div class="mk-wrap">
-  <h1>A2 inside the current admin panel</h1>
-  <p class="mk-sub">Five ways the A2 course can live in the admin panel. Every screen is clickable.</p>
-  <a class="mk-card" href="/tree"><span class="mk-num">1</span><span class="mk-card-body"><b>Course tree</b><span>&ldquo;A2&rdquo; opens the course tree the way a student sees it. Every row keeps its actions in a three-dot menu: Edit, Open, Publish, Delete. A lesson row and Edit on a section open their page inside this frame, a part opens in a small form, and deleting also lives inside the page it belongs to. The Reorder switch turns on dragging, a new order is kept by Save new order or dropped by Cancel; Hide unpublished hides unpublished rows.</span></span></a><a class="mk-card" href="/edit-mode"><span class="mk-num">1.1</span><span class="mk-card-body"><b>Edit mode</b><span>The same tree, but actions, add buttons and dragging appear only while the Edit mode switch is on: sections and parts show an Edit link instead of the three-dot menu, and a lesson opens by clicking its row. The tree itself has no Delete: a lesson and a section are deleted on their own page, a part in its form. With Edit mode off the tree only expands. Reorder stays a separate switch, as in the first variant.</span></span></a><a class="mk-card" href="/hub"><span class="mk-num">2</span><span class="mk-card-body"><b>Hub page</b><span>&ldquo;A2&rdquo; opens a hub page that counts what the course holds; every row opens its list. Lessons, sections, parts, videos, question sets and comments are browsed as flat lists instead of a tree, and a row opens the same lesson or section page as the first two variants.</span></span></a><a class="mk-card" href="/dropdown"><span class="mk-num">3</span><span class="mk-card-body"><b>Dropdown</b><span>The same six lists, reached from a dropdown of the navbar: Sections, Parts, Lessons &middot; Videos, Lesson Questions &middot; Comments.</span></span></a><a class="mk-card" href="/tabs"><span class="mk-num">4</span><span class="mk-card-body"><b>Tabs</b><span>The same six lists, reached from a row of tabs inside a section of its own.</span></span></a>
-  <p class="mk-foot"><a href="/all">All five on one page</a></p>
-</div>
+<main class="mk-center">
+  <h1>Your Best Grade mockups</h1>
+  <p class="mk-sub">Pick a set of mockups.</p>
+  <div class="mk-choice">
+    <a class="mk-card" href="/a2"><span class="mk-card-body"><b>A2 inside the admin panel</b><span>Five ways the A2 course can live in the current admin panel.</span></span><span class="mk-go">Open &rarr;</span></a>
+    <a class="mk-card" href="/affiliate"><span class="mk-card-body"><b>Affiliate program</b><span>Login and signup, the affiliate dashboard and affiliates in the admin panel.</span></span><span class="mk-go">Open &rarr;</span></a>
+  </div>
+</main>
 </body>
 </html>

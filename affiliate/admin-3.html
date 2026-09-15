@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YBG Affiliates Admin</title>
+<style>
+  /* Incumbent admin styles that load before Bootstrap (hesi/admin/scaffold.css via require_tree). */
+  body { background-color: #fff; color: #333; }
+  body, p, ol, ul, td { font-family: verdana, arial, helvetica, sans-serif; font-size: 13px; line-height: 18px; }
+  a { color: #000; }
+</style>
+<link rel="stylesheet" href="assets/bootstrap-3.4.1/css/bootstrap.min.css">
+<style>
+  /* Incumbent admin styles that load after Bootstrap (hesi/admin/admin.css.scss). */
+  .form-control.inline { display: inline-block; }
+  .navbar-default .navbar-nav > li > a:hover,
+  .navbar-default .navbar-nav > li > a:active,
+  .navbar-default .navbar-nav > li > a:focus { color: #555555; background-color: #e7e7e7; }
+
+  /* Mockup switcher, outside the admin page. */
+  .mk-bar { position: sticky; top: 0; z-index: 1100; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; padding: 8px 16px; background: #243142; color: #8d9bb0; font: 12px/1.3 "Segoe UI", system-ui, sans-serif; }
+  .mk-bar b { color: #c9d3e0; font-weight: 600; margin-right: 6px; }
+  .mk-seg { display: inline-flex; }
+  .mk-seg button { background: transparent; border: 1px solid #3a4a60; color: #c9d3e0; padding: 4px 10px; font: inherit; cursor: pointer; margin-left: -1px; }
+  .mk-seg button:first-of-type { border-radius: 3px 0 0 3px; margin-left: 0; }
+  .mk-seg button:last-of-type { border-radius: 0 3px 3px 0; }
+  .mk-seg button.on { background: #e6ecf5; border-color: #e6ecf5; color: #243142; }
+  .mk-note { margin-left: auto; }
+  body[data-bare="1"] .mk-bar { display: none; }
+
+  /* Page and variant switching.
+     Money view and Tim's layout are separate pages; Tabs is one Affiliates page with tabs.
+     .v-money: Money view only. .v-tim: Tim's layout and Tabs. .v-pages: both page variants. .v-tabs: Tabs only. */
+  .mk-page { display: none; }
+  body[data-page="partners"] #page-partners,
+  body[data-page="card"] #page-card,
+  body[data-page="products"] #page-products,
+  body[data-page="links"] #page-links,
+  body[data-page="settings"] #page-settings,
+  body[data-page="payouts"] #page-payouts { display: block; }
+  body:not([data-variant="money"]) .v-money,
+  body[data-variant="money"] .v-tim,
+  body[data-variant="tabs"] .v-pages,
+  body:not([data-variant="tabs"]) .v-tabs { display: none !important; }
+  body[data-variant="tabs"] .own { display: none; }
+  body[data-page="card"] #tabs-head { display: none; }
+  body[data-variant="tabs"] .mk-page:not(#page-card) { padding: 15px 15px 5px; border: 1px solid #ddd; border-top: 0; margin-bottom: 20px; }
+  .aff-tabs { margin-top: 5px; }
+  .aff-tabs .badge { margin-left: 4px; font-weight: normal; }
+
+  /* Metric groups: one lead number per group, the rest smaller. */
+  .metrics { margin-bottom: 5px; }
+  .metrics .panel { margin-bottom: 15px; }
+  .metric-row { display: flex; }
+  .metric { flex: 1 1 0; min-width: 0; padding: 12px 14px 13px; display: flex; flex-direction: column; justify-content: center; }
+  .metric + .metric { border-left: 1px solid #ddd; }
+  .metric-lead { flex: 1.6 1 0; justify-content: flex-start; }
+  .metric-label { color: #555; font-size: 13px; line-height: 18px; }
+  .metric-lead-value { margin: 2px 0 1px; font-size: 31px; line-height: 38px; font-weight: bold; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .metric-value { margin-top: 3px; font-size: 18px; line-height: 24px; font-weight: bold; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .metric-sub { color: #777; font-size: 12px; line-height: 16px; }
+
+  /* Money view: payout band, the sales line and the applications panel. */
+  .payout-band .panel-body { display: flex; align-items: center; padding: 14px 18px; }
+  .payout-band .panel-body::before, .payout-band .panel-body::after { display: none; }
+  .band-main { flex: 0 0 auto; padding-right: 28px; }
+  .band-ready { flex: 1 1 auto; min-width: 0; padding-left: 28px; border-left: 1px solid #ddd; }
+  .band-ready-line { margin: 4px 0 3px; font-size: 18px; line-height: 24px; font-variant-numeric: tabular-nums; }
+  .band-action { flex: 0 0 auto; padding-left: 20px; }
+  .sales-line { margin: 0 0 15px; color: #555; }
+  .sales-line strong { margin-right: 8px; color: #333; }
+  .sales-line span { margin-right: 16px; white-space: nowrap; }
+  .sales-line b { color: #333; font-variant-numeric: tabular-nums; }
+  .shrink { width: 1%; white-space: nowrap; }
+
+  /* Additions inside the Bootstrap 3 vocabulary. */
+  .page-head { margin-bottom: 10px; }
+  .page-head .pull-right { margin-top: 25px; }
+  body[data-variant="tabs"] .mk-page:not(#page-card) .page-head .pull-right { margin-top: 0; margin-bottom: 10px; }
+  .filters { margin-bottom: 15px; }
+  .filters .form-control { margin-right: 4px; }
+  .filters .dash { margin-right: 4px; }
+  .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  th.num { text-align: right; white-space: normal; }
+  .table > thead > tr > th { vertical-align: bottom; }
+  .sort { font-size: 11px; margin-left: 2px; }
+  .tag-row { margin-top: 3px; }
+  .tag-row .label { margin-right: 3px; font-weight: normal; }
+  .ready { display: inline-block; margin-top: 3px; }
+  .name-cell small { white-space: nowrap; }
+  body[data-view="top"] #partners-body { counter-reset: rank; }
+  body[data-view="top"] #partners-body > tr { counter-increment: rank; }
+  body[data-view="top"] #partners-body > tr > td:first-child::before { content: "#" counter(rank); display: inline-block; min-width: 26px; color: #777; }
+  .struck { text-decoration: line-through; color: #777; }
+  .dl-profile { margin-bottom: 0; }
+  .dl-profile dt { width: 120px; font-weight: normal; color: #777; }
+  .dl-profile dd { margin-left: 135px; margin-bottom: 4px; }
+  .card-tabs { margin-top: 5px; }
+  .card-tabs + .tab-body { border: 1px solid #ddd; border-top: 0; padding: 0; margin-bottom: 20px; }
+  .card-tabs + .tab-body .table { margin-bottom: 0; }
+  .period-line { color: #555; }
+  .period-line span { margin-right: 18px; white-space: nowrap; }
+  .step-num { display: inline-block; width: 20px; height: 20px; margin-right: 6px; border-radius: 50%; background: #337ab7; color: #fff; text-align: center; font-size: 12px; line-height: 20px; }
+  .panel-footer .btn { margin-left: 6px; }
+  .panel-heading .pull-right { font-weight: normal; }
+  .empty-row td { color: #777; text-align: center; padding: 18px 8px !important; }
+  .modal.mk-open { display: block; }
+  .modal-backdrop.mk-open { opacity: .5; }
+  pre.csv { margin: 0; font-size: 12px; }
+  .glyphicon-option-vertical { top: 2px; }
+  .settings-table td:first-child { width: 45%; color: #555; }
+  .products-table > tbody > tr > td { vertical-align: middle; }
+  .products-table .input-group { width: 130px; }
+  .products-table .btn-group .btn.active { background-color: #337ab7; border-color: #2e6da4; color: #fff; box-shadow: none; }
+  .links-table tfoot td { font-weight: bold; border-top: 2px solid #ddd; }
+  .link-path { color: #777; }
+</style>
+<style>
+  .mock-version { color: #c7d2e1; text-decoration: none; white-space: nowrap; }
+  .mock-version:hover { color: #ffffff; }
+  .mock-version-name { color: #ffffff; font-weight: 600; white-space: nowrap; margin-right: 8px; }
+</style>
+</head>
+<body data-page="partners" data-variant="tabs" data-bare="0">
+
+<div class="mk-bar" role="toolbar" aria-label="Mockup options">
+  <a class="mock-version" href="/affiliate">&larr; Affiliate program</a><span class="mock-version-name">Affiliates in the admin panel &middot; Version 3 &middot; Tabs</span>
+  <span><b>Page</b><span class="mk-seg" data-key="page">
+    <button type="button" data-value="partners">Applications &amp; Partners</button><button type="button" data-value="card">Affiliate card</button><button type="button" data-value="products">Products</button><button type="button" data-value="links">Links</button><button type="button" data-value="settings">Settings</button><button type="button" data-value="payouts">Payouts</button>
+  </span></span>
+  <span class="mk-note">Sample data</span>
+</div>
+
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#" data-go="partners">Your Best Grade Admin</a>
+    </div>
+    <div class="collapse navbar-collapse in">
+      <ul class="nav navbar-nav">
+        <li><a href="#">Tests</a></li>
+        <li><a href="#">Statistics</a></li>
+        <li><a href="#">Users</a></li>
+        <li class="dropdown"><a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">Catalog<span class="caret"></span></a>
+          <ul class="dropdown-menu"><li><a href="#">Products</a></li><li><a href="#">Programs</a></li></ul>
+        </li>
+        <li class="dropdown v-pages active"><a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">Affiliates<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#" data-go="partners">Applications &amp; Partners</a></li>
+            <li><a href="#" data-go="products">Products</a></li>
+            <li><a href="#" data-go="links">Links</a></li>
+            <li><a href="#" data-go="settings">Settings</a></li>
+            <li><a href="#" data-go="payouts">Payouts</a></li>
+          </ul>
+        </li>
+        <li class="v-tabs active"><a href="#" data-go="partners">Affiliates</a></li>
+        <li class="dropdown"><a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">Content<span class="caret"></span></a>
+          <ul class="dropdown-menu"><li><a href="#">Site Content</a></li><li><a href="#">Tracking Codes</a></li><li><a href="#">Domain Verifications</a></li><li><a href="#">Backups</a></li><li><a href="#">Tags</a></li><li><a href="#">Testimonials</a></li><li><a href="#">CAT setting</a></li><li><a href="#">Question Drafts</a></li></ul>
+        </li>
+        <li class="dropdown"><a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">Logs<span class="caret"></span></a>
+          <ul class="dropdown-menu"><li><a href="#">User Logs</a></li><li><a href="#">Renewal Logs</a></li><li><a href="#">Payment Plan Users</a></li><li><a href="#">Upgrade NCLEX Logs</a></li><li><a href="#">All Checkouts</a></li></ul>
+        </li>
+        <li class="dropdown"><a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">Suspicious<span class="caret"></span></a>
+          <ul class="dropdown-menu"><li><a href="#">Geographic Activity</a></li><li><a href="#">Excessive Practice</a></li><li><a href="#">Practice Test Blocks</a></li></ul>
+        </li>
+        <li><a href="#">Problem Reports</a></li>
+        <li><a href="#">Schools</a></li>
+        <li class="dropdown"><a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">Dev Tools<span class="caret"></span></a>
+          <ul class="dropdown-menu"><li><a href="#">Stripe Payment Audit</a></li><li><a href="#">Payment IDs Search</a></li><li><a href="#">Order Price Reconciliation</a></li><li><a href="#">Test Creator Perf</a></li></ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#">Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <p id="flash" style="color: orange"></p>
+
+  <!-- ============ Tabs variant: one Affiliates page, the tab strip right under the title ============ -->
+  <div class="v-tabs" id="tabs-head">
+    <div class="clearfix page-head">
+      <h1 class="pull-left">Affiliates</h1>
+      <div class="pull-right">
+        <a href="#" class="btn btn-default" data-go="settings">Program rules &amp; rates</a>
+        <a href="#" class="btn btn-success" data-go="payouts">Generate Payout CSV</a>
+      </div>
+    </div>
+    <ul class="nav nav-tabs aff-tabs" id="aff-tabs"></ul>
+  </div>
+
+  <!-- ============ Applications & Partners ============ -->
+  <div class="mk-page" id="page-partners">
+    <div class="clearfix page-head v-pages">
+      <h1 class="pull-left">Affiliates</h1>
+      <div class="pull-right">
+        <a href="#" class="btn btn-default v-tim" data-go="settings">Program rules &amp; rates</a>
+        <a href="#" class="btn btn-success v-tim" data-go="payouts">Generate Payout CSV</a>
+        <a href="#" class="btn btn-default v-money" data-go="settings">Settings</a>
+      </div>
+    </div>
+
+    <div class="v-money" id="money-band"></div>
+
+    <form class="form-inline filters" onsubmit="return false">
+      <input type="date" class="form-control" id="f-from" value="2026-08-01" aria-label="From">
+      <span class="text-muted dash">&ndash;</span>
+      <input type="date" class="form-control" id="f-to" value="2026-09-15" aria-label="To">
+      <select class="form-control" id="f-status" aria-label="Status"></select>
+      <input type="text" class="form-control" id="f-query" placeholder="name or email" aria-label="Search">
+      <select class="form-control" id="f-tag" aria-label="Tag">
+        <option value="">All tags</option><option>UGC</option><option>Blogger</option><option>SMM</option><option>SamCart</option>
+      </select>
+      <button type="submit" class="btn btn-primary" id="f-search">Search</button>
+      <div class="btn-group" role="group" aria-label="View" style="margin-left:8px"><button type="button" class="btn btn-default active" data-view="all">All affiliates</button><button type="button" class="btn btn-default" data-view="top">Top by commissions</button></div>
+    </form>
+
+    <div class="v-money" id="money-sales"></div>
+    <div class="v-money" id="applications"></div>
+    <div class="v-tim" id="tiles"></div>
+
+    <table class="table table-hover" id="partners-table">
+      <thead id="partners-head"></thead>
+      <tbody id="partners-body"></tbody>
+    </table>
+
+    <div class="row v-pages">
+      <div class="col-md-5">
+        <div class="panel panel-default">
+          <div class="panel-heading"><strong>Program settings</strong> <small class="text-muted">read-only</small><a href="#" class="pull-right" data-go="settings">All settings</a></div>
+          <table class="table table-condensed settings-table" style="margin-bottom:0"><tbody id="settings-mini"></tbody></table>
+        </div>
+      </div>
+      <div class="col-md-7">
+        <div class="panel panel-default">
+          <div class="panel-heading"><strong>Payouts</strong> <span class="badge" id="payouts-mini-count"></span><a href="#" class="pull-right" data-go="payouts">All payouts</a></div>
+          <table class="table table-condensed" style="margin-bottom:0">
+            <thead><tr><th>Payout</th><th>Created</th><th>Status</th><th class="num">Affiliates</th><th class="num">Commissions</th><th class="num">Total</th><th>Paid</th></tr></thead>
+            <tbody id="payouts-mini"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Affiliate card ============ -->
+  <div class="mk-page" id="page-card">
+    <ol class="breadcrumb">
+      <li><a href="#" data-go="partners">Affiliates</a></li>
+      <li class="active" id="crumb-name"></li>
+    </ol>
+    <div class="clearfix page-head">
+      <h1 class="pull-left" id="card-title"></h1>
+      <div class="pull-right">
+        <button type="button" class="btn btn-default" data-action="tags">Edit tags</button>
+        <button type="button" class="btn btn-danger" data-action="delete">Delete affiliate</button>
+      </div>
+    </div>
+    <div id="card-decision"></div>
+    <div class="row">
+      <div class="col-md-5">
+        <div class="panel panel-default">
+          <div class="panel-heading"><strong>Profile</strong></div>
+          <div class="panel-body"><dl class="dl-horizontal dl-profile" id="card-profile"></dl></div>
+        </div>
+      </div>
+      <div class="col-md-7">
+        <div class="panel panel-default">
+          <div class="panel-heading"><strong>Balance</strong> <small class="text-muted">all time</small></div>
+          <div id="card-balance"></div>
+          <div class="panel-footer period-line" id="card-period"></div>
+        </div>
+      </div>
+    </div>
+    <ul class="nav nav-tabs card-tabs" id="card-tabs">
+      <li class="active"><a href="#" data-tab="orders">Orders</a></li>
+      <li><a href="#" data-tab="links">Links</a></li>
+      <li><a href="#" data-tab="payouts">Payouts</a></li>
+    </ul>
+    <div class="tab-body">
+      <table class="table table-hover" id="card-table"><thead></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <!-- ============ Products ============ -->
+  <div class="mk-page" id="page-products">
+    <div class="clearfix page-head own">
+      <h1 class="pull-left">Products</h1>
+    </div>
+    <form onsubmit="return false">
+      <div class="panel panel-default">
+        <div class="panel-heading"><strong>HESI Exam Study</strong> <span class="badge" id="products-count"></span> <small class="text-muted">one-time purchases, commission per order</small></div>
+        <table class="table table-hover products-table" style="margin-bottom:0">
+          <thead><tr><th>Product</th><th class="num">Price</th><th>Commission type</th><th>Commission value</th><th class="num">Commission per order</th></tr></thead>
+          <tbody id="products-body"></tbody>
+        </table>
+        <div class="panel-footer clearfix">
+          <span class="text-muted">A changed rate applies to new orders. Earlier commissions keep their amounts.</span>
+          <button type="submit" class="btn btn-primary pull-right" id="save-rates">Save rates</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- ============ Links ============ -->
+  <div class="mk-page" id="page-links">
+    <div class="clearfix page-head own">
+      <h1 class="pull-left">Links</h1>
+    </div>
+    <div class="row">
+      <div class="col-md-7">
+        <div class="panel panel-default">
+          <div class="panel-heading"><strong>Landing pages</strong> <span class="badge" id="links-count"></span> <small class="text-muted" id="links-period"></small></div>
+          <table class="table table-hover links-table" style="margin-bottom:0">
+            <thead><tr><th>Link</th><th class="num">Clicks</th><th class="num">Sales</th></tr></thead>
+            <tbody id="links-body"></tbody>
+            <tfoot id="links-foot"></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Settings ============ -->
+  <div class="mk-page" id="page-settings">
+    <div class="clearfix page-head own">
+      <h1 class="pull-left">Settings</h1>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="panel panel-default">
+          <div class="panel-heading"><strong>Program settings</strong> <small class="text-muted">read-only</small></div>
+          <table class="table table-condensed settings-table" style="margin-bottom:0"><tbody id="settings-full"></tbody></table>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="panel panel-default">
+          <div class="panel-heading"><strong>Applications</strong></div>
+          <div class="panel-body">
+            <form class="form-inline" onsubmit="return false">
+              <div class="checkbox"><label><input type="checkbox" id="auto-approve"> Approve new applications automatically</label></div>
+              <button type="submit" class="btn btn-primary btn-sm" id="save-auto" style="margin-left:10px">Save</button>
+            </form>
+          </div>
+          <table class="table table-condensed settings-table" style="margin-bottom:0">
+            <tbody>
+              <tr><td>Application received</td><td>Email sent to the applicant</td></tr>
+              <tr><td>Approved</td><td>Email with a link to log in</td></tr>
+              <tr><td>Declined</td><td>Email sent to the applicant</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Payouts ============ -->
+  <div class="mk-page" id="page-payouts">
+    <div class="clearfix page-head">
+      <h1 class="pull-left own">Payouts</h1>
+      <div class="pull-right v-tim">
+        <button type="button" class="btn btn-success" id="generate">Generate Payout CSV</button>
+      </div>
+    </div>
+
+    <div class="v-money">
+      <div class="panel panel-default">
+        <div class="panel-heading"><strong><span class="step-num">1</span>Ready for payout</strong> <small class="text-muted">available commissions, $50.00 minimum</small></div>
+        <table class="table table-hover" style="margin-bottom:0">
+          <thead><tr><th>Affiliate</th><th>PayPal email</th><th class="num">Commissions</th><th class="num">Amount</th><th>Check</th></tr></thead>
+          <tbody id="ready-body"></tbody>
+        </table>
+        <div class="panel-footer clearfix" id="ready-foot"></div>
+      </div>
+
+      <div class="panel panel-default" id="open-panel">
+        <div class="panel-heading"><strong><span class="step-num">2</span>Open payout</strong></div>
+        <div class="panel-body" id="open-body"></div>
+      </div>
+
+      <h2 class="h3">History</h2>
+    </div>
+
+    <table class="table table-hover" id="payouts-table">
+      <thead><tr><th>Payout</th><th>Created</th><th>Status</th><th class="num">Affiliates</th><th class="num">Commissions</th><th class="num">Total</th><th>Cutoff</th><th>Paid</th><th>PayPal reference</th><th></th></tr></thead>
+      <tbody id="payouts-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal" id="modal" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-dialog" id="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h2 class="modal-title h4" id="modal-title"></h2></div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-close>Cancel</button>
+        <button type="button" class="btn btn-primary" id="modal-ok">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" id="backdrop" hidden></div>
+
+<script>
+(function () {
+  const TODAY = '2026-09-15';
+  const PERIOD = { from: '2026-08-01', to: '2026-09-15' };
+
+  // HESI one-time plans with their affiliate commission (product_prices.affiliate_commission_type / _value).
+  const PRODUCTS = [
+    { slug: 'hesistudy_three_year', name: '36 Months Access', price: 197, type: 'percent', value: 20 },
+    { slug: 'hesistudy_one_year', name: '12 Months Access', price: 147, type: 'percent', value: 20 },
+    { slug: 'hesistudy_180_days', name: '180 Days', price: 137, type: 'percent', value: 20 },
+    { slug: 'hesistudy_90_days', name: '90 Days', price: 117, type: 'amount', value: 20 },
+    { slug: 'hesistudy_30_days', name: '30 Days', price: 97, type: 'amount', value: 10 }
+  ];
+  const commissionFor = (p) => +(p.type === 'percent' ? p.price * p.value / 100 : p.value).toFixed(2);
+  // Commission is fixed when the order is created; editing a rate later does not change it.
+  const AT_ORDER = Object.fromEntries(PRODUCTS.map((p) => [p.slug, { name: p.name, price: p.price, commission: commissionFor(p) }]));
+
+  const LINKS = [
+    { path: '/hesi/start', name: 'HESI Start' },
+    { path: '/hesi/pricing', name: 'HESI Pricing' }
+  ];
+
+  const AFF = [
+    { id: 'maya', name: 'Maya Brooks', email: 'maya.brooks@example.com', paypal: 'maya.brooks@example.com', ref: '3xPq8Lm2Vt6KzR9b', applied: '2026-09-14', status: 'pending', tags: [] },
+    { id: 'chris', name: 'Chris Nguyen', email: 'chris.nguyen@example.com', paypal: 'c.nguyen.pay@example.com', ref: 'Ns4Jw7Qe1Hk5Tf2D', applied: '2026-09-13', status: 'pending', tags: [] },
+    { id: 'priya', name: 'Priya Shah', email: 'priya.shah@example.com', paypal: 'priya.shah@example.com', ref: 'Hw7kM3pZ9eQt1RaV', applied: '2026-09-10', decided: '2026-09-11', status: 'approved', tags: ['UGC'] },
+    { id: 'kevin', name: 'Kevin Moore', email: 'kevin.moore@example.com', paypal: 'kevin.moore@example.com', ref: 'Bz6Rm1Yt8Pq3Lw5C', applied: '2026-09-02', decided: '2026-09-03', status: 'declined', tags: [] },
+    { id: 'ashley', name: 'Ashley Carter', email: 'ashley.carter@example.com', paypal: 'ashley.carter@example.com', ref: '9dFh3sKp1ZxQ6mWe', applied: '2026-07-28', decided: '2026-07-29', status: 'approved', tags: ['Blogger'] },
+    { id: 'daniel', name: 'Daniel Price', email: 'daniel.price@example.com', paypal: 'dprice.pay@example.com', ref: 'Lr5vB8nTq2Yc4XsJ', applied: '2026-06-01', decided: '2026-06-01', status: 'approved', tags: ['SMM'] },
+    { id: 'taylor', name: 'Taylor Morgan', email: 'taylor.morgan@example.com', paypal: '', ref: 'Tm7gK2rW9xPb4NqE', applied: '2026-07-01', decided: '2026-07-01', status: 'approved', tags: ['SamCart'] },
+    { id: 'jordan', name: 'Jordan Lee', email: 'jordan.lee@example.com', paypal: 'jordan.pay@example.com', ref: 'q4Tn8wLx2bVr7KcM', applied: '2026-05-02', decided: '2026-05-03', status: 'approved', tags: ['UGC'] }
+  ];
+
+  // [date, order id, price slug, status (hold | avail | refunded | paid:N), link]
+  const ORDERS = {
+    jordan: [
+      ['2026-09-12', 52311, 'hesistudy_one_year', 'hold', '/hesi/pricing'],
+      ['2026-09-03', 52104, 'hesistudy_three_year', 'hold', '/hesi/start'],
+      ['2026-08-28', 51977, 'hesistudy_90_days', 'hold', '/hesi/pricing'],
+      ['2026-08-21', 51820, 'hesistudy_30_days', 'hold', '/hesi/start'],
+      ['2026-08-09', 51563, 'hesistudy_180_days', 'avail', '/hesi/pricing'],
+      ['2026-08-06', 51488, 'hesistudy_one_year', 'avail', '/hesi/pricing'],
+      ['2026-08-02', 51402, 'hesistudy_30_days', 'refunded', '/hesi/pricing'],
+      ['2026-07-19', 51077, 'hesistudy_one_year', 'paid:2', '/hesi/pricing'],
+      ['2026-07-10', 50893, 'hesistudy_90_days', 'paid:2', '/hesi/start'],
+      ['2026-07-02', 50710, 'hesistudy_180_days', 'paid:2', '/hesi/pricing'],
+      ['2026-06-11', 50264, 'hesistudy_three_year', 'paid:1', '/hesi/pricing'],
+      ['2026-05-20', 49821, 'hesistudy_30_days', 'paid:1', '/hesi/start']
+    ],
+    ashley: [
+      ['2026-09-09', 52240, 'hesistudy_one_year', 'hold', '/hesi/pricing'],
+      ['2026-08-31', 52031, 'hesistudy_180_days', 'hold', '/hesi/start'],
+      ['2026-08-19', 51781, 'hesistudy_30_days', 'hold', '/hesi/pricing'],
+      ['2026-08-12', 51630, 'hesistudy_90_days', 'avail', '/hesi/pricing']
+    ],
+    daniel: [
+      ['2026-09-06', 52170, 'hesistudy_three_year', 'hold', '/hesi/pricing'],
+      ['2026-08-14', 51702, 'hesistudy_one_year', 'avail', '/hesi/pricing'],
+      ['2026-08-11', 51601, 'hesistudy_90_days', 'avail', '/hesi/pricing'],
+      ['2026-07-16', 50999, 'hesistudy_three_year', 'paid:2', '/hesi/pricing'],
+      ['2026-07-08', 50851, 'hesistudy_one_year', 'paid:2', '/hesi/pricing'],
+      ['2026-07-05', 50781, 'hesistudy_180_days', 'paid:2', '/hesi/pricing'],
+      // Available on Jul 18, before payout #1 was created on Jul 20
+      ['2026-06-18', 50412, 'hesistudy_90_days', 'paid:1', '/hesi/pricing'],
+      ['2026-06-15', 50340, 'hesistudy_one_year', 'paid:1', '/hesi/pricing'],
+      ['2026-06-12', 50281, 'hesistudy_one_year', 'paid:1', '/hesi/pricing']
+    ],
+    taylor: [
+      ['2026-08-30', 52005, 'hesistudy_one_year', 'hold', '/hesi/pricing'],
+      ['2026-08-10', 51588, 'hesistudy_three_year', 'avail', '/hesi/start'],
+      ['2026-08-04', 51455, 'hesistudy_180_days', 'avail', '/hesi/pricing']
+    ]
+  };
+
+  // Clicks per link: [period, all time]
+  const CLICKS = {
+    jordan: { '/hesi/start': [144, 348], '/hesi/pricing': [268, 612] },
+    ashley: { '/hesi/start': [86, 190], '/hesi/pricing': [201, 401] },
+    daniel: { '/hesi/start': [0, 0], '/hesi/pricing': [154, 820] },
+    taylor: { '/hesi/start': [18, 122], '/hesi/pricing': [40, 310] },
+    priya: { '/hesi/start': [25, 35], '/hesi/pricing': [71, 96] }
+  };
+
+  const PAYOUTS = [
+    { n: 2, created: '2026-08-20', paid: '2026-08-21', ref: 'PAYPAL-BATCH-0820', status: 'paid' },
+    { n: 1, created: '2026-07-20', paid: '2026-07-22', ref: 'PAYPAL-BATCH-0720', status: 'paid' }
+  ];
+  let openPayout = null;
+  let autoApprove = false;
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const money = (n) => '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const count = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const plural = (n, word) => `${count(n)} ${word}${n === 1 ? '' : 's'}`;
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const day = (iso) => { const [y, m, d] = iso.split('-').map(Number); return `${MONTHS[m - 1]} ${d}, ${y}`; };
+  const shortDay = (iso) => { const [, m, d] = iso.split('-').map(Number); return `${MONTHS[m - 1]} ${d}`; };
+  const periodText = () => `${shortDay(PERIOD.from)} &ndash; ${day(PERIOD.to)}`;
+  const addDays = (iso, n) => { const t = new Date(iso + 'T12:00:00Z'); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); };
+  const byId = (id) => AFF.find((a) => a.id === id);
+  const inPeriod = (o) => o.date >= PERIOD.from && o.date <= PERIOD.to && o.status !== 'refunded';
+
+  function orders(id) {
+    return (ORDERS[id] || []).map(([date, order, slug, status, link]) => {
+      const p = AT_ORDER[slug];
+      return { date, order, slug, plan: p.name, price: p.price, commission: p.commission, status, link, availableOn: addDays(date, 30) };
+    });
+  }
+
+  function stats(a) {
+    const list = orders(a.id);
+    const sum = (f) => +list.filter(f).reduce((s, o) => s + o.commission, 0).toFixed(2);
+    const period = list.filter(inPeriod);
+    const clicks = Object.values(CLICKS[a.id] || {}).reduce((s, c) => s + c[0], 0);
+    const commissions = +period.reduce((s, o) => s + o.commission, 0).toFixed(2);
+    return {
+      clicks,
+      orders: period.length,
+      revenue: period.reduce((s, o) => s + o.price, 0),
+      commissions,
+      epc: clicks ? commissions / clicks : 0,
+      hold: sum((o) => o.status === 'hold'),
+      avail: sum((o) => o.status === 'avail'),
+      paid: sum((o) => o.status.startsWith('paid')),
+      refunded: sum((o) => o.status === 'refunded'),
+      holdCount: list.filter((o) => o.status === 'hold').length,
+      availCount: list.filter((o) => o.status === 'avail').length,
+      paidCount: list.filter((o) => o.status.startsWith('paid')).length,
+      refundedCount: list.filter((o) => o.status === 'refunded').length
+    };
+  }
+
+  const STATUS_LABEL = { pending: 'label-warning', approved: 'label-success', declined: 'label-danger' };
+  const statusLabel = (s) => `<span class="label ${STATUS_LABEL[s]}">${s[0].toUpperCase() + s.slice(1)}</span>`;
+  const ORDER_LABEL = { hold: ['label-info', 'On hold'], avail: ['label-success', 'Available'], refunded: ['label-danger', 'Refunded'], paid: ['label-default', 'Paid out'] };
+  const orderLabel = (st) => { const k = st.startsWith('paid') ? 'paid' : st; const [c, t] = ORDER_LABEL[k]; return `<span class="label ${c}">${t}</span>`; };
+  const sortIcon = (active) => `<span class="glyphicon ${active ? 'glyphicon-sort-by-attributes-alt' : 'glyphicon-sort text-muted'} sort" aria-hidden="true"></span>`;
+  const tags = (a) => a.tags.length ? `<div class="tag-row">${a.tags.map((t) => `<span class="label label-default">${esc(t)}</span>`).join('')}</div>` : '';
+  const dash = '<span class="text-muted">&mdash;</span>';
+
+  const state = { page: 'partners', variant: 'tabs', bare: '0', status: '', query: '', tag: '', tab: 'orders', card: 'jordan', view: 'all', payoutError: false };
+  const PAGES = ['partners', 'card', 'products', 'links', 'settings', 'payouts'];
+  const VARIANTS = ['money', 'tim', 'tabs'];
+
+  function readHash() {
+    const p = new URLSearchParams(location.hash.slice(1));
+    for (const k of Object.keys(state)) if (p.has(k)) state[k] = p.get(k);
+    if (!PAGES.includes(state.page)) state.page = 'partners';
+    if (!VARIANTS.includes(state.variant)) state.variant = 'money';
+  }
+  function writeHash() {
+    const p = new URLSearchParams();
+    for (const k of ['variant', 'page', 'status', 'view', 'tab', 'card', 'bare']) {
+      if (!state[k] || (k === 'bare' && state[k] === '0') || (k === 'view' && state[k] === 'all')) continue;
+      if ((k === 'tab' || k === 'card') && state.page !== 'card') continue;
+      p.set(k, state[k]);
+    }
+    history.replaceState(null, '', '#' + p.toString());
+  }
+
+  function flash(text, ok = true) {
+    const f = $('#flash');
+    f.style.color = ok ? 'green' : 'orange';
+    f.textContent = text;
+  }
+
+  /* ---------- Totals shared by metrics, links and payouts ---------- */
+  function totals() {
+    const t = { clicks: 0, orders: 0, revenue: 0, commissions: 0, hold: 0, avail: 0, paid: 0, refunded: 0, holdCount: 0, availCount: 0, paidCount: 0, refundedCount: 0 };
+    AFF.filter((a) => a.status === 'approved').map(stats).forEach((s) => { for (const k of Object.keys(t)) t[k] += s[k]; });
+    t.epc = t.clicks ? t.commissions / t.clicks : 0;
+    const over50 = AFF.filter((a) => a.status === 'approved' && stats(a).avail >= 50);
+    t.ready = over50.filter((a) => a.paypal);
+    t.readySum = t.ready.reduce((s, a) => s + stats(a).avail, 0);
+    t.noPaypal = over50.length - t.ready.length;
+    return t;
+  }
+
+  // lead: [label, value, caption]; others: [[label, value], ...]
+  function metricRow(lead, others) {
+    return `<div class="metric-row">
+      <div class="metric metric-lead"><div class="metric-label">${lead[0]}</div><div class="metric-lead-value">${lead[1]}</div>${lead[2] ? `<div class="metric-sub">${lead[2]}</div>` : ''}</div>
+      ${others.map(([l, v]) => `<div class="metric"><div class="metric-label">${l}</div><div class="metric-value">${v}</div></div>`).join('')}
+    </div>`;
+  }
+
+  function renderMetrics() {
+    const t = totals();
+    const avgOrder = t.orders ? `avg order ${money(t.revenue / t.orders)} &middot; ` : '';
+
+    // Tim's layout and Tabs: the tile row, sales for the period and balances for all time
+    $('#tiles').innerHTML = `<div class="row metrics">
+      <div class="col-sm-7"><div class="panel panel-default"><div class="panel-heading"><strong>Sales</strong> <small class="text-muted">${periodText()}</small></div>
+        ${metricRow(['Revenue', money(t.revenue), `${avgOrder}EPC ${money(t.epc)}`], [['Clicks', count(t.clicks)], ['Orders', count(t.orders)], ['Commissions', money(t.commissions)]])}</div></div>
+      <div class="col-sm-5"><div class="panel panel-default"><div class="panel-heading"><strong>Balances</strong> <small class="text-muted">all time</small></div>
+        ${metricRow(['Available', money(t.avail), plural(t.availCount, 'commission')], [['On hold', money(t.hold)], ['Paid out', money(t.paid)]])}</div></div>
+    </div>`;
+
+    // Money view: the payout band, then one line of sales for the period
+    let readyLabel = 'Ready for payout';
+    let readyLine = [`<strong>${money(t.readySum)}</strong>`, plural(t.ready.length, 'affiliate')].concat(t.noPaypal ? [`${t.noPaypal} without PayPal`] : []).join(' &middot; ');
+    let readyNote = '$50.00 minimum. Affiliates without a PayPal email are skipped.';
+    let action;
+    if (openPayout) {
+      readyLabel = `Payout #${openPayout.n} is open`;
+      readyLine = `<strong>${money(openPayout.items.reduce((s, i) => s + i.amount, 0))}</strong> &middot; ${plural(openPayout.items.length, 'affiliate')}`;
+      readyNote = 'Upload the CSV to PayPal, then mark the payout as paid.';
+      action = `<a href="#" class="btn btn-default" data-go="payouts">Open payout #${openPayout.n}</a>`;
+    } else {
+      action = t.ready.length
+        ? '<button type="button" class="btn btn-success" data-action="create">Create payout</button>'
+        : '<button type="button" class="btn btn-success" disabled title="Nobody has $50.00 or more with a PayPal email">Create payout</button>';
+    }
+    $('#money-band').innerHTML = `<div class="panel panel-default payout-band"><div class="panel-body">
+      <div class="band-main"><div class="metric-label">Available</div><div class="metric-lead-value">${money(t.avail)}</div><div class="metric-sub">${plural(t.availCount, 'commission')} &middot; On hold ${money(t.hold)} &middot; Paid out ${money(t.paid)}</div></div>
+      <div class="band-ready"><div class="metric-label">${readyLabel}</div><div class="band-ready-line">${readyLine}</div><div class="metric-sub">${readyNote}</div></div>
+      <div class="band-action">${action}</div>
+    </div></div>`;
+    $('#money-sales').innerHTML = `<p class="sales-line"><strong>Sales, ${periodText()}</strong>${[['Clicks', count(t.clicks)], ['Orders', count(t.orders)], ['Revenue', money(t.revenue)], ['EPC', money(t.epc)], ['Commissions', money(t.commissions)]].map(([l, v]) => `<span>${l} <b>${v}</b></span>`).join('')}</p>`;
+  }
+
+  function renderTabs() {
+    const items = [['partners', 'Applications &amp; Partners', AFF.length], ['products', 'Products', PRODUCTS.length], ['links', 'Links', LINKS.length], ['settings', 'Settings', null], ['payouts', 'Payouts', PAYOUTS.length + (openPayout ? 1 : 0)]];
+    $('#aff-tabs').innerHTML = items.map(([k, label, n]) => `<li role="presentation"${state.page === k ? ' class="active"' : ''}><a href="#" data-go="${k}"${state.page === k ? ' aria-current="page"' : ''}>${label}${n === null ? '' : `<span class="badge">${n}</span>`}</a></li>`).join('');
+  }
+
+  /* ---------- Applications & Partners ---------- */
+  function renderStatusSelect() {
+    const counts = { pending: 0, approved: 0, declined: 0 };
+    AFF.forEach((a) => { counts[a.status] += 1; });
+    $('#f-status').innerHTML = `<option value="">All statuses (${AFF.length})</option>` +
+      ['pending', 'approved', 'declined'].map((s) => `<option value="${s}"${state.status === s ? ' selected' : ''}>${s[0].toUpperCase() + s.slice(1)} (${counts[s]})</option>`).join('');
+  }
+
+  function matches(a) {
+    const q = state.query.trim().toLowerCase();
+    return (!state.tag || a.tags.includes(state.tag)) && (!q || [a.name, a.email, a.paypal].join(' ').toLowerCase().includes(q));
+  }
+
+  function visibleAffiliates() {
+    const list = AFF.filter((a) => matches(a) && (!state.status || a.status === state.status));
+    if (state.view === 'top') return list.filter((a) => a.status === 'approved').sort((x, y) => (stats(y).commissions - stats(x).commissions) || (stats(y).epc - stats(x).epc));
+    if (state.variant === 'money') {
+      // Pending applications have their own panel above the table.
+      const rank = { approved: 0, declined: 1 };
+      return list.filter((a) => a.status !== 'pending').sort((x, y) => (rank[x.status] - rank[y.status]) || (stats(y).avail - stats(x).avail));
+    }
+    return [...list].sort((x, y) => y.applied.localeCompare(x.applied));
+  }
+
+  function actionsMenu(a) {
+    const decide = a.status === 'pending'
+      ? `<li><a href="#" data-action="approve" data-id="${a.id}">Approve</a></li><li><a href="#" data-action="decline" data-id="${a.id}">Decline</a></li><li role="separator" class="divider"></li>`
+      : '';
+    return `<div class="btn-group">
+      <button type="button" class="btn btn-default btn-xs dropdown-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Actions for ${esc(a.name)}"><span class="glyphicon glyphicon-option-vertical" aria-hidden="true"></span></button>
+      <ul class="dropdown-menu dropdown-menu-right">${decide}<li><a href="#" data-action="tags" data-id="${a.id}">Edit tags</a></li><li><a href="#" data-action="delete" data-id="${a.id}">Delete</a></li></ul>
+    </div>`;
+  }
+  const rowActions = (a) => `<td class="text-nowrap"><a href="#" class="btn btn-default btn-xs" data-card="${a.id}">View</a> ${actionsMenu(a)}</td>`;
+
+  function nameCell(a, withPaypal) {
+    const pay = a.paypal ? `<small class="text-muted">PayPal: ${esc(a.paypal)}</small>` : '<small class="text-danger">PayPal: not set</small>';
+    return `<a href="#" data-card="${a.id}">${esc(a.name)}</a><br><small class="text-muted">${esc(a.email)}</small>${withPaypal ? '<br>' + pay : ''}${tags(a)}`;
+  }
+
+  function renderApplications() {
+    const box = $('#applications');
+    const list = AFF.filter((a) => a.status === 'pending' && matches(a) && (!state.status || state.status === 'pending'));
+    if (!list.length || state.view === 'top') { box.innerHTML = ''; return; }
+    box.innerHTML = `<div class="panel panel-warning">
+      <div class="panel-heading"><strong>Applications</strong> <span class="badge">${list.length}</span> <small>waiting for a decision</small></div>
+      <table class="table table-hover" style="margin-bottom:0">
+        <thead><tr><th>Applicant</th><th>PayPal email</th><th class="shrink">Applied</th><th class="shrink"></th></tr></thead>
+        <tbody id="applications-body">${list.map((a) => `<tr data-id="${a.id}">
+          <td><a href="#" data-card="${a.id}">${esc(a.name)}</a><br><small class="text-muted">${esc(a.email)}</small>${tags(a)}</td>
+          <td>${a.paypal ? esc(a.paypal) : '<span class="text-danger">Not set</span>'}</td>
+          <td class="text-nowrap">${day(a.applied)}</td>
+          ${rowActions(a)}
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+  }
+
+  function renderPartners() {
+    renderStatusSelect();
+    const list = visibleAffiliates();
+    const head = $('#partners-head');
+    const body = $('#partners-body');
+    const timTable = state.variant !== 'money';
+    $('#partners-table').classList.toggle('table-condensed', timTable);
+    if (timTable) {
+      head.innerHTML = `<tr><th>Name &amp; Email&nbsp;${sortIcon()}</th><th>Applied&nbsp;${sortIcon(true)}</th><th class="num">Clicks&nbsp;${sortIcon()}</th><th class="num">Orders&nbsp;${sortIcon()}</th><th class="num">Revenue&nbsp;${sortIcon()}</th><th class="num">Commissions&nbsp;${sortIcon()}</th><th class="num">EPC&nbsp;${sortIcon()}</th><th class="num">Paid out&nbsp;${sortIcon()}</th><th class="num">On hold&nbsp;${sortIcon()}</th><th class="num">Available&nbsp;${sortIcon()}</th><th>Status</th><th></th></tr>`;
+      body.innerHTML = list.map((a) => {
+        const s = a.status === 'approved' ? stats(a) : null;
+        const n = (v, f) => s ? f(v) : dash;
+        return `<tr data-id="${a.id}">
+          <td class="name-cell">${nameCell(a, true)}</td>
+          <td class="text-nowrap">${day(a.applied)}</td>
+          <td class="num">${n(s && s.clicks, count)}</td>
+          <td class="num">${n(s && s.orders, count)}</td>
+          <td class="num">${n(s && s.revenue, money)}</td>
+          <td class="num">${n(s && s.commissions, money)}</td>
+          <td class="num">${n(s && s.epc, money)}</td>
+          <td class="num">${n(s && s.paid, money)}</td>
+          <td class="num">${n(s && s.hold, money)}</td>
+          <td class="num">${n(s && s.avail, money)}</td>
+          <td>${statusLabel(a.status)}</td>
+          ${rowActions(a)}
+        </tr>`;
+      }).join('') || '<tr class="empty-row"><td colspan="12">No affiliates found.</td></tr>';
+    } else {
+      head.innerHTML = `<tr><th>Affiliate</th><th>Status</th><th class="num">Clicks&nbsp;${sortIcon()}</th><th class="num">Orders&nbsp;${sortIcon()}</th><th class="num">Revenue&nbsp;${sortIcon()}</th><th class="num">EPC&nbsp;${sortIcon()}</th><th class="num">On hold&nbsp;${sortIcon()}</th><th class="num">Available&nbsp;${sortIcon(true)}</th><th class="num">Paid out&nbsp;${sortIcon()}</th><th></th></tr>`;
+      body.innerHTML = list.map((a) => {
+        if (a.status !== 'approved') {
+          return `<tr data-id="${a.id}">
+            <td>${nameCell(a, true)}</td>
+            <td>${statusLabel(a.status)}<br><small class="text-muted">Declined ${day(a.decided)}</small></td>
+            ${`<td class="num">${dash}</td>`.repeat(7)}
+            ${rowActions(a)}
+          </tr>`;
+        }
+        const s = stats(a);
+        const availNote = s.avail >= 50
+          ? (a.paypal ? '<span class="label label-success ready">Ready for payout</span>' : '<span class="label label-danger ready">No PayPal email</span>')
+          : (s.avail > 0 ? `<small class="text-muted ready">${money(50 - s.avail)} to $50.00</small>` : '');
+        return `<tr data-id="${a.id}">
+          <td>${nameCell(a, false)}</td>
+          <td>${statusLabel(a.status)}</td>
+          <td class="num">${count(s.clicks)}</td>
+          <td class="num">${count(s.orders)}</td>
+          <td class="num">${money(s.revenue)}</td>
+          <td class="num">${money(s.epc)}</td>
+          <td class="num">${money(s.hold)}</td>
+          <td class="num"><strong>${money(s.avail)}</strong>${availNote ? '<br>' + availNote : ''}</td>
+          <td class="num">${money(s.paid)}</td>
+          ${rowActions(a)}
+        </tr>`;
+      }).join('') || `<tr class="empty-row"><td colspan="10">${state.status === 'pending' ? 'Pending applications are listed above.' : 'No affiliates found.'}</td></tr>`;
+    }
+  }
+
+  /* ---------- Program settings (the block at the bottom of Tim's page) ---------- */
+  function settingsRows(full) {
+    const rows = [
+      ['Hold period', '30 days'],
+      ['Cookie lifetime', '30 days, last click counts'],
+      ['Minimum payout', '$50.00'],
+      ['Commission rates', '<a href="#" data-go="products">Per product</a>'],
+      ['Auto-approve applications', autoApprove ? 'On' : 'Off'],
+      ['Emails on approve / decline', 'On / On'],
+      ['Last changed', 'Sep 1, 2026 by admin']
+    ];
+    if (full) rows.splice(4, 0,
+      ['Counted purchases', 'One-time HESI purchases through Stripe and PayPal'],
+      ['Refund before payout', 'Commission is cancelled'],
+      ['Refund after payout', 'Subtracted from the next payout']);
+    return rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+  }
+
+  function payoutSummary(p) {
+    const items = p.items || payoutItems(p.n);
+    return { affs: new Set(items.map((i) => i.id)).size, comm: items.reduce((s, i) => s + i.count, 0), sum: items.reduce((s, i) => s + i.amount, 0) };
+  }
+  const payoutStatus = (p) => (p.status === 'paid' ? '<span class="label label-default">Paid</span>' : '<span class="label label-primary">Generated</span>');
+
+  function renderBottom() {
+    $('#settings-mini').innerHTML = settingsRows(false);
+    const all = (openPayout ? [openPayout] : []).concat(PAYOUTS);
+    $('#payouts-mini-count').textContent = all.length;
+    $('#payouts-mini').innerHTML = all.map((p) => {
+      const s = payoutSummary(p);
+      return `<tr><td>#${p.n}</td><td class="text-nowrap">${day(p.created)}</td><td>${payoutStatus(p)}</td><td class="num">${s.affs}</td><td class="num">${s.comm}</td><td class="num">${money(s.sum)}</td><td class="text-nowrap">${p.paid ? day(p.paid) : dash}</td></tr>`;
+    }).join('') || '<tr class="empty-row"><td colspan="7">No payouts yet.</td></tr>';
+    $('#settings-full').innerHTML = settingsRows(true);
+  }
+
+  /* ---------- Affiliate card ---------- */
+  function renderCard() {
+    const a = byId(state.card) || byId('jordan');
+    const s = stats(a);
+    $('#crumb-name').textContent = a.name;
+    $('#card-title').textContent = a.name;
+    $('#card-decision').innerHTML = a.status === 'pending'
+      ? `<div class="alert alert-warning">Applied ${day(a.applied)}. <button type="button" class="btn btn-success btn-sm" data-action="approve" data-id="${a.id}">Approve</button> <button type="button" class="btn btn-default btn-sm" data-action="decline" data-id="${a.id}">Decline</button></div>`
+      : '';
+    const decided = a.decided ? `<dt>${a.status === 'declined' ? 'Declined' : 'Approved'}</dt><dd>${day(a.decided)}</dd>` : '';
+    $('#card-profile').innerHTML = `
+      <dt>Status</dt><dd>${statusLabel(a.status)}</dd>
+      <dt>Email</dt><dd>${esc(a.email)}</dd>
+      <dt>PayPal email</dt><dd>${a.paypal ? esc(a.paypal) : '<span class="text-danger">Not set</span>'}</dd>
+      <dt>Ref code</dt><dd><code>${esc(a.ref)}</code></dd>
+      <dt>Link format</dt><dd><small><code>yourbestgrade.com/hesi/start?aff=${esc(a.ref)}</code></small></dd>
+      <dt>Applied</dt><dd>${day(a.applied)}</dd>${decided}
+      <dt>Tags</dt><dd>${a.tags.length ? a.tags.map((t) => `<span class="label label-default">${esc(t)}</span>`).join(' ') : '<span class="text-muted">None</span>'}</dd>`;
+    let availNote = '';
+    if (a.status === 'approved' && s.avail >= 50) availNote = a.paypal ? ' <span class="label label-success">Ready for payout</span>' : ' <span class="label label-danger">No PayPal email</span>';
+    else if (a.status === 'approved' && s.avail > 0) availNote = ` &middot; ${money(50 - s.avail)} to $50.00`;
+    $('#card-balance').innerHTML = metricRow(
+      ['Available', money(s.avail), plural(s.availCount, 'commission') + availNote],
+      [['On hold', money(s.hold)], ['Paid out', money(s.paid)], ['Refunded', money(s.refunded)]]
+    );
+    $('#card-period').innerHTML = `<strong>${day(PERIOD.from)} &ndash; ${day(PERIOD.to)}:</strong> <span>Clicks ${count(s.clicks)}</span><span>Orders ${s.orders}</span><span>Revenue ${money(s.revenue)}</span><span>Commissions ${money(s.commissions)}</span><span>EPC ${money(s.epc)}</span>`;
+
+    const list = orders(a.id);
+    const approved = a.status === 'approved';
+    const payouts = PAYOUTS.concat(openPayout ? [openPayout] : []).map((p) => {
+      const mine = list.filter((o) => o.status === 'paid:' + p.n || (openPayout && p === openPayout && p.items.some((i) => i.id === a.id) && o.status === 'avail'));
+      return { p, mine };
+    }).filter((x) => x.mine.length).sort((x, y) => y.p.n - x.p.n);
+    const counts = { orders: list.length, links: approved ? LINKS.length : 0, payouts: payouts.length };
+    $$('#card-tabs a').forEach((t) => {
+      const k = t.dataset.tab;
+      t.textContent = `${k[0].toUpperCase() + k.slice(1)} (${counts[k]})`;
+      t.parentElement.classList.toggle('active', k === state.tab);
+    });
+    const table = $('#card-table');
+    if (state.tab === 'links') {
+      table.tHead.innerHTML = `<tr><th>Link</th><th>Affiliate URL</th><th class="num">Clicks, ${shortDay(PERIOD.from)} &ndash; ${shortDay(PERIOD.to)}</th><th class="num">Sales, ${shortDay(PERIOD.from)} &ndash; ${shortDay(PERIOD.to)}</th><th class="num">Clicks, all time</th></tr>`;
+      table.tBodies[0].innerHTML = approved ? LINKS.map((l) => {
+        const [p, all] = (CLICKS[a.id] || {})[l.path] || [0, 0];
+        return `<tr>
+          <td>${l.name}<br><small class="link-path">${l.path}</small></td>
+          <td><code>https://www.yourbestgrade.com${l.path}?aff=${esc(a.ref)}</code></td>
+          <td class="num">${count(p)}</td>
+          <td class="num">${list.filter((o) => o.link === l.path && inPeriod(o)).length}</td>
+          <td class="num">${count(all)}</td>
+        </tr>`;
+      }).join('') : '<tr class="empty-row"><td colspan="5">Links appear after approval.</td></tr>';
+    } else if (state.tab === 'payouts') {
+      table.tHead.innerHTML = '<tr><th>Payout</th><th>Created</th><th class="num">Commissions</th><th class="num">Amount</th><th>Status</th><th>Paid</th></tr>';
+      table.tBodies[0].innerHTML = payouts.map(({ p, mine }) => `<tr>
+        <td><a href="#" data-go="payouts">#${p.n}</a></td><td>${day(p.created)}</td>
+        <td class="num">${mine.length}</td><td class="num">${money(mine.reduce((sum, o) => sum + o.commission, 0))}</td>
+        <td>${payoutStatus(p)}</td>
+        <td>${p.paid ? day(p.paid) : dash}</td>
+      </tr>`).join('') || '<tr class="empty-row"><td colspan="6">No payouts yet.</td></tr>';
+    } else {
+      table.tHead.innerHTML = '<tr><th>Date</th><th>Order</th><th>Product</th><th>Link</th><th class="num">Order amount</th><th class="num">Commission</th><th>Status</th><th>Available on</th></tr>';
+      table.tBodies[0].innerHTML = list.map((o) => `<tr>
+        <td class="text-nowrap">${day(o.date)}</td>
+        <td><a href="#">#${o.order}</a></td>
+        <td>${o.plan}<br><small class="text-muted">${o.slug}</small></td>
+        <td><small>${o.link}</small></td>
+        <td class="num">${money(o.price)}</td>
+        <td class="num">${o.status === 'refunded' ? `<span class="struck">${money(o.commission)}</span> $0.00` : money(o.commission)}</td>
+        <td>${orderLabel(o.status)}${o.status.startsWith('paid') ? ` <small class="text-muted">#${o.status.split(':')[1]}</small>` : ''}</td>
+        <td class="text-nowrap">${o.status === 'refunded' ? dash : day(o.availableOn)}</td>
+      </tr>`).join('') || '<tr class="empty-row"><td colspan="8">No orders yet.</td></tr>';
+    }
+  }
+
+  /* ---------- Products ---------- */
+  function renderProducts() {
+    $('#products-count').textContent = PRODUCTS.length;
+    $('#products-body').innerHTML = PRODUCTS.map((p, i) => {
+      const input = `<input type="number" class="form-control" min="0" step="0.01" value="${p.value}" data-value-for="${i}" aria-label="Commission value for ${esc(p.name)}">`;
+      const field = p.type === 'amount'
+        ? `<div class="input-group input-group-sm"><span class="input-group-addon">$</span>${input}</div>`
+        : `<div class="input-group input-group-sm">${input}<span class="input-group-addon">%</span></div>`;
+      return `<tr>
+        <td>${esc(p.name)}<br><small class="text-muted">${p.slug} &middot; one_time</small></td>
+        <td class="num">${money(p.price)}</td>
+        <td><div class="btn-group btn-group-xs" role="group" aria-label="Commission type for ${esc(p.name)}">
+          <button type="button" class="btn btn-default${p.type === 'amount' ? ' active' : ''}" data-type-for="${i}" data-type="amount" aria-pressed="${p.type === 'amount'}">Amount</button>
+          <button type="button" class="btn btn-default${p.type === 'percent' ? ' active' : ''}" data-type-for="${i}" data-type="percent" aria-pressed="${p.type === 'percent'}">Percent</button>
+        </div></td>
+        <td>${field}</td>
+        <td class="num" data-per-order="${i}">${money(commissionFor(p))}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  /* ---------- Links ---------- */
+  function renderLinks() {
+    const approved = AFF.filter((a) => a.status === 'approved');
+    const rows = LINKS.map((l) => ({
+      l,
+      clicks: approved.reduce((s, a) => s + (((CLICKS[a.id] || {})[l.path] || [0])[0]), 0),
+      sales: approved.reduce((s, a) => s + orders(a.id).filter((o) => o.link === l.path && inPeriod(o)).length, 0)
+    }));
+    $('#links-count').textContent = LINKS.length;
+    $('#links-period').innerHTML = periodText();
+    $('#links-body').innerHTML = rows.map(({ l, clicks, sales }) => `<tr>
+      <td>${l.name}<br><small class="link-path">yourbestgrade.com${l.path}?aff=&hellip;</small></td>
+      <td class="num">${count(clicks)}</td>
+      <td class="num">${count(sales)}</td>
+    </tr>`).join('');
+    $('#links-foot').innerHTML = `<tr><td>Total</td><td class="num">${count(rows.reduce((s, r) => s + r.clicks, 0))}</td><td class="num">${count(rows.reduce((s, r) => s + r.sales, 0))}</td></tr>`;
+  }
+
+  /* ---------- Payouts ---------- */
+  function eligible() {
+    return AFF.filter((a) => a.status === 'approved').map((a) => ({ a, s: stats(a) })).filter((x) => x.s.avail > 0);
+  }
+
+  function renderPayouts() {
+    const rows = eligible().sort((x, y) => y.s.avail - x.s.avail);
+    const inOpen = (id) => openPayout && openPayout.items.some((i) => i.id === id);
+    const good = rows.filter((x) => x.s.avail >= 50 && x.a.paypal && !inOpen(x.a.id));
+    $('#ready-body').innerHTML = rows.map(({ a, s }) => {
+      let check;
+      if (inOpen(a.id)) check = `<span class="label label-primary">In payout #${openPayout.n}</span>`;
+      else if (s.avail < 50) check = `<small class="text-muted">Waits: ${money(50 - s.avail)} to $50.00</small>`;
+      else if (!a.paypal) check = '<span class="label label-danger">No PayPal email</span> <small class="text-muted">skipped</small>';
+      else check = '<span class="label label-success">OK</span>';
+      return `<tr${s.avail < 50 ? ' class="text-muted"' : ''}>
+        <td><a href="#" data-card="${a.id}">${esc(a.name)}</a></td>
+        <td>${a.paypal ? esc(a.paypal) : '<span class="text-danger">Not set</span>'}</td>
+        <td class="num">${s.availCount}</td><td class="num">${money(s.avail)}</td><td>${check}</td>
+      </tr>`;
+    }).join('') || '<tr class="empty-row"><td colspan="5">No available commissions.</td></tr>';
+    const total = good.reduce((sum, x) => sum + x.s.avail, 0);
+    $('#ready-foot').innerHTML = openPayout
+      ? `<span class="text-muted">Payout #${openPayout.n} is open. New commissions go into the next payout.</span>`
+      : `${state.payoutError && !good.length ? '<div class="alert alert-danger" role="alert" style="margin-bottom:10px">Nothing to pay: no affiliate has $50.00 or more in available commissions with a PayPal email.</div>' : ''}<strong>${money(total)}</strong> for ${plural(good.length, 'affiliate')}<button type="button" class="btn btn-success pull-right" data-action="create">Create payout</button>`;
+
+    const open = $('#open-body');
+    if (openPayout) {
+      open.innerHTML = `<p><strong>Payout #${openPayout.n}</strong> &middot; created ${day(openPayout.created)} &middot; ${plural(openPayout.items.length, "affiliate")} &middot; ${openPayout.items.reduce((s, i) => s + i.count, 0)} commissions &middot; <strong>${money(openPayout.items.reduce((s, i) => s + i.amount, 0))}</strong></p>
+        <button type="button" class="btn btn-default" data-action="csv"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> Download CSV</button>
+        <button type="button" class="btn btn-success" data-action="paid">Mark as paid</button>
+        <button type="button" class="btn btn-link" data-action="cancel">Cancel payout</button>`;
+    } else {
+      open.innerHTML = '<p class="text-muted" style="margin:0">No open payout. Create one from the list above, upload the CSV to PayPal, then mark it as paid.</p>';
+    }
+
+    $('#generate').disabled = !!openPayout;
+    $('#generate').title = openPayout ? `Payout #${openPayout.n} is still open` : '';
+
+    const all = (openPayout ? [openPayout] : []).concat(PAYOUTS);
+    $('#payouts-body').innerHTML = all.map((p) => {
+      const s = payoutSummary(p);
+      const actions = p.status === 'generated'
+        ? '<button type="button" class="btn btn-default btn-xs" data-action="csv">CSV</button> <button type="button" class="btn btn-success btn-xs" data-action="paid">Mark paid</button> <button type="button" class="btn btn-default btn-xs" data-action="cancel">Cancel</button>'
+        : '<button type="button" class="btn btn-default btn-xs" data-action="csv" data-n="' + p.n + '">CSV</button>';
+      return `<tr>
+        <td>#${p.n}</td><td>${day(p.created)}</td>
+        <td>${payoutStatus(p)}</td>
+        <td class="num">${s.affs}</td><td class="num">${s.comm}</td><td class="num">${money(s.sum)}</td>
+        <td>${day(p.created)}</td><td>${p.paid ? day(p.paid) : dash}</td>
+        <td>${p.ref ? `<code>${p.ref}</code>` : dash}</td>
+        <td class="text-nowrap">${actions}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function payoutItems(n) {
+    const out = [];
+    for (const a of AFF) {
+      const mine = orders(a.id).filter((o) => o.status === 'paid:' + n);
+      if (mine.length) out.push({ id: a.id, name: a.name, paypal: a.paypal, count: mine.length, amount: mine.reduce((s, o) => s + o.commission, 0) });
+    }
+    return out;
+  }
+
+  function createPayout() {
+    const good = eligible().filter((x) => x.s.avail >= 50 && x.a.paypal);
+    const skipped = eligible().filter((x) => x.s.avail >= 50 && !x.a.paypal);
+    if (!good.length) {
+      state.payoutError = true;
+      flash(state.variant !== 'money' ? 'Nothing to pay: no affiliate has $50.00 or more in available commissions with a PayPal email.' : '', false);
+      render();
+      return;
+    }
+    state.payoutError = false;
+    openPayout = { n: PAYOUTS[0].n + 1, created: TODAY, status: 'generated', items: good.map(({ a, s }) => ({ id: a.id, name: a.name, paypal: a.paypal, count: s.availCount, amount: s.avail })) };
+    const sum = openPayout.items.reduce((s, i) => s + i.amount, 0);
+    flash(`Payout #${openPayout.n} created: ${plural(openPayout.items.length, "affiliate")}, ${money(sum)}.` + (skipped.length ? ` Skipped without a PayPal email: ${skipped.map((x) => x.a.name).join(', ')}.` : ''));
+    render();
+  }
+
+  function markPaid(ref) {
+    const n = openPayout.n;
+    for (const item of openPayout.items) (ORDERS[item.id] || []).forEach((row) => { if (row[3] === 'avail') row[3] = 'paid:' + n; });
+    PAYOUTS.unshift({ n, created: openPayout.created, paid: TODAY, ref, status: 'paid' });
+    openPayout = null;
+    flash(`Payout #${n} is marked as paid. Balances show the commissions as paid out.`);
+    render();
+  }
+
+  function confirmPaid() {
+    const sum = openPayout.items.reduce((s, i) => s + i.amount, 0);
+    openModal({
+      title: `Mark payout #${openPayout.n} as paid`,
+      body: `<p>Mark <strong>${money(sum)}</strong> to ${plural(openPayout.items.length, "affiliate")} as paid in PayPal? Their commissions move to paid out.</p><div class="form-group" style="margin-bottom:0"><label for="paypal-ref">PayPal batch reference</label><input type="text" class="form-control" id="paypal-ref" placeholder="PAYPAL-BATCH-0915"><span class="help-block" id="paypal-ref-help" style="display:none">Enter the batch reference from PayPal.</span></div>`,
+      ok: 'Mark as paid',
+      okClass: 'btn-success',
+      run: () => {
+        const input = $('#paypal-ref');
+        const ref = input.value.trim();
+        if (!ref) { input.parentElement.classList.add('has-error'); $('#paypal-ref-help').style.display = 'block'; input.focus(); return; }
+        closeModal();
+        markPaid(ref);
+      }
+    });
+    $('#paypal-ref').focus();
+  }
+
+  function confirmCancel() {
+    const n = openPayout.n;
+    openModal({
+      title: `Cancel payout #${n}`,
+      body: `<p>Cancel payout #${n}? Its commissions become available again. Cancel only if the CSV was not paid in PayPal.</p>`,
+      ok: 'Cancel payout',
+      okClass: 'btn-danger',
+      cancel: 'Keep payout',
+      run: () => { openPayout = null; closeModal(); flash(`Payout #${n} is cancelled. Its commissions are available again.`); render(); }
+    });
+  }
+
+  /* ---------- Modal ---------- */
+  let onOk = null;
+  function openModal({ title, body, ok, okClass = 'btn-primary', wide = false, run, cancel = 'Cancel' }) {
+    $('#modal-title').textContent = title;
+    $('#modal-body').innerHTML = body;
+    const btn = $('#modal-ok');
+    btn.textContent = ok;
+    btn.className = 'btn ' + okClass;
+    btn.style.display = run ? '' : 'none';
+    $('#modal [data-close]').textContent = run ? cancel : ok;
+    $('#modal-dialog').className = 'modal-dialog' + (wide ? ' modal-lg' : '');
+    onOk = run;
+    $('#modal').classList.add('mk-open');
+    $('#backdrop').hidden = false;
+    $('#backdrop').classList.add('in', 'mk-open');
+    document.body.classList.add('modal-open');
+    (run ? btn : $('#modal [data-close]')).focus();
+  }
+  function closeModal() {
+    $('#modal').classList.remove('mk-open');
+    $('#backdrop').hidden = true;
+    $('#backdrop').classList.remove('in', 'mk-open');
+    document.body.classList.remove('modal-open');
+    onOk = null;
+  }
+
+  function csvPreview(n) {
+    const items = openPayout && (!n || +n === openPayout.n) ? openPayout.items : payoutItems(+n);
+    const lines = items.map((i) => `${i.paypal},${i.amount.toFixed(2)},USD,YourBestGrade affiliate payout #${n || openPayout.n}`);
+    return `<p><code>affiliate-payout-${n || openPayout.n}.csv</code></p><pre class="csv">${esc(lines.join('\n'))}</pre>`;
+  }
+
+  /* ---------- Actions ---------- */
+  function decide(id, status) {
+    const a = byId(id);
+    const verb = status === 'approved' ? 'Approve' : 'Decline';
+    openModal({
+      title: `${verb} application`,
+      body: `<p>${verb} <strong>${esc(a.email)}</strong>? The affiliate will get an email.</p>`,
+      ok: verb,
+      okClass: status === 'approved' ? 'btn-success' : 'btn-danger',
+      run: () => {
+        a.status = status;
+        a.decided = TODAY;
+        if (status === 'approved') CLICKS[a.id] = { '/hesi/start': [0, 0], '/hesi/pricing': [0, 0] };
+        closeModal();
+        flash(`${a.email} is ${status}. The affiliate will get an email.`);
+        render();
+      }
+    });
+  }
+
+  function editTags(id) {
+    const a = byId(id);
+    const all = ['UGC', 'Blogger', 'SMM', 'SamCart'];
+    openModal({
+      title: `Tags for ${a.name}`,
+      body: all.map((t) => `<div class="checkbox"><label><input type="checkbox" value="${t}"${a.tags.includes(t) ? ' checked' : ''}> ${t}</label></div>`).join(''),
+      ok: 'Save tags',
+      run: () => {
+        a.tags = $$('#modal-body input:checked').map((i) => i.value);
+        closeModal();
+        flash(`Tags saved for ${a.name}.`);
+        render();
+      }
+    });
+  }
+
+  function deleteAffiliate(id) {
+    const a = byId(id);
+    openModal({
+      title: 'Delete affiliate',
+      body: `<p>Delete <strong>${esc(a.name)}</strong> (${esc(a.email)})? Orders and payouts stay in the history.</p>`,
+      ok: 'Delete',
+      okClass: 'btn-danger',
+      run: () => {
+        AFF.splice(AFF.indexOf(a), 1);
+        closeModal();
+        flash(`${a.email} is deleted. Orders and payouts stay in the history.`);
+        if (state.page === 'card') state.page = 'partners';
+        render();
+      }
+    });
+  }
+
+  function setType(i, type) {
+    const p = PRODUCTS[i];
+    if (p.type === type) return;
+    p.type = type;
+    renderProducts();
+  }
+
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('a, button');
+    const openDrop = $$('.dropdown.open, .btn-group.open');
+    if (t && t.classList.contains('dropdown-toggle')) {
+      e.preventDefault();
+      const holder = t.parentElement;
+      const was = holder.classList.contains('open');
+      openDrop.forEach((d) => { d.classList.remove('open'); $('.dropdown-toggle', d).setAttribute('aria-expanded', 'false'); });
+      if (!was) { holder.classList.add('open'); t.setAttribute('aria-expanded', 'true'); }
+      return;
+    }
+    openDrop.forEach((d) => { d.classList.remove('open'); const tg = $('.dropdown-toggle', d); if (tg) tg.setAttribute('aria-expanded', 'false'); });
+    if (!t) return;
+
+    if (t.closest('.mk-seg')) {
+      state[t.parentElement.dataset.key] = t.dataset.value;
+      flash('');
+      render();
+      return;
+    }
+    if (t.hasAttribute('data-close')) { closeModal(); return; }
+    if (t.id === 'modal-ok') { if (onOk) onOk(); return; }
+    if (t.href !== undefined && t.getAttribute('href') === '#') e.preventDefault();
+    if (t.dataset.go) { state.page = t.dataset.go; flash(''); render(); window.scrollTo(0, 0); return; }
+    if (t.dataset.card) { state.page = 'card'; state.card = t.dataset.card; state.tab = 'orders'; flash(''); render(); window.scrollTo(0, 0); return; }
+    if (t.dataset.view) { state.view = t.dataset.view; render(); return; }
+    if (t.dataset.tab) { state.tab = t.dataset.tab; render(); return; }
+    if (t.dataset.typeFor) { setType(+t.dataset.typeFor, t.dataset.type); return; }
+    if (t.id === 'f-search') { state.status = $('#f-status').value; state.query = $('#f-query').value; state.tag = $('#f-tag').value; render(); return; }
+    if (t.id === 'generate') { createPayout(); return; }
+    if (t.id === 'save-auto') { autoApprove = $('#auto-approve').checked; flash(`Auto-approve is ${autoApprove ? 'on' : 'off'}.`); render(); return; }
+    if (t.id === 'save-rates') { flash('Commission rates saved. New orders get the new rates.'); render(); return; }
+    const act = t.dataset.action;
+    if (!act) return;
+    const id = t.dataset.id || state.card;
+    if (act === 'approve') decide(id, 'approved');
+    if (act === 'decline') decide(id, 'declined');
+    if (act === 'tags') editTags(id);
+    if (act === 'delete') deleteAffiliate(id);
+    if (act === 'create') createPayout();
+    if (act === 'paid') confirmPaid();
+    if (act === 'cancel') confirmCancel();
+    if (act === 'csv') openModal({ title: 'PayPal payout CSV', body: csvPreview(t.dataset.n), ok: 'Close', wide: true });
+  });
+
+  document.addEventListener('input', (e) => {
+    const i = e.target.dataset.valueFor;
+    if (i === undefined) return;
+    const p = PRODUCTS[+i];
+    p.value = Math.max(0, parseFloat(e.target.value) || 0);
+    $(`[data-per-order="${i}"]`).textContent = money(commissionFor(p));
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { closeModal(); $$('.dropdown.open, .btn-group.open').forEach((d) => d.classList.remove('open')); }
+  });
+  $('#f-status').addEventListener('change', (e) => { state.status = e.target.value; render(); });
+  window.addEventListener('hashchange', () => { readHash(); render(); });
+
+  function render() {
+    document.body.dataset.page = state.page;
+    document.body.dataset.variant = state.variant;
+    document.body.dataset.bare = state.bare;
+    document.body.dataset.view = state.view;
+    $$('[data-view]').forEach((b) => b.classList.toggle('active', b.dataset.view === state.view));
+    $$('.mk-seg').forEach((seg) => $$('button', seg).forEach((b) => b.classList.toggle('on', state[seg.dataset.key] === b.dataset.value)));
+    $('#auto-approve').checked = autoApprove;
+    renderMetrics();
+    renderTabs();
+    renderApplications();
+    renderPartners();
+    renderBottom();
+    renderCard();
+    renderProducts();
+    renderLinks();
+    renderPayouts();
+    writeHash();
+  }
+
+  readHash();
+  render();
+})();
+</script>
+</body>
+</html>

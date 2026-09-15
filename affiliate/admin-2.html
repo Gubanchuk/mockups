@@ -49,21 +49,35 @@
   .aff-tabs { margin-top: 5px; }
   .aff-tabs .badge { margin-left: 4px; font-weight: normal; }
 
-  /* Metrics: two groups, sales for the period and commission balances. */
+  /* Metric groups: one lead number per group, the rest smaller. */
   .metrics { margin-bottom: 5px; }
   .metrics .panel { margin-bottom: 15px; }
-  .metrics .panel-heading small { margin-left: 4px; }
   .metric-row { display: flex; }
-  .metric { flex: 1 1 0; min-width: 0; padding: 12px 14px 13px; }
+  .metric { flex: 1 1 0; min-width: 0; padding: 12px 14px 13px; display: flex; flex-direction: column; justify-content: center; }
   .metric + .metric { border-left: 1px solid #ddd; }
+  .metric-lead { flex: 1.6 1 0; justify-content: flex-start; }
   .metric-label { color: #555; font-size: 13px; line-height: 18px; }
-  .metric-value { margin: 3px 0 2px; font-size: 22px; line-height: 28px; font-weight: bold; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .metric-lead-value { margin: 2px 0 1px; font-size: 31px; line-height: 38px; font-weight: bold; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .metric-value { margin-top: 3px; font-size: 18px; line-height: 24px; font-weight: bold; white-space: nowrap; font-variant-numeric: tabular-nums; }
   .metric-sub { color: #777; font-size: 12px; line-height: 16px; }
+
+  /* Money view: payout band, the sales line and the applications panel. */
+  .payout-band .panel-body { display: flex; align-items: center; padding: 14px 18px; }
+  .payout-band .panel-body::before, .payout-band .panel-body::after { display: none; }
+  .band-main { flex: 0 0 auto; padding-right: 28px; }
+  .band-ready { flex: 1 1 auto; min-width: 0; padding-left: 28px; border-left: 1px solid #ddd; }
+  .band-ready-line { margin: 4px 0 3px; font-size: 18px; line-height: 24px; font-variant-numeric: tabular-nums; }
+  .band-action { flex: 0 0 auto; padding-left: 20px; }
+  .sales-line { margin: 0 0 15px; color: #555; }
+  .sales-line strong { margin-right: 8px; color: #333; }
+  .sales-line span { margin-right: 16px; white-space: nowrap; }
+  .sales-line b { color: #333; font-variant-numeric: tabular-nums; }
+  .shrink { width: 1%; white-space: nowrap; }
 
   /* Additions inside the Bootstrap 3 vocabulary. */
   .page-head { margin-bottom: 10px; }
   .page-head .pull-right { margin-top: 25px; }
-  body[data-variant="tabs"] .mk-page .page-head .pull-right { margin-top: 0; margin-bottom: 10px; }
+  body[data-variant="tabs"] .mk-page:not(#page-card) .page-head .pull-right { margin-top: 0; margin-bottom: 10px; }
   .filters { margin-bottom: 15px; }
   .filters .form-control { margin-right: 4px; }
   .filters .dash { margin-right: 4px; }
@@ -102,13 +116,16 @@
   .links-table tfoot td { font-weight: bold; border-top: 2px solid #ddd; }
   .link-path { color: #777; }
 </style>
+<style>
+  .mock-version { color: #c7d2e1; text-decoration: none; white-space: nowrap; }
+  .mock-version:hover { color: #ffffff; }
+  .mock-version-name { color: #ffffff; font-weight: 600; white-space: nowrap; margin-right: 8px; }
+</style>
 </head>
-<body data-page="partners" data-variant="money" data-bare="0">
+<body data-page="partners" data-variant="tim" data-bare="0">
 
 <div class="mk-bar" role="toolbar" aria-label="Mockup options">
-  <span><b>Variant</b><span class="mk-seg" data-key="variant">
-    <button type="button" data-value="money">Money view</button><button type="button" data-value="tim">Tim's layout</button><button type="button" data-value="tabs">Tabs</button>
-  </span></span>
+  <a class="mock-version" href="/affiliate">&larr; Affiliate program</a><span class="mock-version-name">Affiliates in the admin panel &middot; Version 2 &middot; Tim's layout</span>
   <span><b>Page</b><span class="mk-seg" data-key="page">
     <button type="button" data-value="partners">Applications &amp; Partners</button><button type="button" data-value="card">Affiliate card</button><button type="button" data-value="products">Products</button><button type="button" data-value="links">Links</button><button type="button" data-value="settings">Settings</button><button type="button" data-value="payouts">Payouts</button>
   </span></span>
@@ -128,7 +145,7 @@
         <li class="dropdown"><a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">Catalog<span class="caret"></span></a>
           <ul class="dropdown-menu"><li><a href="#">Products</a></li><li><a href="#">Programs</a></li></ul>
         </li>
-        <li class="dropdown v-pages"><a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">Affiliates<span class="caret"></span></a>
+        <li class="dropdown v-pages active"><a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">Affiliates<span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li><a href="#" data-go="partners">Applications &amp; Partners</a></li>
             <li><a href="#" data-go="products">Products</a></li>
@@ -163,7 +180,7 @@
 <div class="container-fluid">
   <p id="flash" style="color: orange"></p>
 
-  <!-- ============ Tabs variant: one Affiliates page ============ -->
+  <!-- ============ Tabs variant: one Affiliates page, the tab strip right under the title ============ -->
   <div class="v-tabs" id="tabs-head">
     <div class="clearfix page-head">
       <h1 class="pull-left">Affiliates</h1>
@@ -172,7 +189,6 @@
         <a href="#" class="btn btn-success" data-go="payouts">Generate Payout CSV</a>
       </div>
     </div>
-    <div id="metrics-tabs"></div>
     <ul class="nav nav-tabs aff-tabs" id="aff-tabs"></ul>
   </div>
 
@@ -182,10 +198,12 @@
       <h1 class="pull-left">Affiliates</h1>
       <div class="pull-right">
         <a href="#" class="btn btn-default v-tim" data-go="settings">Program rules &amp; rates</a>
+        <a href="#" class="btn btn-success v-tim" data-go="payouts">Generate Payout CSV</a>
         <a href="#" class="btn btn-default v-money" data-go="settings">Settings</a>
-        <a href="#" class="btn btn-success" data-go="payouts"><span class="v-tim">Generate Payout CSV</span><span class="v-money">Create payout</span></a>
       </div>
     </div>
+
+    <div class="v-money" id="money-band"></div>
 
     <form class="form-inline filters" onsubmit="return false">
       <input type="date" class="form-control" id="f-from" value="2026-08-01" aria-label="From">
@@ -200,7 +218,9 @@
       <div class="btn-group" role="group" aria-label="View" style="margin-left:8px"><button type="button" class="btn btn-default active" data-view="all">All affiliates</button><button type="button" class="btn btn-default" data-view="top">Top by commissions</button></div>
     </form>
 
-    <div class="v-pages" id="metrics-pages"></div>
+    <div class="v-money" id="money-sales"></div>
+    <div class="v-money" id="applications"></div>
+    <div class="v-tim" id="tiles"></div>
 
     <table class="table table-hover" id="partners-table">
       <thead id="partners-head"></thead>
@@ -250,7 +270,7 @@
       <div class="col-md-7">
         <div class="panel panel-default">
           <div class="panel-heading"><strong>Balance</strong> <small class="text-muted">all time</small></div>
-          <table class="table" style="margin-bottom:0"><tbody><tr id="card-balance"></tr></tbody></table>
+          <div id="card-balance"></div>
           <div class="panel-footer period-line" id="card-period"></div>
         </div>
       </div>
@@ -447,7 +467,8 @@
       ['2026-07-16', 50999, 'hesistudy_three_year', 'paid:2', '/hesi/pricing'],
       ['2026-07-08', 50851, 'hesistudy_one_year', 'paid:2', '/hesi/pricing'],
       ['2026-07-05', 50781, 'hesistudy_180_days', 'paid:2', '/hesi/pricing'],
-      ['2026-07-01', 50688, 'hesistudy_90_days', 'paid:2', '/hesi/pricing'],
+      // Available on Jul 18, before payout #1 was created on Jul 20
+      ['2026-06-18', 50412, 'hesistudy_90_days', 'paid:1', '/hesi/pricing'],
       ['2026-06-15', 50340, 'hesistudy_one_year', 'paid:1', '/hesi/pricing'],
       ['2026-06-12', 50281, 'hesistudy_one_year', 'paid:1', '/hesi/pricing']
     ],
@@ -526,7 +547,7 @@
   const tags = (a) => a.tags.length ? `<div class="tag-row">${a.tags.map((t) => `<span class="label label-default">${esc(t)}</span>`).join('')}</div>` : '';
   const dash = '<span class="text-muted">&mdash;</span>';
 
-  const state = { page: 'partners', variant: 'money', bare: '0', status: '', query: '', tag: '', tab: 'orders', card: 'jordan', view: 'all', payoutError: false };
+  const state = { page: 'partners', variant: 'tim', bare: '0', status: '', query: '', tag: '', tab: 'orders', card: 'jordan', view: 'all', payoutError: false };
   const PAGES = ['partners', 'card', 'products', 'links', 'settings', 'payouts'];
   const VARIANTS = ['money', 'tim', 'tabs'];
 
@@ -564,32 +585,47 @@
     return t;
   }
 
-  function metric(label, value, sub, valueClass = '') {
-    return `<div class="metric"><div class="metric-label">${label}</div><div class="metric-value${valueClass ? ' ' + valueClass : ''}">${value}</div><div class="metric-sub">${sub}</div></div>`;
+  // lead: [label, value, caption]; others: [[label, value], ...]
+  function metricRow(lead, others) {
+    return `<div class="metric-row">
+      <div class="metric metric-lead"><div class="metric-label">${lead[0]}</div><div class="metric-lead-value">${lead[1]}</div>${lead[2] ? `<div class="metric-sub">${lead[2]}</div>` : ''}</div>
+      ${others.map(([l, v]) => `<div class="metric"><div class="metric-label">${l}</div><div class="metric-value">${v}</div></div>`).join('')}
+    </div>`;
   }
 
   function renderMetrics() {
     const t = totals();
-    const payouts = PAYOUTS.length;
-    const sales = `<div class="panel panel-default"><div class="panel-heading"><strong>Sales</strong> <small class="text-muted">${periodText()}</small></div><div class="metric-row">
-      ${metric('Clicks', count(t.clicks), `EPC ${money(t.epc)}`)}
-      ${metric('Orders', count(t.orders), t.clicks ? `${(t.orders / t.clicks * 100).toFixed(1)}% of clicks` : '&nbsp;')}
-      ${metric('Revenue', money(t.revenue), t.orders ? `avg order ${money(t.revenue / t.orders)}` : '&nbsp;')}
+    const avgOrder = t.orders ? `avg order ${money(t.revenue / t.orders)} &middot; ` : '';
+
+    // Tim's layout and Tabs: the tile row, sales for the period and balances for all time
+    $('#tiles').innerHTML = `<div class="row metrics">
+      <div class="col-sm-7"><div class="panel panel-default"><div class="panel-heading"><strong>Sales</strong> <small class="text-muted">${periodText()}</small></div>
+        ${metricRow(['Revenue', money(t.revenue), `${avgOrder}EPC ${money(t.epc)}`], [['Clicks', count(t.clicks)], ['Orders', count(t.orders)], ['Commissions', money(t.commissions)]])}</div></div>
+      <div class="col-sm-5"><div class="panel panel-default"><div class="panel-heading"><strong>Balances</strong> <small class="text-muted">all time</small></div>
+        ${metricRow(['Available', money(t.avail), plural(t.availCount, 'commission')], [['On hold', money(t.hold)], ['Paid out', money(t.paid)]])}</div></div>
+    </div>`;
+
+    // Money view: the payout band, then one line of sales for the period
+    let readyLabel = 'Ready for payout';
+    let readyLine = [`<strong>${money(t.readySum)}</strong>`, plural(t.ready.length, 'affiliate')].concat(t.noPaypal ? [`${t.noPaypal} without PayPal`] : []).join(' &middot; ');
+    let readyNote = '$50.00 minimum. Affiliates without a PayPal email are skipped.';
+    let action;
+    if (openPayout) {
+      readyLabel = `Payout #${openPayout.n} is open`;
+      readyLine = `<strong>${money(openPayout.items.reduce((s, i) => s + i.amount, 0))}</strong> &middot; ${plural(openPayout.items.length, 'affiliate')}`;
+      readyNote = 'Upload the CSV to PayPal, then mark the payout as paid.';
+      action = `<a href="#" class="btn btn-default" data-go="payouts">Open payout #${openPayout.n}</a>`;
+    } else {
+      action = t.ready.length
+        ? '<button type="button" class="btn btn-success" data-action="create">Create payout</button>'
+        : '<button type="button" class="btn btn-success" disabled title="Nobody has $50.00 or more with a PayPal email">Create payout</button>';
+    }
+    $('#money-band').innerHTML = `<div class="panel panel-default payout-band"><div class="panel-body">
+      <div class="band-main"><div class="metric-label">Available</div><div class="metric-lead-value">${money(t.avail)}</div><div class="metric-sub">${plural(t.availCount, 'commission')} &middot; On hold ${money(t.hold)} &middot; Paid out ${money(t.paid)}</div></div>
+      <div class="band-ready"><div class="metric-label">${readyLabel}</div><div class="band-ready-line">${readyLine}</div><div class="metric-sub">${readyNote}</div></div>
+      <div class="band-action">${action}</div>
     </div></div>`;
-    const readyText = t.ready.length ? `${money(t.readySum)} for ${plural(t.ready.length, 'affiliate')}` : 'nobody over $50.00';
-    const cells = [
-      metric('Commissions', money(t.commissions), `${shortDay(PERIOD.from)} &ndash; ${shortDay(PERIOD.to)}`),
-      metric('On hold', money(t.hold), plural(t.holdCount, 'commission')),
-      metric('Available', money(t.avail), plural(t.availCount, 'commission')),
-      state.variant === 'money' ? metric('Ready for payout', money(t.readySum), readyText.replace(`${money(t.readySum)} for `, '') + (t.noPaypal ? `, ${t.noPaypal} without PayPal` : ''), 'text-success') : '',
-      metric('Paid out', money(t.paid), `in ${plural(payouts, 'payout')}`)
-    ].join('');
-    const comm = `<div class="panel panel-default"><div class="panel-heading"><strong>Commissions</strong> <small class="text-muted">balances all time</small></div><div class="metric-row">${cells}</div></div>`;
-    const html = state.variant === 'money'
-      ? `<div class="row metrics"><div class="col-sm-7">${comm}</div><div class="col-sm-5">${sales}</div></div>`
-      : `<div class="row metrics"><div class="col-sm-5">${sales}</div><div class="col-sm-7">${comm}</div></div>`;
-    $('#metrics-pages').innerHTML = html;
-    $('#metrics-tabs').innerHTML = html;
+    $('#money-sales').innerHTML = `<p class="sales-line"><strong>Sales, ${periodText()}</strong>${[['Clicks', count(t.clicks)], ['Orders', count(t.orders)], ['Revenue', money(t.revenue)], ['EPC', money(t.epc)], ['Commissions', money(t.commissions)]].map(([l, v]) => `<span>${l} <b>${v}</b></span>`).join('')}</p>`;
   }
 
   function renderTabs() {
@@ -605,17 +641,20 @@
       ['pending', 'approved', 'declined'].map((s) => `<option value="${s}"${state.status === s ? ' selected' : ''}>${s[0].toUpperCase() + s.slice(1)} (${counts[s]})</option>`).join('');
   }
 
-  function visibleAffiliates() {
+  function matches(a) {
     const q = state.query.trim().toLowerCase();
-    let list = AFF.filter((a) => (!state.status || a.status === state.status)
-      && (!state.tag || a.tags.includes(state.tag))
-      && (!q || [a.name, a.email, a.paypal].join(' ').toLowerCase().includes(q)));
+    return (!state.tag || a.tags.includes(state.tag)) && (!q || [a.name, a.email, a.paypal].join(' ').toLowerCase().includes(q));
+  }
+
+  function visibleAffiliates() {
+    const list = AFF.filter((a) => matches(a) && (!state.status || a.status === state.status));
     if (state.view === 'top') return list.filter((a) => a.status === 'approved').sort((x, y) => (stats(y).commissions - stats(x).commissions) || (stats(y).epc - stats(x).epc));
     if (state.variant === 'money') {
-      const rank = { pending: 0, approved: 1, declined: 2 };
-      list = [...list].sort((x, y) => (rank[x.status] - rank[y.status]) || (stats(y).avail - stats(x).avail));
+      // Pending applications have their own panel above the table.
+      const rank = { approved: 0, declined: 1 };
+      return list.filter((a) => a.status !== 'pending').sort((x, y) => (rank[x.status] - rank[y.status]) || (stats(y).avail - stats(x).avail));
     }
-    return list;
+    return [...list].sort((x, y) => y.applied.localeCompare(x.applied));
   }
 
   function actionsMenu(a) {
@@ -634,6 +673,24 @@
     return `<a href="#" data-card="${a.id}">${esc(a.name)}</a><br><small class="text-muted">${esc(a.email)}</small>${withPaypal ? '<br>' + pay : ''}${tags(a)}`;
   }
 
+  function renderApplications() {
+    const box = $('#applications');
+    const list = AFF.filter((a) => a.status === 'pending' && matches(a) && (!state.status || state.status === 'pending'));
+    if (!list.length || state.view === 'top') { box.innerHTML = ''; return; }
+    box.innerHTML = `<div class="panel panel-warning">
+      <div class="panel-heading"><strong>Applications</strong> <span class="badge">${list.length}</span> <small>waiting for a decision</small></div>
+      <table class="table table-hover" style="margin-bottom:0">
+        <thead><tr><th>Applicant</th><th>PayPal email</th><th class="shrink">Applied</th><th class="shrink"></th></tr></thead>
+        <tbody id="applications-body">${list.map((a) => `<tr data-id="${a.id}">
+          <td><a href="#" data-card="${a.id}">${esc(a.name)}</a><br><small class="text-muted">${esc(a.email)}</small>${tags(a)}</td>
+          <td>${a.paypal ? esc(a.paypal) : '<span class="text-danger">Not set</span>'}</td>
+          <td class="text-nowrap">${day(a.applied)}</td>
+          ${rowActions(a)}
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+  }
+
   function renderPartners() {
     renderStatusSelect();
     const list = visibleAffiliates();
@@ -642,7 +699,7 @@
     const timTable = state.variant !== 'money';
     $('#partners-table').classList.toggle('table-condensed', timTable);
     if (timTable) {
-      head.innerHTML = `<tr><th>Name &amp; Email&nbsp;${sortIcon()}</th><th>Applied&nbsp;${sortIcon(true)}</th><th class="num">Clicks&nbsp;${sortIcon()}</th><th class="num">Orders&nbsp;${sortIcon()}</th><th class="num">Revenue&nbsp;${sortIcon()}</th><th class="num">Commissions&nbsp;${sortIcon()}</th><th class="num">EPC&nbsp;${sortIcon()}</th><th class="num">Payments&nbsp;${sortIcon()}</th><th class="num">Pending balance&nbsp;${sortIcon()}</th><th class="num">Available balance&nbsp;${sortIcon()}</th><th>Status</th><th></th></tr>`;
+      head.innerHTML = `<tr><th>Name &amp; Email&nbsp;${sortIcon()}</th><th>Applied&nbsp;${sortIcon(true)}</th><th class="num">Clicks&nbsp;${sortIcon()}</th><th class="num">Orders&nbsp;${sortIcon()}</th><th class="num">Revenue&nbsp;${sortIcon()}</th><th class="num">Commissions&nbsp;${sortIcon()}</th><th class="num">EPC&nbsp;${sortIcon()}</th><th class="num">Paid out&nbsp;${sortIcon()}</th><th class="num">On hold&nbsp;${sortIcon()}</th><th class="num">Available&nbsp;${sortIcon()}</th><th>Status</th><th></th></tr>`;
       body.innerHTML = list.map((a) => {
         const s = a.status === 'approved' ? stats(a) : null;
         const n = (v, f) => s ? f(v) : dash;
@@ -665,10 +722,9 @@
       head.innerHTML = `<tr><th>Affiliate</th><th>Status</th><th class="num">Clicks&nbsp;${sortIcon()}</th><th class="num">Orders&nbsp;${sortIcon()}</th><th class="num">Revenue&nbsp;${sortIcon()}</th><th class="num">EPC&nbsp;${sortIcon()}</th><th class="num">On hold&nbsp;${sortIcon()}</th><th class="num">Available&nbsp;${sortIcon(true)}</th><th class="num">Paid out&nbsp;${sortIcon()}</th><th></th></tr>`;
       body.innerHTML = list.map((a) => {
         if (a.status !== 'approved') {
-          const note = a.status === 'pending' ? `Applied ${day(a.applied)}` : `Declined ${day(a.decided)}`;
-          return `<tr data-id="${a.id}"${a.status === 'pending' ? ' class="warning"' : ''}>
+          return `<tr data-id="${a.id}">
             <td>${nameCell(a, true)}</td>
-            <td>${statusLabel(a.status)}<br><small class="text-muted">${note}</small></td>
+            <td>${statusLabel(a.status)}<br><small class="text-muted">Declined ${day(a.decided)}</small></td>
             ${`<td class="num">${dash}</td>`.repeat(7)}
             ${rowActions(a)}
           </tr>`;
@@ -689,7 +745,7 @@
           <td class="num">${money(s.paid)}</td>
           ${rowActions(a)}
         </tr>`;
-      }).join('') || '<tr class="empty-row"><td colspan="10">No affiliates found.</td></tr>';
+      }).join('') || `<tr class="empty-row"><td colspan="10">${state.status === 'pending' ? 'Pending applications are listed above.' : 'No affiliates found.'}</td></tr>`;
     }
   }
 
@@ -746,11 +802,13 @@
       <dt>Link format</dt><dd><small><code>yourbestgrade.com/hesi/start?aff=${esc(a.ref)}</code></small></dd>
       <dt>Applied</dt><dd>${day(a.applied)}</dd>${decided}
       <dt>Tags</dt><dd>${a.tags.length ? a.tags.map((t) => `<span class="label label-default">${esc(t)}</span>`).join(' ') : '<span class="text-muted">None</span>'}</dd>`;
-    const readyNote = s.avail >= 50 ? '<br><span class="label label-success">Ready for payout</span>' : (s.avail > 0 ? `<br><small class="text-muted">${money(50 - s.avail)} to $50.00</small>` : '');
-    $('#card-balance').innerHTML = [
-      ['On hold', s.hold, s.holdCount, ''], ['Available', s.avail, s.availCount, a.status === 'approved' ? readyNote : ''],
-      ['Paid out', s.paid, s.paidCount, ''], ['Refunded', s.refunded, s.refundedCount, '']
-    ].map(([l, v, c, extra]) => `<td style="width:25%"><small class="text-muted">${l}</small><br><strong>${money(v)}</strong><br><small class="text-muted">${plural(c, 'commission')}</small>${extra}</td>`).join('');
+    let availNote = '';
+    if (a.status === 'approved' && s.avail >= 50) availNote = a.paypal ? ' <span class="label label-success">Ready for payout</span>' : ' <span class="label label-danger">No PayPal email</span>';
+    else if (a.status === 'approved' && s.avail > 0) availNote = ` &middot; ${money(50 - s.avail)} to $50.00`;
+    $('#card-balance').innerHTML = metricRow(
+      ['Available', money(s.avail), plural(s.availCount, 'commission') + availNote],
+      [['On hold', money(s.hold)], ['Paid out', money(s.paid)], ['Refunded', money(s.refunded)]]
+    );
     $('#card-period').innerHTML = `<strong>${day(PERIOD.from)} &ndash; ${day(PERIOD.to)}:</strong> <span>Clicks ${count(s.clicks)}</span><span>Orders ${s.orders}</span><span>Revenue ${money(s.revenue)}</span><span>Commissions ${money(s.commissions)}</span><span>EPC ${money(s.epc)}</span>`;
 
     const list = orders(a.id);
@@ -868,7 +926,7 @@
 
     const open = $('#open-body');
     if (openPayout) {
-      open.innerHTML = `<p><strong>Payout #${openPayout.n}</strong> &middot; created ${day(openPayout.created)} &middot; ${openPayout.items.length} affiliates &middot; ${openPayout.items.reduce((s, i) => s + i.count, 0)} commissions &middot; <strong>${money(openPayout.items.reduce((s, i) => s + i.amount, 0))}</strong></p>
+      open.innerHTML = `<p><strong>Payout #${openPayout.n}</strong> &middot; created ${day(openPayout.created)} &middot; ${plural(openPayout.items.length, "affiliate")} &middot; ${openPayout.items.reduce((s, i) => s + i.count, 0)} commissions &middot; <strong>${money(openPayout.items.reduce((s, i) => s + i.amount, 0))}</strong></p>
         <button type="button" class="btn btn-default" data-action="csv"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> Download CSV</button>
         <button type="button" class="btn btn-success" data-action="paid">Mark as paid</button>
         <button type="button" class="btn btn-link" data-action="cancel">Cancel payout</button>`;
@@ -917,7 +975,7 @@
     state.payoutError = false;
     openPayout = { n: PAYOUTS[0].n + 1, created: TODAY, status: 'generated', items: good.map(({ a, s }) => ({ id: a.id, name: a.name, paypal: a.paypal, count: s.availCount, amount: s.avail })) };
     const sum = openPayout.items.reduce((s, i) => s + i.amount, 0);
-    flash(`Payout #${openPayout.n} created: ${openPayout.items.length} affiliates, ${money(sum)}.` + (skipped.length ? ` Skipped without a PayPal email: ${skipped.map((x) => x.a.name).join(', ')}.` : ''));
+    flash(`Payout #${openPayout.n} created: ${plural(openPayout.items.length, "affiliate")}, ${money(sum)}.` + (skipped.length ? ` Skipped without a PayPal email: ${skipped.map((x) => x.a.name).join(', ')}.` : ''));
     render();
   }
 
@@ -934,7 +992,7 @@
     const sum = openPayout.items.reduce((s, i) => s + i.amount, 0);
     openModal({
       title: `Mark payout #${openPayout.n} as paid`,
-      body: `<p>Mark <strong>${money(sum)}</strong> to ${openPayout.items.length} affiliates as paid in PayPal? Their commissions move to paid out.</p><div class="form-group" style="margin-bottom:0"><label for="paypal-ref">PayPal batch reference</label><input type="text" class="form-control" id="paypal-ref" placeholder="PAYPAL-BATCH-0915"><span class="help-block" id="paypal-ref-help" style="display:none">Enter the batch reference from PayPal.</span></div>`,
+      body: `<p>Mark <strong>${money(sum)}</strong> to ${plural(openPayout.items.length, "affiliate")} as paid in PayPal? Their commissions move to paid out.</p><div class="form-group" style="margin-bottom:0"><label for="paypal-ref">PayPal batch reference</label><input type="text" class="form-control" id="paypal-ref" placeholder="PAYPAL-BATCH-0915"><span class="help-block" id="paypal-ref-help" style="display:none">Enter the batch reference from PayPal.</span></div>`,
       ok: 'Mark as paid',
       okClass: 'btn-success',
       run: () => {
@@ -1121,6 +1179,7 @@
     $('#auto-approve').checked = autoApprove;
     renderMetrics();
     renderTabs();
+    renderApplications();
     renderPartners();
     renderBottom();
     renderCard();

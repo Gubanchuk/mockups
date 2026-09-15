@@ -9,56 +9,44 @@
     :root { --ink: #183261; --link: #1E5290; --ground: #E6EDF6; }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--ground); font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; color: var(--ink); }
-    .mk-bar { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 18px; padding: 0 20px; background: #183261; color: #ffffff; font-size: 13px; }
-    .mk-bar a { color: rgba(255,255,255,0.72); text-decoration: none; padding: 11px 0; }
-    .mk-bar a:hover { color: #ffffff; }
-    .mk-home { font-weight: 600; color: #ffffff; margin-right: 6px; padding: 11px 0; }
-    .mk-bar a[aria-current] { color: #ffffff; box-shadow: inset 0 -2px 0 #ffffff; }
     .mk-wrap { max-width: 940px; margin: 0 auto; padding: 56px 20px 80px 20px; }
+    .mk-back { margin: 0 0 18px 0; font-size: 13px; }
+    .mk-back a { color: var(--link); text-decoration: none; }
     h1 { font-size: 30px; font-weight: 600; margin: 0 0 8px 0; }
     .mk-sub { color: #5a6f92; font-size: 15px; margin: 0 0 34px 0; }
-    .mk-card { padding: 20px 22px; margin-bottom: 12px; background: #ffffff; border: 1px solid #d7e0ee; border-radius: 12px; }
-    .mk-card h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0 0 12px 0; font-size: 16px; font-weight: 600; }
+    .mk-card { display: flex; gap: 16px; align-items: flex-start; padding: 20px 22px; margin-bottom: 12px; background: #ffffff; border: 1px solid #d7e0ee; border-radius: 12px; color: inherit; text-decoration: none; }
+    .mk-card:hover { border-color: #1E5290; box-shadow: 0 10px 26px rgba(24,50,97,0.12); }
+    .mk-num { flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 26px; padding: 0 8px; border-radius: 13px; background: #183261; color: #ffffff; font-size: 13px; font-weight: 600; }
+    .mk-card-body { display: block; }
+    .mk-card-body b { display: block; font-size: 16px; margin-bottom: 5px; }
+    .mk-card-body span { display: block; font-size: 13px; line-height: 1.55; color: #5a6f92; }
+    .mk-group { margin: 0 0 36px 0; }
+    .mk-group h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0 0 6px 0; font-size: 20px; font-weight: 600; }
     .mk-task { color: #5a6f92; font-size: 13px; font-weight: 500; }
-    .mk-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
-    .mk-links a { display: inline-block; padding: 8px 14px; border: 1px solid #d7e0ee; border-radius: 8px; color: var(--link); font-size: 13.5px; font-weight: 500; text-decoration: none; }
-    .mk-links a:hover { border-color: #1E5290; box-shadow: 0 6px 16px rgba(24,50,97,0.10); }
-    .mk-links li:first-child a { background: #183261; border-color: #183261; color: #ffffff; }
+    .mk-note { margin: 0 0 12px 0; color: #5a6f92; font-size: 13px; }
   </style>
 </head>
 <body>
-<nav class="mk-bar"><span class="mk-home">YBG mockups</span><a href="/">A2 inside the admin panel</a><a href="/affiliate" aria-current="page">Affiliate program</a></nav>
 <div class="mk-wrap">
+  <p class="mk-back"><a href="/">&larr; All mockups</a></p>
   <h1>Affiliate program</h1>
-  <p class="mk-sub">Three mockups for the affiliate program. Every link opens a variant directly; the bar on top of a mockup switches screens and states.</p>
-  <section class="mk-card">
+  <p class="mk-sub">Three mockups, each in several versions. Every version opens on its own page.</p>
+  <section class="mk-group">
     <h2>Login and signup<span class="mk-task">YBG-1802</span></h2>
-    <ul class="mk-links">
-      <li><a href="/affiliate/login#variant=card&screen=login">Variant 1 · Card with steps</a></li>
-      <li><a href="/affiliate/login#variant=tabs&screen=login">Variant 2 · Tabs</a></li>
-    </ul>
+    <a class="mk-card" href="/affiliate/login-1"><span class="mk-num">1</span><span class="mk-card-body"><b>Version 1 &middot; Card with steps</b><span>The form on the left; how the program works and the application status on the right.</span></span></a>
+    <a class="mk-card" href="/affiliate/login-2"><span class="mk-num">2</span><span class="mk-card-body"><b>Version 2 &middot; Tabs</b><span>One card with Log in and Apply tabs; the application status sits above the form.</span></span></a>
   </section>
-  <section class="mk-card">
+  <section class="mk-group">
     <h2>Affiliate dashboard<span class="mk-task">YBG-1803</span></h2>
-    <ul class="mk-links">
-      <li><a href="/affiliate/dashboard#variant=ledger&section=earnings">Variant 1 · Order ledger</a></li>
-      <li><a href="/affiliate/dashboard#variant=timeline&section=earnings">Variant 2 · Timeline</a></li>
-      <li><a href="/affiliate/dashboard#section=links">Links</a></li>
-      <li><a href="/affiliate/dashboard#section=payouts">Payouts</a></li>
-      <li><a href="/affiliate/dashboard#section=settings">Settings</a></li>
-    </ul>
+    <p class="mk-note">The versions differ in Earnings, so they open there. Links, Payouts and Settings are the same.</p>
+    <a class="mk-card" href="/affiliate/dashboard-1#section=earnings"><span class="mk-num">1</span><span class="mk-card-body"><b>Version 1 &middot; Order ledger</b><span>Balances by status on tabs above one table of orders.</span></span></a>
+    <a class="mk-card" href="/affiliate/dashboard-2#section=earnings"><span class="mk-num">2</span><span class="mk-card-body"><b>Version 2 &middot; Timeline</b><span>Balances as steps; orders grouped by the date their commission becomes available.</span></span></a>
   </section>
-  <section class="mk-card">
+  <section class="mk-group">
     <h2>Affiliates in the admin panel<span class="mk-task">YBG-1804</span></h2>
-    <ul class="mk-links">
-      <li><a href="/affiliate/admin#variant=money&page=partners">Variant 1 · Money view</a></li>
-      <li><a href="/affiliate/admin#variant=tim&page=partners">Variant 2 · Tim's layout</a></li>
-      <li><a href="/affiliate/admin#variant=tabs&page=partners">Variant 3 · Tabs</a></li>
-      <li><a href="/affiliate/admin#variant=money&page=card">Affiliate card</a></li>
-      <li><a href="/affiliate/admin#variant=money&page=products">Products</a></li>
-      <li><a href="/affiliate/admin#variant=money&page=links">Links</a></li>
-      <li><a href="/affiliate/admin#variant=money&page=payouts">Payouts</a></li>
-    </ul>
+    <a class="mk-card" href="/affiliate/admin-1"><span class="mk-num">1</span><span class="mk-card-body"><b>Version 1 &middot; Money view</b><span>What is ready for payout comes first; applications in a panel of their own.</span></span></a>
+    <a class="mk-card" href="/affiliate/admin-2"><span class="mk-num">2</span><span class="mk-card-body"><b>Version 2 &middot; Tim's layout</b><span>The columns of the page on beta; payouts through one CSV button.</span></span></a>
+    <a class="mk-card" href="/affiliate/admin-3"><span class="mk-num">3</span><span class="mk-card-body"><b>Version 3 &middot; Tabs</b><span>One Affiliates page; partners, products, links, settings and payouts on tabs.</span></span></a>
   </section>
 </div>
 </body>
