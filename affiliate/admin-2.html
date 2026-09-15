@@ -30,8 +30,8 @@
   body[data-bare="1"] .mk-bar { display: none; }
 
   /* Page and variant switching.
-     Money view and Tim's layout are separate pages; Tabs is one Affiliates page with tabs.
-     .v-money: Money view only. .v-tim: Tim's layout and Tabs. .v-pages: both page variants. .v-tabs: Tabs only. */
+     Money view and Single table are separate pages; Tabs is one Affiliates page with tabs.
+     .v-money: Money view only. .v-tim: Single table and Tabs. .v-pages: both page variants. .v-tabs: Tabs only. */
   .mk-page { display: none; }
   body[data-page="partners"] #page-partners,
   body[data-page="card"] #page-card,
@@ -127,7 +127,7 @@
 <body data-page="partners" data-variant="tim" data-bare="0">
 
 <div class="mk-bar" role="toolbar" aria-label="Mockup options">
-  <a class="mock-version" href="/affiliate">&larr; Affiliate program</a><span class="mock-version-name">Affiliates in the admin panel &middot; Version 2 &middot; Tim's layout</span>
+  <a class="mock-version" href="/affiliate">&larr; Affiliate program</a><span class="mock-version-name">Affiliates in the admin panel &middot; Version 2 &middot; Single table</span>
   <span><b>Page</b><span class="mk-seg" data-key="page">
     <button type="button" data-value="partners">Applications &amp; Partners</button><button type="button" data-value="card">Affiliate card</button><button type="button" data-value="products">Products</button><button type="button" data-value="links">Links</button><button type="button" data-value="settings">Settings</button><button type="button" data-value="payouts">Payouts</button>
   </span></span>
@@ -599,7 +599,7 @@
     const t = totals();
     const avgOrder = t.orders ? `avg order ${money(t.revenue / t.orders)} &middot; ` : '';
 
-    // Tim's layout and Tabs: the tile row, sales for the period and balances for all time
+    // Single table and Tabs: the tile row, sales for the period and balances for all time
     $('#tiles').innerHTML = `<div class="row metrics">
       <div class="col-sm-7"><div class="panel panel-default"><div class="panel-heading"><strong>Sales</strong> <small class="text-muted">${periodText()}</small></div>
         ${metricRow(['Revenue', money(t.revenue), `${avgOrder}EPC ${money(t.epc)}`], [['Clicks', count(t.clicks)], ['Orders', count(t.orders)], ['Commissions', money(t.commissions)]])}</div></div>
@@ -751,7 +751,7 @@
     }
   }
 
-  /* ---------- Program settings (the block at the bottom of Tim's page) ---------- */
+  /* ---------- Program settings (the block at the bottom of the beta page) ---------- */
   function settingsRows(full) {
     const rows = [
       ['Hold period', '30 days'],
