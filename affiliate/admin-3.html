@@ -78,6 +78,8 @@
   .page-head { margin-bottom: 10px; }
   .page-head .pull-right { margin-top: 25px; }
   body[data-variant="tabs"] .mk-page:not(#page-card) .page-head .pull-right { margin-top: 0; margin-bottom: 10px; }
+  /* On the Payouts tab the page has its own Generate Payout CSV, so the header shortcut steps aside */
+  body[data-variant="tabs"][data-page="payouts"] #tabs-head .btn-success { display: none; }
   .filters { margin-bottom: 15px; }
   .filters .form-control { margin-right: 4px; }
   .filters .dash { margin-right: 4px; }
