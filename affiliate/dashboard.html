@@ -1,0 +1,908 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Links | YourBestGrade Affiliate Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #183261;
+    --navy-deep: #0e2c56;
+    --blue: #1e5290;
+    --orange: #ef561f;
+    --orange-hover: #c8430f;
+    --ground: #eff5fe;
+    --surface: #eeeff5;
+    --panel-tint: #f6f9fe;
+    --line: #e3e9f2;
+    --ink: #1f2a3c;
+    --muted: #56657c;
+    --field: #c9d6e8;
+    --hold-bg: #e3ecf9;
+    --avail-bg: #e2f4e6;
+    --avail-ink: #146c2e;
+    --avail-bar: #1cbb3f;
+    --paid-bg: #eeeff5;
+    --paid-ink: #3f4a5c;
+    --refund-bg: #fdecea;
+    --refund-ink: #9b1c1c;
+    --footer-note: #7e9ac1;
+  }
+
+  * { box-sizing: border-box; }
+  html { scrollbar-color: #b9c9df var(--ground); }
+  body {
+    margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+    font-family: "Poppins", Arial, sans-serif; color: var(--ink); background: var(--ground); -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--blue); color: #fff; }
+  input { caret-color: var(--blue); }
+  a { color: var(--blue); text-underline-offset: 3px; }
+  a:hover { color: var(--orange); }
+  :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
+  img { max-width: 100%; }
+  svg.icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* ---------- Mockup toolbar (not part of the page) ---------- */
+  .mock-bar { position: sticky; top: 0; z-index: 50; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 10px 20px; background: #16202e; color: #c7d2e1; font: 500 12px/1 "Poppins", Arial, sans-serif; }
+  .mock-group { display: flex; align-items: center; gap: 8px; }
+  .mock-group span { color: #8d9bb0; }
+  .mock-seg { display: flex; background: #243142; border-radius: 6px; padding: 2px; }
+  .mock-seg button { font: inherit; color: #c7d2e1; background: none; border: 0; cursor: pointer; padding: 7px 10px; border-radius: 4px; }
+  .mock-seg button:hover { color: #fff; }
+  .mock-seg button[aria-pressed="true"] { background: #f3f6fb; color: #16202e; }
+  .mock-sample { margin-left: auto; padding: 6px 10px; border: 1px dashed #8d9bb0; border-radius: 4px; color: #e6edf6; }
+  body[data-bare="1"] .mock-bar { display: none; }
+
+  /* ---------- Site header (same as the login pages) ---------- */
+  .site-header { background: #fff; border-bottom: 0.5px solid #d3d3d3; box-shadow: 0 2px 17px 5px rgba(23, 106, 184, 0.1); position: relative; z-index: 5; }
+  .site-header__inner { max-width: 1140px; margin: 0 auto; height: 74px; display: flex; align-items: center; padding: 0 24px 0 40px; }
+  .site-header__logo img { display: block; width: 158px; height: auto; }
+  .site-header__logo--ybg img { width: 130px; }
+  .site-header__menu { display: flex; gap: 30px; margin-left: 40px; }
+  .site-header__menu a { color: #000; text-decoration: none; font-size: 12.9px; font-weight: 500; letter-spacing: 0.02em; }
+  .site-header__menu a:hover { color: var(--orange); }
+  .chrome { display: none; }
+  body[data-chrome="program"] .chrome--program,
+  body[data-chrome="hesi"] .chrome--hesi,
+  body[data-chrome="schools"] .chrome--schools,
+  body[data-chrome="ybg"] .chrome--ybg { display: block; }
+
+  /* Program logo: the YourBestGrade mark plus the program name, laid out like the HESI Exam Study logo */
+  .program-logo { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+  .site-header__logo.program-logo img { width: 104px; }
+  .program-logo__rule { width: 1.5px; height: 44px; background: #e3d3c3; border-radius: 1px; }
+  .program-logo__words { display: flex; flex-direction: column; font-family: Arial, Helvetica, sans-serif; font-weight: 700; font-size: 15.5px; line-height: 1.02; letter-spacing: 0.01em; text-transform: uppercase; }
+  .program-logo__words span:first-child { color: #434343; }
+  .program-logo__words span:last-child { color: #1768b8; }
+
+  /* ---------- Dashboard frame ---------- */
+  .dash { flex: 1 0 auto; width: 100%; max-width: 1180px; margin: 0 auto; padding: 36px 24px 72px; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 24px; align-items: start; }
+  body[data-menu="top"] .dash { grid-template-columns: minmax(0, 1fr); }
+  .panel { background: #fff; border-radius: 10px; box-shadow: 0 4px 18px rgba(24, 50, 97, 0.07), 0 1px 2px rgba(24, 50, 97, 0.06); }
+
+  /* Side menu */
+  .side { padding: 22px 14px; position: sticky; top: 24px; }
+  body[data-menu="top"] .side { display: none; }
+  .who { padding: 0 10px 18px; margin: 0 0 10px; border-bottom: 1px solid var(--line); }
+  .who strong { display: block; color: var(--navy); font-size: 15px; font-weight: 600; }
+  .who span { display: block; margin-top: 2px; color: var(--muted); font-size: 12.5px; overflow-wrap: anywhere; }
+  .side .who__logout { display: none; }
+  .nav { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+  .nav a, .logout {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px;
+    color: var(--blue); font-size: 14px; font-weight: 500; text-decoration: none; cursor: pointer;
+    background: none; border: 0; font-family: inherit; width: 100%; text-align: left;
+  }
+  .nav a:hover, .logout:hover { background: var(--surface); color: var(--blue); }
+  .nav a[aria-current="page"] { background: var(--surface); font-weight: 600; color: var(--navy); }
+  .side .logout { margin-top: 10px; padding-top: 12px; border-top: 1px solid var(--line); border-radius: 0 0 10px 10px; color: var(--muted); }
+
+  /* Top menu */
+  .topbar { display: none; align-items: center; gap: 8px; padding: 8px 10px 8px 8px; margin: 0 0 22px; }
+  body[data-menu="top"] .topbar { display: flex; }
+  .topbar .nav { display: flex; gap: 4px; }
+  .topbar .who-inline { margin-left: auto; display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
+  .topbar .who-inline strong { color: var(--navy); font-weight: 600; }
+  .topbar .logout { width: auto; color: var(--muted); }
+
+  /* Sections */
+  .section { display: none; }
+  body[data-section="links"] .section--links,
+  body[data-section="earnings"] .section--earnings,
+  body[data-section="payouts"] .section--payouts,
+  body[data-section="settings"] .section--settings { display: block; }
+  .page-title { margin: 4px 0 18px; color: var(--navy); font-size: 26px; font-weight: 600; line-height: 1.25; }
+  .page-lead { margin: -8px 0 20px; color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 70ch; }
+
+  /* Links */
+  .links { padding: 6px 0; }
+  .link-row { display: grid; grid-template-columns: minmax(190px, 1fr) minmax(260px, 2fr) 60px 100px 76px; gap: 18px; align-items: center; padding: 18px 24px; }
+  .link-row + .link-row { border-top: 1px solid var(--line); }
+  .link-head { padding-top: 14px; padding-bottom: 10px; color: var(--muted); font-size: 12.5px; font-weight: 500; }
+  .link-head span:nth-child(n+3), .link-row .count { text-align: right; }
+  .link-name strong { display: block; color: var(--navy); font-size: 14.5px; font-weight: 600; }
+  .link-name span { display: block; margin-top: 3px; color: var(--muted); font-size: 12.5px; }
+  .copy { display: flex; gap: 8px; align-items: center; }
+  .link-url { flex: 1; min-width: 0; padding: 9px 12px; border: 1px solid var(--field); border-radius: 6px; background: #f8fafd; font-size: 13px; line-height: 1.45; color: var(--ink); user-select: all; }
+  .copy button { flex: none; display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border: 0; border-radius: 6px; background: var(--orange); color: #fff; font: 600 13.5px "Poppins", Arial, sans-serif; cursor: pointer; transition: background-color 160ms ease-out; }
+  .copy button:hover { background: var(--orange-hover); }
+  .copy button.is-copied { background: var(--avail-ink); }
+  .copy button svg.icon { width: 16px; height: 16px; stroke-width: 2; }
+  .count { color: var(--ink); font-size: 15px; font-weight: 500; }
+  .count small { display: none; }
+
+  /* Earnings */
+  .stats { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 0 0 12px; color: var(--muted); font-size: 13.5px; }
+  .stats b { color: var(--navy); font-size: 15px; font-weight: 600; margin-left: 6px; }
+  .hold-note { display: flex; gap: 8px; align-items: flex-start; margin: 0 0 18px; color: var(--muted); font-size: 13px; line-height: 1.55; max-width: 90ch; }
+  .hold-note svg.icon { width: 16px; height: 16px; margin-top: 2px; color: var(--blue); }
+
+  /* Earnings has two variants: the ledger (default) and the timeline */
+  .variant-timeline { display: none; }
+  body[data-variant="timeline"] .variant-timeline { display: block; }
+  body[data-variant="timeline"] .variant-ledger { display: none; }
+
+  .ledger { overflow: hidden; }
+  .tabs { display: flex; border-bottom: 1px solid var(--line); padding: 0 8px; }
+  .tab {
+    flex: 1 1 0; display: flex; flex-direction: column; justify-content: flex-start; gap: 3px; min-width: 0;
+    padding: 14px 12px 12px; margin-bottom: -1px; background: none; border: 0; border-bottom: 2px solid transparent;
+    font-family: inherit; text-align: left; color: var(--muted); cursor: pointer;
+    transition: color 160ms ease-out, border-color 160ms ease-out;
+  }
+  .tab--all { flex: 0.7 1 0; }
+  .tab:hover { color: var(--navy); }
+  .tab[aria-pressed="true"] { border-bottom-color: var(--blue); color: var(--navy); }
+  .tab__line { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 13px; font-weight: 500; }
+  .tab__sum { color: var(--navy); font-size: 15px; font-weight: 600; }
+  .tab__meta { font-size: 12px; color: var(--muted); }
+  .tab__bar { width: 100%; max-width: 140px; height: 4px; margin: 4px 0 6px; background: var(--surface); border-radius: 2px; overflow: hidden; }
+  .tab__bar i { display: block; height: 100%; width: 100%; background: var(--avail-bar); border-radius: 2px; transform-origin: left center; transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1); }
+  body[data-state="below"] .tab__bar i { transform: scaleX(0.59); }
+  body[data-state="new"] .tab__bar i { transform: scaleX(0); }
+  .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; }
+  .dot-hold { background: var(--blue); }
+  .dot-avail { background: var(--avail-bar); }
+  .dot-paid { background: #7b8698; }
+  .dot-refund { background: #c62828; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th { padding: 14px 16px 10px; color: var(--muted); font-size: 12.5px; font-weight: 500; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  tbody td { padding: 14px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover td { background: #fafcff; }
+  th.r, td.r { text-align: right; }
+  td .product { color: var(--navy); font-weight: 500; white-space: nowrap; }
+  td .plan { display: block; color: var(--muted); font-size: 12.5px; }
+  .section--earnings td:first-child, .section--earnings td:last-child { white-space: nowrap; }
+  .col-customer { display: none; }
+  body[data-email="masked"] .col-customer { display: table-cell; }
+  body[data-email="masked"] .section--earnings th, body[data-email="masked"] .section--earnings td { padding-left: 12px; padding-right: 12px; }
+  .strike { color: var(--muted); text-decoration: line-through; margin-right: 6px; font-size: 12.5px; }
+  .status { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 500; white-space: nowrap; }
+  .st-hold { background: var(--hold-bg); color: var(--blue); }
+  .st-avail { background: var(--avail-bg); color: var(--avail-ink); }
+  .st-paid { background: var(--paid-bg); color: var(--paid-ink); }
+  .st-refund { background: var(--refund-bg); color: var(--refund-ink); }
+
+  /* Timeline: balance steps */
+  .balance-steps { padding: 18px 24px 16px; margin: 0 0 18px; }
+  .balance-steps__row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 14px; align-items: start; }
+  .bstep { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .bstep__label { display: flex; align-items: center; color: var(--muted); font-size: 13px; font-weight: 500; }
+  .bstep__sum { color: var(--navy); font-size: 18px; font-weight: 600; line-height: 1.3; }
+  .bstep__meta { color: var(--muted); font-size: 12px; }
+  .bstep .tab__bar { margin: 6px 0 3px; }
+  .bstep__arrow { width: 20px; height: 20px; margin-top: 24px; color: #9fb2cc; }
+  .balance-steps__refund { display: flex; align-items: center; gap: 6px; margin: 14px 0 0; padding: 12px 0 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  .balance-steps__refund b { margin-left: 4px; color: var(--navy); font-weight: 600; }
+
+  /* Timeline: orders grouped by the date their commission becomes available */
+  .feed { overflow: hidden; }
+  .group { display: grid; grid-template-columns: 168px minmax(0, 1fr); }
+  .group + .group, .group + .today, .today + .group { border-top: 1px solid var(--line); }
+  .group__when { position: relative; display: flex; flex-direction: column; gap: 2px; padding: 16px 22px 16px 24px; border-right: 2px solid var(--line); }
+  .group__when::after { content: ""; position: absolute; top: 20px; right: -8px; width: 14px; height: 14px; border-radius: 50%; border: 3px solid #fff; background: var(--blue); }
+  .group--avail .group__when::after { background: var(--avail-bar); }
+  .group--paid .group__when::after { background: #7b8698; }
+  .group--refund .group__when::after { background: #c62828; }
+  .group__label { color: var(--muted); font-size: 12px; }
+  .group__date { color: var(--navy); font-size: 14.5px; font-weight: 600; }
+  .group__in { color: var(--blue); font-size: 12px; font-weight: 500; }
+  .group__meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin-top: 2px; }
+  .group__sum { color: var(--muted); font-size: 12.5px; font-weight: 500; }
+  .group__orders { padding: 6px 24px 6px 26px; }
+  .order, .feed-head__cols { display: grid; grid-template-columns: minmax(0, 1fr) 90px 84px 92px; gap: 16px; }
+  .order { align-items: center; padding: 10px 0; font-size: 13.5px; }
+  .order + .order { border-top: 1px solid var(--line); }
+  body[data-email="masked"] .order, body[data-email="masked"] .feed-head__cols { grid-template-columns: minmax(0, 1fr) 128px 90px 84px 92px; gap: 12px; }
+  .order__product .product { color: var(--navy); font-weight: 500; }
+  .order__product .product { display: block; }
+  .order__date { display: block; margin-top: 2px; color: var(--muted); font-size: 12.5px; }
+  .order__customer { display: none; color: var(--muted); font-size: 13px; white-space: nowrap; }
+  body[data-email="masked"] .order__customer { display: block; }
+  .order__amount { text-align: right; color: var(--muted); }
+  .order__commission { text-align: right; color: var(--navy); font-weight: 600; white-space: nowrap; }
+  .order__status { text-align: right; }
+  .order__ordered { white-space: nowrap; }
+  /* One column header for the feed; on narrower screens the date line carries "Available on" itself */
+  .feed-head { display: grid; grid-template-columns: 168px minmax(0, 1fr); border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12.5px; font-weight: 500; white-space: nowrap; }
+  .feed-head__when { padding: 12px 22px 10px 24px; }
+  .feed-head .feed-head__cols { padding: 12px 24px 10px 26px; }
+  .feed-head__cols .r { text-align: right; }
+  .feed-head__customer { display: none; }
+  body[data-email="masked"] .feed-head__customer { display: block; }
+  .today { display: grid; grid-template-columns: 168px minmax(0, 1fr); background: var(--panel-tint); color: var(--blue); font-size: 12.5px; font-weight: 600; }
+  .today span { padding: 8px 24px; }
+  .today span:first-child { border-right: 2px solid var(--line); }
+  .feed-empty { display: none; padding: 36px 16px; text-align: center; color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+  .feed-empty strong { display: block; color: var(--navy); font-size: 14.5px; font-weight: 600; }
+
+  /* States: below the $50 minimum hides one available order; a new affiliate has no orders or payouts */
+  body[data-state="below"] [data-hide-below] { display: none; }
+  body[data-state="new"] tr[data-status],
+  body[data-state="new"] .payout-row,
+  body[data-state="new"] .next-payout,
+  body[data-state="new"] .feed { display: none; }
+  body[data-state="new"] .feed-empty { display: block; }
+  body:not([data-state="new"]) .empty-row { display: none !important; }
+  .section--earnings tbody tr[hidden] { display: none !important; }
+  body[data-state="new"] .empty-row { display: table-row; }
+  .empty-row td { color: var(--muted); text-align: center; padding: 36px 16px; line-height: 1.6; }
+  .empty-row strong { display: block; color: var(--navy); font-size: 14.5px; font-weight: 600; }
+  .when-below { display: none; }
+  body[data-state="below"] .when-below { display: inline; }
+  body[data-state="below"] .when-reached { display: none; }
+
+  /* Payouts */
+  .next-payout { display: flex; align-items: center; gap: 10px; padding: 14px 18px; margin: 0 0 16px; font-size: 14px; color: var(--ink); }
+  .next-payout svg.icon { color: var(--avail-ink); }
+  .next-payout svg.icon-wait { display: none; color: var(--blue); }
+  body[data-state="below"] .next-payout .icon-done { display: none; }
+  body[data-state="below"] .next-payout .icon-wait { display: block; }
+  .next-payout b { color: var(--navy); }
+  .payout-start { display: none; margin: -6px 0 16px; color: var(--muted); font-size: 13.5px; }
+  body[data-state="new"] .payout-start { display: block; }
+
+  /* Settings */
+  .form-panel { padding: 26px 28px 28px; max-width: 620px; }
+  .form-panel h2 { margin: 0 0 16px; color: var(--navy); font-size: 17px; font-weight: 600; }
+  label { display: block; margin: 0 0 6px; color: var(--navy); font-size: 13px; font-weight: 500; }
+  .field-input { width: 100%; height: 42px; padding: 0 12px; font: 400 14px "Poppins", Arial, sans-serif; color: var(--ink); background: #fff; border: 1px solid var(--field); border-radius: 6px; }
+  .field-input:focus { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); }
+  .hint { margin: 6px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.5; }
+  .btn-primary { margin-top: 18px; height: 44px; padding: 0 22px; border: 0; border-radius: 6px; background: var(--orange); color: #fff; font: 600 14.5px "Poppins", Arial, sans-serif; cursor: pointer; }
+  .btn-primary:hover { background: var(--orange-hover); }
+
+  /* ---------- Footers (same as the login pages) ---------- */
+  .footer-hesi { background: var(--navy-deep); color: #fff; }
+  .footer-hesi__inner { max-width: 1140px; margin: 0 auto; padding: 40px 40px 34px; }
+  .footer-hesi__row { display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+  .footer-hesi__seal img { display: block; width: 133px; height: auto; }
+  .footer-hesi__menu { display: flex; gap: 64px; }
+  .footer-hesi__menu div { display: grid; gap: 10px; }
+  .footer-hesi__menu a { color: #fff; font-size: 12px; text-decoration: none; }
+  .footer-hesi__menu a:hover { color: var(--orange); }
+  .footer-hesi__social { display: flex; gap: 14px; }
+  .footer-hesi__social img { display: block; width: 26px; height: 26px; }
+  .footer-hesi__legal { margin: 30px 0 0; padding: 22px 0 0; border-top: 1px solid rgba(126, 154, 193, 0.25); }
+  .footer-hesi__copy { font-size: 12.6px; }
+  .footer-hesi__note { margin: 10px 0 0; color: var(--footer-note); font-size: 11.7px; line-height: 1.6; }
+  .footer-light { background: #fff; color: var(--navy); border-top: 1px solid var(--line); }
+  .footer-light__inner { max-width: 1140px; margin: 0 auto; padding: 32px 40px 28px; }
+  .footer-light__row { display: flex; align-items: center; justify-content: space-between; gap: 28px; }
+  .footer-light__seal img { display: block; height: 44px; width: auto; }
+  .footer-light__links { display: flex; gap: 26px; font-size: 12.8px; }
+  .footer-light__links a, .footer-light__mail { color: var(--navy); text-decoration: none; }
+  .footer-light__links a:hover, .footer-light__mail:hover { color: var(--orange); }
+  .footer-light__mail { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
+  .footer-light__mail img { width: 18px; height: auto; }
+  .footer-light__bottom { margin: 22px 0 0; text-align: center; font-size: 12px; line-height: 1.7; color: var(--muted); }
+
+  /* ---------- Tablet ---------- */
+  @media (max-width: 1080px) {
+    .link-row { grid-template-columns: 1fr 64px 96px 76px; }
+    .link-row .copy { grid-column: 1 / -1; grid-row: 2; }
+    .link-head span:nth-child(2) { display: none; }
+    .tab__meta { display: none; }
+    .tab[data-filter="avail"] .tab__meta { display: block; }
+    .section--earnings th, .section--earnings td { padding-left: 12px; padding-right: 12px; }
+    .group { grid-template-columns: minmax(0, 1fr); }
+    .group__when { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; padding: 14px 24px 2px 44px; border-right: 0; }
+    .group__when::after { top: 17px; left: 20px; right: auto; }
+    .group__orders { padding: 0 24px 10px 44px; }
+    .today { grid-template-columns: auto minmax(0, 1fr); }
+    .today span { padding: 8px 0 8px 12px; }
+    .today span:first-child { border-right: 0; padding-left: 44px; }
+    .feed-head { grid-template-columns: minmax(0, 1fr); }
+    .feed-head__when { display: none; }
+    .feed-head .feed-head__cols { padding: 12px 24px 10px 44px; }
+    .group__when::before { content: "Available on"; color: var(--muted); font-size: 12px; }
+    .group--refund .group__when::before { content: none; }
+  }
+
+  /* ---------- Below the dashboard's full width: the side menu becomes a bar above the content ---------- */
+  @media (min-width: 768px) and (max-width: 1180px) {
+    .dash { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+    .side { position: static; display: flex; align-items: center; gap: 8px; padding: 8px 10px 8px 8px; }
+    .side .nav { display: flex; gap: 4px; }
+    .side .nav a { width: auto; }
+    .side .nav svg.icon { display: none; }
+    .who { order: 1; display: flex; align-items: center; gap: 12px; margin: 0 0 0 auto; padding: 0; border-bottom: 0; }
+    .who strong { font-size: 13px; }
+    .who span { display: none; }
+    .side .who__logout { display: inline-flex; width: auto; margin: 0; padding: 10px 12px; border: 0; border-radius: 10px; color: var(--muted); }
+    .side > .logout { display: none; }
+  }
+
+  /* Narrow tablet: every status tab puts its sum under the label, whatever the amount length */
+  @media (min-width: 768px) and (max-width: 920px) {
+    .tab__line { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* ---------- Narrow tablet and phone: ledger rows become cards ---------- */
+  @media (max-width: 920px) {
+    .section--earnings tbody tr.empty-row td { padding: 28px 20px; white-space: normal; }
+
+    .section--earnings thead { display: none; }
+    .section--earnings table, .section--earnings tbody { display: block; width: 100%; }
+    .section--earnings tbody tr {
+      display: grid; grid-template-columns: 1fr auto; gap: 3px 12px; padding: 12px 16px; border-bottom: 1px solid var(--line);
+      grid-template-areas: "product commission" "date status" "avail amount" "customer customer";
+    }
+    .section--earnings tbody tr:last-child { border-bottom: 0; }
+    .section--earnings tbody td, body[data-email="masked"] .section--earnings tbody td { display: block; padding: 0; border: 0; white-space: normal; font-size: 13px; }
+    .section--earnings tbody tr:hover td { background: none; }
+    .section--earnings tbody td:nth-child(1) { grid-area: date; color: var(--muted); }
+    .section--earnings tbody td:nth-child(2) { grid-area: product; }
+    .section--earnings tbody td:nth-child(3) { grid-area: customer; color: var(--muted); }
+    .section--earnings tbody td:nth-child(4) { grid-area: amount; text-align: right; color: var(--muted); }
+    .section--earnings tbody td:nth-child(5) { grid-area: commission; text-align: right; font-size: 14.5px; font-weight: 600; color: var(--navy); }
+    .section--earnings tbody td:nth-child(6) { grid-area: status; justify-self: end; }
+    .section--earnings tbody td:nth-child(7) { grid-area: avail; color: var(--muted); }
+    .section--earnings tbody td:nth-child(4)::before { content: "Order "; }
+    .section--earnings tbody td:nth-child(7)::before { content: "Available on "; }
+    .section--earnings tbody td.col-customer { display: none; }
+    body[data-email="masked"] .section--earnings tbody td.col-customer { display: block; }
+    .section--earnings td .plan { display: inline; margin-left: 6px; }
+    .section--earnings .status { padding: 2px 8px; font-size: 12px; }
+    body[data-state="new"] .section--earnings .empty-row { display: block; }
+    .section--earnings .empty-row td { display: block; text-align: center; }
+  }
+
+  /* ---------- Phone ---------- */
+  @media (max-width: 767px) {
+    .site-header__inner { height: 64px; padding: 0 16px; }
+    .site-header__logo img { width: 124px; }
+    .site-header__logo--ybg img { width: 104px; }
+    .site-header__menu { display: none; }
+    .dash, body[data-menu="top"] .dash { grid-template-columns: minmax(0, 1fr); padding: 20px 14px 48px; gap: 16px; }
+
+    .side { position: static; padding: 12px 8px 8px; }
+    .who { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 6px 10px; margin-bottom: 6px; }
+    .who span { display: none; }
+    .side .who__logout { display: inline-flex; width: auto; padding: 4px 8px; margin: 0; border: 0; border-radius: 6px; font-size: 13.5px; }
+    .side .nav { display: flex; justify-content: space-between; gap: 2px; }
+    .side .nav a { padding: 9px 10px; font-size: 13.5px; }
+    .side .nav svg.icon { display: none; }
+    .side > .logout { display: none; }
+    .topbar { flex-wrap: wrap; padding: 8px; }
+    .topbar .nav { width: 100%; justify-content: space-between; gap: 2px; }
+    .topbar .nav a { padding: 9px 10px; font-size: 13.5px; }
+    .topbar .who-inline { margin-left: 0; width: 100%; justify-content: space-between; padding: 6px 6px 2px; border-top: 1px solid var(--line); }
+
+    .page-title { font-size: 22px; }
+    .link-head { display: none; }
+    .link-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 12px; padding: 16px; }
+    .link-row .link-name { grid-column: 1 / -1; }
+    .link-row .copy { grid-column: 1 / -1; grid-row: auto; }
+    .link-row .count { text-align: left; font-size: 14px; }
+    .count small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+
+    .stats { gap: 6px 18px; }
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8px; padding: 4px 8px 0; }
+    .tab, .tab--all { padding: 10px 8px 9px; margin-bottom: 0; }
+    .tab__meta { display: block; }
+    thead { display: none; }
+    table, tbody { display: block; width: 100%; }
+
+    .balance-steps { padding: 14px 16px; }
+    .balance-steps__row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .bstep__arrow { width: 16px; height: 16px; margin: 0 0 0 2px; transform: rotate(90deg); }
+    .group__when { padding: 12px 16px 2px 36px; }
+    .group__when::after { top: 14px; left: 12px; }
+    .group__sum { display: none; }
+    .group__orders { padding: 0 16px 8px 36px; }
+    .order, body[data-email="masked"] .order {
+      grid-template-columns: minmax(0, 1fr) auto; gap: 3px 12px;
+      grid-template-areas: "product commission" "product status" "customer amount";
+    }
+    .order__product { grid-area: product; }
+    .order__customer { grid-area: customer; }
+    .order__amount { grid-area: amount; font-size: 13px; }
+    .order__amount::before { content: "Order "; }
+    .order__commission { grid-area: commission; font-size: 14.5px; }
+    .order__status { grid-area: status; }
+    .order .status { padding: 2px 8px; font-size: 12px; }
+    .today { grid-template-columns: auto minmax(0, 1fr); }
+    .today span { padding: 7px 0 7px 16px; }
+    .today span:first-child { border-right: 0; padding-left: 36px; }
+    .feed-head { display: none; }
+    .feed-empty { padding: 28px 20px; }
+
+    .section--payouts tr { display: block; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    .section--payouts tr:last-child { border-bottom: 0; }
+    .section--payouts td { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; border: 0; text-align: right; }
+    .section--payouts td::before { content: attr(data-label); color: var(--muted); font-size: 12.5px; text-align: left; }
+    body[data-state="new"] .empty-row { display: block; }
+    .empty-row td, .section--payouts .empty-row td { display: block; text-align: center; padding: 28px 16px; }
+    .empty-row td::before { content: none !important; }
+
+    .form-panel { padding: 20px 18px 22px; }
+    .footer-hesi__inner, .footer-light__inner { padding: 30px 20px 26px; }
+    .footer-hesi__row, .footer-light__row { flex-direction: column; text-align: center; gap: 22px; }
+    .footer-hesi__menu { gap: 28px; }
+    .footer-light__links { flex-direction: column; gap: 10px; }
+  }
+  @media (max-width: 767px) {
+    .site-header__logo.program-logo img { width: 86px; }
+    .program-logo__rule { height: 36px; }
+    .program-logo__words { font-size: 12.5px; }
+  }
+</style>
+</head>
+<body data-variant="ledger" data-section="links" data-chrome="program" data-menu="side" data-email="hidden" data-state="active" data-bare="0">
+
+<div class="mock-bar" role="toolbar" aria-label="Mockup options">
+  <div class="mock-group"><span>Variant</span>
+    <div class="mock-seg" data-key="variant">
+      <button data-value="ledger">Ledger</button>
+      <button data-value="timeline">Timeline</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Section</span>
+    <div class="mock-seg" data-key="section">
+      <button data-value="links">Links</button>
+      <button data-value="earnings">Earnings</button>
+      <button data-value="payouts">Payouts</button>
+      <button data-value="settings">Settings</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Header &amp; footer</span>
+    <div class="mock-seg" data-key="chrome">
+      <button data-value="program">Program</button>
+      <button data-value="hesi">HESI</button>
+      <button data-value="schools">Simple</button>
+      <button data-value="ybg">YourBestGrade</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Menu</span>
+    <div class="mock-seg" data-key="menu">
+      <button data-value="side">Side</button>
+      <button data-value="top">Top</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Buyer email</span>
+    <div class="mock-seg" data-key="email">
+      <button data-value="hidden">Hidden</button>
+      <button data-value="masked">Masked</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>State</span>
+    <div class="mock-seg" data-key="state">
+      <button data-value="active">Active</button>
+      <button data-value="below">Below $50</button>
+      <button data-value="new">New affiliate</button>
+    </div>
+  </div>
+  <div class="mock-sample">Sample data</div>
+</div>
+
+<header class="site-header chrome chrome--program">
+  <div class="site-header__inner">
+    <a class="site-header__logo program-logo" href="#" aria-label="YourBestGrade Affiliate Program">
+      <img src="assets/colored-single.png" alt="">
+      <span class="program-logo__rule" aria-hidden="true"></span>
+      <span class="program-logo__words" aria-hidden="true"><span>Affiliate</span><span>Program</span></span>
+    </a>
+  </div>
+</header>
+<header class="site-header chrome chrome--hesi">
+  <div class="site-header__inner">
+    <a class="site-header__logo" href="#"><img src="assets/header__logo.png" alt="HESI Exam Study"></a>
+    <nav class="site-header__menu" aria-label="Main"><a href="#">PRICING</a><a href="#">FAQ</a><a href="#">ABOUT US</a></nav>
+  </div>
+</header>
+<header class="site-header chrome chrome--schools">
+  <div class="site-header__inner">
+    <a class="site-header__logo" href="#"><img src="assets/header__logo.png" alt="HESI Exam Study"></a>
+  </div>
+</header>
+<header class="site-header chrome chrome--ybg">
+  <div class="site-header__inner">
+    <a class="site-header__logo site-header__logo--ybg" href="#"><img src="assets/colored-single.png" alt="YourBestGrade"></a>
+  </div>
+</header>
+
+<div class="dash">
+  <aside class="panel side" aria-label="Affiliate menu">
+    <div class="who"><strong>Jordan Lee</strong><span>jordan.lee@example.com</span><button class="logout who__logout" type="button">Log out</button></div>
+    <ul class="nav">
+      <li><a href="#" data-go="links"><svg class="icon" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>Links</a></li>
+      <li><a href="#" data-go="earnings"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M16 15h2"/></svg>Earnings</a></li>
+      <li><a href="#" data-go="payouts"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>Payouts</a></li>
+      <li><a href="#" data-go="settings"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</a></li>
+    </ul>
+    <button class="logout" type="button"><svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>Log out</button>
+  </aside>
+
+  <main>
+    <nav class="panel topbar" aria-label="Affiliate menu">
+      <ul class="nav">
+        <li><a href="#" data-go="links">Links</a></li>
+        <li><a href="#" data-go="earnings">Earnings</a></li>
+        <li><a href="#" data-go="payouts">Payouts</a></li>
+        <li><a href="#" data-go="settings">Settings</a></li>
+      </ul>
+      <div class="who-inline"><strong>Jordan Lee</strong><button class="logout" type="button"><svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>Log out</button></div>
+    </nav>
+
+    <!-- Links -->
+    <section class="section section--links">
+      <h1 class="page-title">Links</h1>
+      <p class="page-lead">Share these links. A purchase counts for you if the buyer clicked your link within the last 30 days, and your link was the last one they clicked.</p>
+      <div class="panel links">
+        <div class="link-row link-head"><span>Link</span><span>Your link</span><span>Clicks</span><span>Unique visitors</span><span>Purchases</span></div>
+        <div class="link-row">
+          <div class="link-name"><strong>HESI Exam Study</strong><span>yourbestgrade.com/<wbr>hesi/<wbr>start</span></div>
+          <div class="copy"><span class="link-url">https://www.yourbestgrade.com/<wbr>hesi/<wbr>start<wbr>?aff=Jx7Kq2MvR9tLp4Wn</span><button type="button"><svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg><span>Copy</span></button></div>
+          <div class="count num" data-new="0">612<small>clicks</small></div>
+          <div class="count num" data-new="0">471<small>unique visitors</small></div>
+          <div class="count num" data-new="0">5<small>purchases</small></div>
+        </div>
+        <div class="link-row">
+          <div class="link-name"><strong>HESI Exam Study pricing</strong><span>yourbestgrade.com/<wbr>hesi/<wbr>pricing</span></div>
+          <div class="copy"><span class="link-url">https://www.yourbestgrade.com/<wbr>hesi/<wbr>pricing<wbr>?aff=Jx7Kq2MvR9tLp4Wn</span><button type="button"><svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg><span>Copy</span></button></div>
+          <div class="count num" data-new="0">348<small>clicks</small></div>
+          <div class="count num" data-new="0">279<small>unique visitors</small></div>
+          <div class="count num" data-below="6" data-new="0">7<small>purchases</small></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Earnings -->
+    <section class="section section--earnings">
+      <h1 class="page-title">Earnings</h1>
+      <div class="stats">
+        <span>Revenue<b class="num" data-below="$1,500.00" data-new="$0.00">$1,647.00</b></span>
+        <span>Clicks<b class="num" data-new="0">960</b></span>
+        <span>Earnings per click<b class="num" data-below="$0.31" data-new="$0.00">$0.34</b></span>
+      </div>
+      <p class="hold-note">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <span>A commission stays on hold for 30 days after the purchase, then it becomes available. Available commissions are paid out to your PayPal once they add up to $50. If an order is refunded, its commission is cancelled.</span>
+      </p>
+
+      <!-- Variant: ledger -->
+      <div class="panel ledger variant-ledger">
+        <div class="tabs" role="group" aria-label="Filter orders by status">
+          <button class="tab tab--all" type="button" data-filter="all" aria-pressed="true">
+            <span class="tab__line">All orders</span>
+          </button>
+          <button class="tab" type="button" data-filter="hold" aria-pressed="false">
+            <span class="tab__line"><span><i class="dot dot-hold"></i> On hold</span><span class="tab__sum num" data-new="$0.00">$111.60</span></span>
+            <span class="tab__meta" data-new="0 orders">4 orders</span>
+          </button>
+          <button class="tab" type="button" data-filter="avail" aria-pressed="false">
+            <span class="tab__line"><span><i class="dot dot-avail"></i> Available</span><span class="tab__sum num" data-below="$29.40" data-new="$0.00">$58.80</span></span>
+            <span class="tab__meta" data-below="$20.60 to the $50 minimum" data-new="$50 to the payout minimum">$50 payout minimum reached</span>
+            <span class="tab__bar" aria-hidden="true"><i></i></span>
+          </button>
+          <button class="tab" type="button" data-filter="paid" aria-pressed="false">
+            <span class="tab__line"><span><i class="dot dot-paid"></i> Paid out</span><span class="tab__sum num" data-new="$0.00">$159.00</span></span>
+            <span class="tab__meta" data-new="0 orders">5 orders</span>
+          </button>
+          <button class="tab" type="button" data-filter="refund" aria-pressed="false">
+            <span class="tab__line"><span><i class="dot dot-refund"></i> Refunded</span><span class="tab__sum num" data-new="$0.00">$39.40</span></span>
+            <span class="tab__meta" data-new="0 orders">1 order</span>
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Product</th>
+              <th class="col-customer">Customer</th>
+              <th class="r">Order amount</th>
+              <th class="r">Commission</th>
+              <th>Status</th>
+              <th>Available on</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-status="hold"><td class="num">Sep 12, 2026</td><td><span class="product">HESI Exam Study</span><span class="plan">36 Months Access</span></td><td class="col-customer">m***@gmail.com</td><td class="r num">$197.00</td><td class="r num">$39.40</td><td><span class="status st-hold">On hold</span></td><td class="num">Oct 12, 2026</td></tr>
+            <tr data-status="hold"><td class="num">Sep 12, 2026</td><td><span class="product">HESI Exam Study</span><span class="plan">12 Months Access</span></td><td class="col-customer">k***@yahoo.com</td><td class="r num">$147.00</td><td class="r num">$29.40</td><td><span class="status st-hold">On hold</span></td><td class="num">Oct 12, 2026</td></tr>
+            <tr data-status="hold"><td class="num">Sep 3, 2026</td><td><span class="product">HESI Exam Study</span><span class="plan">90 Days</span></td><td class="col-customer">d***@outlook.com</td><td class="r num">$117.00</td><td class="r num">$23.40</td><td><span class="status st-hold">On hold</span></td><td class="num">Oct 3, 2026</td></tr>
+            <tr data-status="hold"><td class="num">Aug 28, 2026</td><td><span class="product">HESI Exam Study</span><span class="plan">30 Days</span></td><td class="col-customer">a***@gmail.com</td><td class="r num">$97.00</td><td class="r num">$19.40</td><td><span class="status st-hold">On hold</span></td><td class="num">Sep 27, 2026</td></tr>
+            <tr data-status="avail"><td class="num">Aug 11, 2026</td><td><span class="product">HESI Exam Study</span><span class="plan">12 Months Access</span></td><td class="col-customer">t***@gmail.com</td><td class="r num">$147.00</td><td class="r num">$29.40</td><td><span class="status st-avail">Available</span></td><td class="num">Sep 10, 2026</td></tr>
+            <tr data-status="avail" data-hide-below><td class="num">Aug 6, 2026</td><td><span class="product">HESI Exam Study</span><span class="plan">12 Months Access</span></td><td class="col-customer">s***@icloud.com</td><td class="r num">$147.00</td><td class="r num">$29.40</td><td><span class="status st-avail">Available</span></td><td class="num">Sep 5, 2026</td></tr>
+            <tr data-status="refund"><td class="num">Jul 30, 2026</td><td><span class="product">HESI Exam Study</span><span class="plan">36 Months Access</span></td><td class="col-customer">r***@gmail.com</td><td class="r num">$197.00</td><td class="r num"><span class="strike">$39.40</span>$0.00</td><td><span class="status st-refund">Refunded</span></td><td>—</td></tr>
+            <tr data-status="paid"><td class="num">Jul 19, 2026</td><td><span class="product">HESI Exam Study</span><span class="plan">180 Days</span></td><td class="col-customer">b***@gmail.com</td><td class="r num">$137.00</td><td class="r num">$27.40</td><td><span class="status st-paid">Paid out</span></td><td class="num">Aug 18, 2026</td></tr>
+            <tr data-status="paid"><td class="num">Jul 2, 2026</td><td><span class="product">HESI Exam Study</span><span class="plan">36 Months Access</span></td><td class="col-customer">j***@hotmail.com</td><td class="r num">$197.00</td><td class="r num">$39.40</td><td><span class="status st-paid">Paid out</span></td><td class="num">Aug 1, 2026</td></tr>
+            <tr data-status="paid"><td class="num">Jul 2, 2026</td><td><span class="product">HESI Exam Study</span><span class="plan">12 Months Access</span></td><td class="col-customer">l***@gmail.com</td><td class="r num">$147.00</td><td class="r num">$29.40</td><td><span class="status st-paid">Paid out</span></td><td class="num">Aug 1, 2026</td></tr>
+            <tr data-status="paid"><td class="num">May 18, 2026</td><td><span class="product">HESI Exam Study</span><span class="plan">90 Days</span></td><td class="col-customer">n***@gmail.com</td><td class="r num">$117.00</td><td class="r num">$23.40</td><td><span class="status st-paid">Paid out</span></td><td class="num">Jun 17, 2026</td></tr>
+            <tr data-status="paid"><td class="num">May 12, 2026</td><td><span class="product">HESI Exam Study</span><span class="plan">36 Months Access</span></td><td class="col-customer">c***@yahoo.com</td><td class="r num">$197.00</td><td class="r num">$39.40</td><td><span class="status st-paid">Paid out</span></td><td class="num">Jun 11, 2026</td></tr>
+            <tr class="empty-row"><td colspan="7"><strong>No orders yet</strong>Purchases made through your links will show up here.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Variant: timeline -->
+      <div class="variant-timeline">
+        <div class="panel balance-steps">
+          <div class="balance-steps__row">
+            <div class="bstep">
+              <span class="bstep__label"><i class="dot dot-hold"></i>On hold</span>
+              <span class="bstep__sum num" data-new="$0.00">$111.60</span>
+              <span class="bstep__meta" data-new="0 orders">4 orders</span>
+            </div>
+            <svg class="icon bstep__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+            <div class="bstep">
+              <span class="bstep__label"><i class="dot dot-avail"></i>Available</span>
+              <span class="bstep__sum num" data-below="$29.40" data-new="$0.00">$58.80</span>
+              <span class="bstep__meta" data-below="1 order" data-new="0 orders">2 orders</span>
+              <span class="tab__bar" aria-hidden="true"><i></i></span>
+              <span class="bstep__meta" data-below="$20.60 to the $50 minimum" data-new="$50 to the payout minimum">$50 payout minimum reached</span>
+            </div>
+            <svg class="icon bstep__arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+            <div class="bstep">
+              <span class="bstep__label"><i class="dot dot-paid"></i>Paid out</span>
+              <span class="bstep__sum num" data-new="$0.00">$159.00</span>
+              <span class="bstep__meta" data-new="0 orders">5 orders</span>
+            </div>
+          </div>
+          <div class="balance-steps__refund"><i class="dot dot-refund"></i>Refunded<b class="num" data-new="$0.00">$39.40</b><span data-new="· 0 orders">· 1 order</span></div>
+        </div>
+
+        <div class="panel feed">
+          <div class="feed-head"><span class="feed-head__when">Available on</span><span class="feed-head__cols"><span>Order</span><span class="feed-head__customer">Customer</span><span class="r">Order amount</span><span class="r">Commission</span><span class="r">Status</span></span></div>
+          <div class="group group--hold">
+            <div class="group__when"><strong class="group__date num">Oct 12, 2026</strong><span class="group__meta"><span class="group__in">in 27 days</span><span class="group__sum num">$68.80</span></span></div>
+            <div class="group__orders">
+              <div class="order"><div class="order__product"><span class="product">HESI Exam Study</span><span class="order__date">36 Months Access · <span class="order__ordered">Ordered Sep 12, 2026</span></span></div><div class="order__customer">m***@gmail.com</div><div class="order__amount num">$197.00</div><div class="order__commission num">$39.40</div><div class="order__status"><span class="status st-hold">On hold</span></div></div>
+              <div class="order"><div class="order__product"><span class="product">HESI Exam Study</span><span class="order__date">12 Months Access · <span class="order__ordered">Ordered Sep 12, 2026</span></span></div><div class="order__customer">k***@yahoo.com</div><div class="order__amount num">$147.00</div><div class="order__commission num">$29.40</div><div class="order__status"><span class="status st-hold">On hold</span></div></div>
+            </div>
+          </div>
+          <div class="group group--hold">
+            <div class="group__when"><strong class="group__date num">Oct 3, 2026</strong><span class="group__meta"><span class="group__in">in 18 days</span></span></div>
+            <div class="group__orders">
+              <div class="order"><div class="order__product"><span class="product">HESI Exam Study</span><span class="order__date">90 Days · <span class="order__ordered">Ordered Sep 3, 2026</span></span></div><div class="order__customer">d***@outlook.com</div><div class="order__amount num">$117.00</div><div class="order__commission num">$23.40</div><div class="order__status"><span class="status st-hold">On hold</span></div></div>
+            </div>
+          </div>
+          <div class="group group--hold">
+            <div class="group__when"><strong class="group__date num">Sep 27, 2026</strong><span class="group__meta"><span class="group__in">in 12 days</span></span></div>
+            <div class="group__orders">
+              <div class="order"><div class="order__product"><span class="product">HESI Exam Study</span><span class="order__date">30 Days · <span class="order__ordered">Ordered Aug 28, 2026</span></span></div><div class="order__customer">a***@gmail.com</div><div class="order__amount num">$97.00</div><div class="order__commission num">$19.40</div><div class="order__status"><span class="status st-hold">On hold</span></div></div>
+            </div>
+          </div>
+          <div class="today"><span>Today</span><span class="num">Sep 15, 2026</span></div>
+          <div class="group group--avail">
+            <div class="group__when"><strong class="group__date num">Sep 10, 2026</strong></div>
+            <div class="group__orders">
+              <div class="order"><div class="order__product"><span class="product">HESI Exam Study</span><span class="order__date">12 Months Access · <span class="order__ordered">Ordered Aug 11, 2026</span></span></div><div class="order__customer">t***@gmail.com</div><div class="order__amount num">$147.00</div><div class="order__commission num">$29.40</div><div class="order__status"><span class="status st-avail">Available</span></div></div>
+            </div>
+          </div>
+          <div class="group group--avail" data-hide-below>
+            <div class="group__when"><strong class="group__date num">Sep 5, 2026</strong></div>
+            <div class="group__orders">
+              <div class="order"><div class="order__product"><span class="product">HESI Exam Study</span><span class="order__date">12 Months Access · <span class="order__ordered">Ordered Aug 6, 2026</span></span></div><div class="order__customer">s***@icloud.com</div><div class="order__amount num">$147.00</div><div class="order__commission num">$29.40</div><div class="order__status"><span class="status st-avail">Available</span></div></div>
+            </div>
+          </div>
+          <div class="group group--refund">
+            <div class="group__when"><span class="group__label">Cancelled</span><strong class="group__date num">Aug 29, 2026</strong></div>
+            <div class="group__orders">
+              <div class="order"><div class="order__product"><span class="product">HESI Exam Study</span><span class="order__date">36 Months Access · <span class="order__ordered">Ordered Jul 30, 2026</span></span></div><div class="order__customer">r***@gmail.com</div><div class="order__amount num">$197.00</div><div class="order__commission num"><span class="strike">$39.40</span>$0.00</div><div class="order__status"><span class="status st-refund">Refunded</span></div></div>
+            </div>
+          </div>
+          <div class="group group--paid">
+            <div class="group__when"><strong class="group__date num">Aug 18, 2026</strong></div>
+            <div class="group__orders">
+              <div class="order"><div class="order__product"><span class="product">HESI Exam Study</span><span class="order__date">180 Days · <span class="order__ordered">Ordered Jul 19, 2026</span></span></div><div class="order__customer">b***@gmail.com</div><div class="order__amount num">$137.00</div><div class="order__commission num">$27.40</div><div class="order__status"><span class="status st-paid">Paid out</span></div></div>
+            </div>
+          </div>
+          <div class="group group--paid">
+            <div class="group__when"><strong class="group__date num">Aug 1, 2026</strong><span class="group__meta"><span class="group__sum num">$68.80</span></span></div>
+            <div class="group__orders">
+              <div class="order"><div class="order__product"><span class="product">HESI Exam Study</span><span class="order__date">36 Months Access · <span class="order__ordered">Ordered Jul 2, 2026</span></span></div><div class="order__customer">j***@hotmail.com</div><div class="order__amount num">$197.00</div><div class="order__commission num">$39.40</div><div class="order__status"><span class="status st-paid">Paid out</span></div></div>
+              <div class="order"><div class="order__product"><span class="product">HESI Exam Study</span><span class="order__date">12 Months Access · <span class="order__ordered">Ordered Jul 2, 2026</span></span></div><div class="order__customer">l***@gmail.com</div><div class="order__amount num">$147.00</div><div class="order__commission num">$29.40</div><div class="order__status"><span class="status st-paid">Paid out</span></div></div>
+            </div>
+          </div>
+          <div class="group group--paid">
+            <div class="group__when"><strong class="group__date num">Jun 17, 2026</strong></div>
+            <div class="group__orders">
+              <div class="order"><div class="order__product"><span class="product">HESI Exam Study</span><span class="order__date">90 Days · <span class="order__ordered">Ordered May 18, 2026</span></span></div><div class="order__customer">n***@gmail.com</div><div class="order__amount num">$117.00</div><div class="order__commission num">$23.40</div><div class="order__status"><span class="status st-paid">Paid out</span></div></div>
+            </div>
+          </div>
+          <div class="group group--paid">
+            <div class="group__when"><strong class="group__date num">Jun 11, 2026</strong></div>
+            <div class="group__orders">
+              <div class="order"><div class="order__product"><span class="product">HESI Exam Study</span><span class="order__date">36 Months Access · <span class="order__ordered">Ordered May 12, 2026</span></span></div><div class="order__customer">c***@yahoo.com</div><div class="order__amount num">$197.00</div><div class="order__commission num">$39.40</div><div class="order__status"><span class="status st-paid">Paid out</span></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel feed-empty"><strong>No orders yet</strong>Purchases made through your links will show up here.</div>
+      </div>
+    </section>
+
+    <!-- Payouts -->
+    <section class="section section--payouts">
+      <h1 class="page-title">Payouts</h1>
+      <div class="panel next-payout">
+        <svg class="icon icon-done" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        <svg class="icon icon-wait" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        <span class="when-reached">Your available balance of <b class="num">$58.80</b> has reached the $50 minimum and will be included in the next payout.</span>
+        <span class="when-below">Your available balance is <b class="num">$29.40</b>. It will be paid out once it reaches $50.</span>
+      </div>
+      <p class="payout-start">Payouts start once your available balance reaches $50.</p>
+      <div class="panel ledger">
+        <table>
+          <thead>
+            <tr><th>Date paid</th><th class="r">Amount</th><th class="r">Commissions</th><th>PayPal account</th></tr>
+          </thead>
+          <tbody>
+            <tr class="payout-row"><td data-label="Date paid" class="num">Aug 20, 2026</td><td data-label="Amount" class="r num">$96.20</td><td data-label="Commissions" class="r num">3</td><td data-label="PayPal account">jordan.lee@example.com</td></tr>
+            <tr class="payout-row"><td data-label="Date paid" class="num">Jun 19, 2026</td><td data-label="Amount" class="r num">$62.80</td><td data-label="Commissions" class="r num">2</td><td data-label="PayPal account">jordan.lee@example.com</td></tr>
+            <tr class="empty-row"><td colspan="4"><strong>No payouts yet</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section class="section section--settings">
+      <h1 class="page-title">Settings</h1>
+      <form class="panel form-panel" novalidate>
+        <h2>Payouts</h2>
+        <label for="paypal">PayPal email for payouts</label>
+        <input class="field-input" id="paypal" type="email" value="jordan.lee@example.com" autocomplete="off" aria-describedby="paypal-hint">
+        <p class="hint" id="paypal-hint">We send your commissions to this PayPal account. A new email applies to the next payout.</p>
+        <button class="btn-primary" type="submit">Save changes</button>
+      </form>
+    </section>
+  </main>
+</div>
+
+<footer class="footer-hesi chrome chrome--program chrome--hesi chrome--schools">
+  <div class="footer-hesi__inner">
+    <div class="footer-hesi__row">
+      <a class="footer-hesi__seal" href="#"><img src="assets/footerlogo1.webp" alt="Norton Secured"></a>
+      <nav class="footer-hesi__menu" aria-label="Footer">
+        <div><a href="#">About</a><a href="#">FAQs</a></div>
+        <div><a href="#">Register</a><a href="#">Login</a></div>
+        <div><a href="#">Terms and Conditions</a><a href="#">Privacy Policy</a></div>
+      </nav>
+      <div class="footer-hesi__social">
+        <a href="#" aria-label="Facebook"><img src="assets/facebook.png" alt=""></a>
+        <a href="#" aria-label="Twitter"><img src="assets/twitter.png" alt=""></a>
+      </div>
+    </div>
+    <div class="footer-hesi__legal">
+      <div class="footer-hesi__copy">Copyright © 2026 Your Best Grade, Inc. All Rights Reserved.</div>
+      <p class="footer-hesi__note">
+        *We utilize surveys to measure the effectiveness of our program. Our latest results show that over 90% of customers who responded to our surveys and reported to have taken the HESI Exit since joining, passed their exam.<br>
+        **Please see the full terms and conditions of the success guarantee on our Pricing page.<br>
+        HESI is a registered trademark of Elsevier, Inc., creator and owner of the official HESI Examinations and Review Materials. Elsevier is not involved in the production of, and does not endorse, this website or its content.
+      </p>
+    </div>
+  </div>
+</footer>
+<footer class="footer-light chrome chrome--ybg">
+  <div class="footer-light__inner">
+    <div class="footer-light__row">
+      <a class="footer-light__seal" href="#"><img src="assets/norton-light.png" alt="Norton Secured"></a>
+      <nav class="footer-light__links" aria-label="Footer"><a href="#">Terms and Conditions</a><a href="#">Privacy Policy</a></nav>
+      <a class="footer-light__mail" href="mailto:support@yourbestgrade.com"><img src="assets/email-icon.png" alt="">support@yourbestgrade.com</a>
+    </div>
+    <div class="footer-light__bottom">
+      Copyright © 2026 Your Best Grade, Inc. All Rights Reserved.<br>
+      HESI is a registered trademark of Elsevier Inc. NCLEX is a registered trademark of the National Council of State Boards of Nursing, Inc.
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var body = document.body;
+    var KEYS = ['variant', 'section', 'chrome', 'menu', 'email', 'state', 'filter', 'bare'];
+    var TITLES = { links: 'Links', earnings: 'Earnings', payouts: 'Payouts', settings: 'Settings' };
+
+    // Values that change with the mockup state keep their active text in data-active
+    var stateful = document.querySelectorAll('[data-below], [data-new]');
+    stateful.forEach(function (el) { if (!el.hasAttribute('data-tr')) el.dataset.active = el.firstChild ? el.firstChild.textContent : el.textContent; });
+
+    function readHash() {
+      var state = {};
+      location.hash.replace(/^#/, '').split('&').forEach(function (pair) {
+        var parts = pair.split('=');
+        if (KEYS.indexOf(parts[0]) !== -1 && parts[1]) state[parts[0]] = decodeURIComponent(parts[1]);
+      });
+      return state;
+    }
+
+    function applyFilter(filter) {
+      document.querySelectorAll('.tab').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.filter === filter)); });
+      document.querySelectorAll('.section--earnings tbody tr[data-status]').forEach(function (row) {
+        row.hidden = !(filter === 'all' || row.dataset.status === filter);
+      });
+    }
+
+    function apply() {
+      var state = readHash();
+      KEYS.forEach(function (key) { if (state[key] && key !== 'filter') body.dataset[key] = state[key]; });
+      document.title = (TITLES[body.dataset.section] || 'Links') + ' | YourBestGrade Affiliate Dashboard';
+      document.querySelectorAll('.mock-seg').forEach(function (seg) {
+        seg.querySelectorAll('button').forEach(function (btn) {
+          btn.setAttribute('aria-pressed', String(btn.dataset.value === body.dataset[seg.dataset.key]));
+        });
+      });
+      document.querySelectorAll('.nav a').forEach(function (link) {
+        if (link.dataset.go === body.dataset.section) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+      var mode = body.dataset.state;
+      stateful.forEach(function (el) {
+        var value = (mode === 'below' && el.dataset.below) || (mode === 'new' && el.dataset.new) || el.dataset.active;
+        if (el.firstChild && el.firstChild.nodeType === 3) el.firstChild.textContent = value; else el.textContent = value;
+      });
+      applyFilter(state.filter || 'all');
+    }
+
+    function go(key, value) {
+      var state = readHash();
+      KEYS.forEach(function (k) { if (!state[k] && body.dataset[k] && k !== 'filter') state[k] = body.dataset[k]; });
+      state[key] = value;
+      var hash = KEYS.filter(function (k) { return state[k]; }).map(function (k) { return k + '=' + state[k]; }).join('&');
+      history.replaceState(null, '', '#' + hash);
+      apply();
+    }
+
+    document.querySelectorAll('.mock-seg button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        go(btn.parentElement.dataset.key, btn.dataset.value);
+        // Variants differ only in Earnings, so switching the variant opens that section
+        if (btn.parentElement.dataset.key === 'variant') go('section', 'earnings');
+      });
+    });
+    document.querySelectorAll('[data-go]').forEach(function (link) {
+      link.addEventListener('click', function (event) { event.preventDefault(); go('section', link.dataset.go); window.scrollTo(0, 0); });
+    });
+    document.querySelectorAll('.tab').forEach(function (btn) {
+      btn.addEventListener('click', function () { go('filter', btn.dataset.filter); });
+    });
+
+    document.querySelectorAll('.copy button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var url = btn.parentElement.querySelector('.link-url').textContent;
+        if (navigator.clipboard) navigator.clipboard.writeText(url).catch(function () {});
+        btn.classList.add('is-copied');
+        btn.querySelector('span').textContent = 'Copied';
+        setTimeout(function () { btn.classList.remove('is-copied'); btn.querySelector('span').textContent = 'Copy'; }, 1600);
+      });
+    });
+
+    document.querySelectorAll('form').forEach(function (form) { form.addEventListener('submit', function (e) { e.preventDefault(); }); });
+    document.querySelectorAll('a[href="#"]').forEach(function (link) {
+      if (!link.dataset.go) link.addEventListener('click', function (e) { e.preventDefault(); });
+    });
+
+    window.addEventListener('hashchange', apply);
+    apply();
+  })();
+</script>
+</body>
+</html>

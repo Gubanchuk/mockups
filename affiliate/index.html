@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Affiliate program mockups</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+  <style>
+    :root { --ink: #183261; --link: #1E5290; --ground: #E6EDF6; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--ground); font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; color: var(--ink); }
+    .mk-bar { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 18px; padding: 0 20px; background: #183261; color: #ffffff; font-size: 13px; }
+    .mk-bar a { color: rgba(255,255,255,0.72); text-decoration: none; padding: 11px 0; }
+    .mk-bar a:hover { color: #ffffff; }
+    .mk-home { font-weight: 600; color: #ffffff; margin-right: 6px; padding: 11px 0; }
+    .mk-bar a[aria-current] { color: #ffffff; box-shadow: inset 0 -2px 0 #ffffff; }
+    .mk-wrap { max-width: 940px; margin: 0 auto; padding: 56px 20px 80px 20px; }
+    h1 { font-size: 30px; font-weight: 600; margin: 0 0 8px 0; }
+    .mk-sub { color: #5a6f92; font-size: 15px; margin: 0 0 34px 0; }
+    .mk-card { padding: 20px 22px; margin-bottom: 12px; background: #ffffff; border: 1px solid #d7e0ee; border-radius: 12px; }
+    .mk-card h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0 0 12px 0; font-size: 16px; font-weight: 600; }
+    .mk-task { color: #5a6f92; font-size: 13px; font-weight: 500; }
+    .mk-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .mk-links a { display: inline-block; padding: 8px 14px; border: 1px solid #d7e0ee; border-radius: 8px; color: var(--link); font-size: 13.5px; font-weight: 500; text-decoration: none; }
+    .mk-links a:hover { border-color: #1E5290; box-shadow: 0 6px 16px rgba(24,50,97,0.10); }
+    .mk-links li:first-child a { background: #183261; border-color: #183261; color: #ffffff; }
+  </style>
+</head>
+<body>
+<nav class="mk-bar"><span class="mk-home">YBG mockups</span><a href="/">A2 inside the admin panel</a><a href="/affiliate" aria-current="page">Affiliate program</a></nav>
+<div class="mk-wrap">
+  <h1>Affiliate program</h1>
+  <p class="mk-sub">Three mockups for the affiliate program. Every link opens a variant directly; the bar on top of a mockup switches screens and states.</p>
+  <section class="mk-card">
+    <h2>Login and signup<span class="mk-task">YBG-1802</span></h2>
+    <ul class="mk-links">
+      <li><a href="/affiliate/login#variant=card&screen=login">Variant 1 · Card with steps</a></li>
+      <li><a href="/affiliate/login#variant=tabs&screen=login">Variant 2 · Tabs</a></li>
+    </ul>
+  </section>
+  <section class="mk-card">
+    <h2>Affiliate dashboard<span class="mk-task">YBG-1803</span></h2>
+    <ul class="mk-links">
+      <li><a href="/affiliate/dashboard#variant=ledger&section=earnings">Variant 1 · Order ledger</a></li>
+      <li><a href="/affiliate/dashboard#variant=timeline&section=earnings">Variant 2 · Timeline</a></li>
+      <li><a href="/affiliate/dashboard#section=links">Links</a></li>
+      <li><a href="/affiliate/dashboard#section=payouts">Payouts</a></li>
+      <li><a href="/affiliate/dashboard#section=settings">Settings</a></li>
+    </ul>
+  </section>
+  <section class="mk-card">
+    <h2>Affiliates in the admin panel<span class="mk-task">YBG-1804</span></h2>
+    <ul class="mk-links">
+      <li><a href="/affiliate/admin#variant=money&page=partners">Variant 1 · Money view</a></li>
+      <li><a href="/affiliate/admin#variant=tim&page=partners">Variant 2 · Tim's layout</a></li>
+      <li><a href="/affiliate/admin#variant=tabs&page=partners">Variant 3 · Tabs</a></li>
+    </ul>
+  </section>
+</div>
+</body>
+</html>

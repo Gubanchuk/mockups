@@ -17,3 +17,14 @@ Live: https://ybg-admin-mockup.vercel.app
 | `/all` | all five on one page |
 
 Static site, nothing to build on deploy. The generator that writes these files lives outside this repo.
+
+## Affiliate program
+
+| Path | Mockup |
+|---|---|
+| `/affiliate` | the three affiliate mockups with direct links to every variant |
+| `/affiliate/login` | YBG-1802 - login and signup |
+| `/affiliate/dashboard` | YBG-1803 - affiliate dashboard |
+| `/affiliate/admin` | YBG-1804 - affiliates in the admin panel |
+
+The affiliate pages are copied from `mockups/affiliate` by `build-affiliate-site.js`.
