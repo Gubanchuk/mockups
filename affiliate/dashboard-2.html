@@ -145,8 +145,7 @@
   .rates thead th { padding: 12px 24px 10px; }
   .rates tbody td { padding: 13px 24px; }
   .rates tbody tr:not(.rates__group):hover td { background: #fafcff; }
-  .rates__group { background: var(--panel-tint); }
-  .rates__group td { padding: 9px 24px; color: var(--navy); font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em; border-bottom: 0; }
+  .rates__price small { display: block; margin-top: 2px; font-size: 12.5px; }
   .rates__plan { color: var(--navy); font-weight: 500; }
   .rates__price { color: var(--muted); }
   .rates__earn { color: var(--navy); font-size: 15px; font-weight: 600; }
@@ -427,7 +426,6 @@
     .rates tbody td:nth-child(1) { grid-area: plan; }
     .rates tbody td:nth-child(2) { grid-area: price; text-align: left; font-size: 12.5px; }
     .rates tbody td:nth-child(3) { grid-area: earn; align-self: center; }
-    .rates tbody tr.rates__group { display: block; padding: 8px 16px; border-bottom: 0; }
 
 
     .section--payouts tr { display: block; padding: 12px 16px; border-bottom: 1px solid var(--line); }
@@ -784,14 +782,18 @@
     function plural(n, word) { return group3(String(n)) + ' ' + word + (n === 1 ? '' : 's'); }
     function fmtDate(t) { var d = new Date(t); return MONTHS[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear(); }
     // Commission rates as they are set in the admin panel, Affiliates -> Products: a fixed amount, or "10%" of the price
+    // plan, price, rate, price on a payment plan; the commission is the same either way
     var RATES = [
-      { group: 'One-time', rows: [['30 Days', 97, 8], ['90 Days', 117, 10], ['180 Days', 137, 11], ['12 Months Access', 147, 12], ['36 Months Access', 197, 20]] },
-      { group: 'Payment plan', rows: [['30 Days', 107, 8], ['90 Days', 127, 10], ['180 Days', 147, 11], ['12 Months Access', 157, 12], ['36 Months Access', 207, 20]] }
+      ['30 Days', 97, 8, 107],
+      ['90 Days', 117, 10, 127],
+      ['180 Days', 137, 11, 147],
+      ['12 Months Access', 147, 12, 157],
+      ['36 Months Access', 197, 20, 207]
     ];
     // A percentage is taken from the price, rounded half up, and never more than the price
     function rateAmount(price, rate) { return typeof rate === 'number' ? rate : Math.min(price, Math.round(price * parseFloat(rate)) / 100); }
     var COMMISSION = {};
-    RATES[0].rows.forEach(function (r) { COMMISSION[r[0]] = rateAmount(r[1], r[2]); });
+    RATES.forEach(function (r) { COMMISSION[r[0]] = rateAmount(r[1], r[2]); });
 
     function order(t, plan, price, email, status, hideBelow) {
       return { date: t, plan: plan, price: price, commission: COMMISSION[plan], email: email, status: status, hideBelow: !!hideBelow };
@@ -898,14 +900,12 @@
     // The rates table, the same in Links and in the Commissions section
     (function () {
       var html = '<table><thead><tr><th>Plan</th><th class="r">Price</th><th class="r">You earn</th></tr></thead><tbody>' +
-        RATES.map(function (g) {
-          return '<tr class="rates__group"><td colspan="3">' + g.group + '</td></tr>' +
-            g.rows.map(function (r) {
-              var share = typeof r[2] === 'string' ? '<small>' + r[2] + ' of the price</small>' : '';
-              return '<tr><td class="rates__plan">' + r[0] + '</td>' +
-                '<td class="r num rates__price">' + money(r[1]) + '</td>' +
-                '<td class="r num rates__earn">' + money(rateAmount(r[1], r[2])) + share + '</td></tr>';
-            }).join('');
+        RATES.map(function (r) {
+          var share = typeof r[2] === 'string' ? '<small>' + r[2] + ' of the price</small>' : '';
+          return '<tr><td class="rates__plan">' + r[0] + '</td>' +
+            '<td class="r num rates__price">' + money(r[1]) +
+              '<small>' + money(r[3]) + ' on a payment plan</small></td>' +
+            '<td class="r num rates__earn">' + money(rateAmount(r[1], r[2])) + share + '</td></tr>';
         }).join('') + '</tbody></table>';
       document.querySelectorAll('.rates__body').forEach(function (el) { el.innerHTML = html; });
     })();
