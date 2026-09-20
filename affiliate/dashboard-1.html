@@ -904,7 +904,7 @@
           var share = typeof r[2] === 'string' ? '<small>' + r[2] + ' of the price</small>' : '';
           return '<tr><td class="rates__plan">' + r[0] + '</td>' +
             '<td class="r num rates__price">' + money(r[1]) +
-              '<small>' + money(r[3]) + ' on a payment plan</small></td>' +
+              '<small>' + money(r[3]) + ' with a plan</small></td>' +
             '<td class="r num rates__earn">' + money(rateAmount(r[1], r[2])) + share + '</td></tr>';
         }).join('') + '</tbody></table>';
       document.querySelectorAll('.rates__body').forEach(function (el) { el.innerHTML = html; });
