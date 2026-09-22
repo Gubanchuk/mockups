@@ -1,5 +1,6 @@
 // Course tree behaviour for the mockup: expand/collapse, "..." menus, Publish toggle, Reorder switch with drag and drop,
-// Edit mode switch (variant 1.1), "Hide unpublished" checkbox, premoderation switch.
+// Edit mode switch (variant 1.1; variant 1 + Edit mode, where it also makes the lesson page read-only), "Hide unpublished"
+// checkbox, premoderation switch.
 // Drill-in (07.09): a lesson row (or Edit) opens the lesson page, Edit on a section opens the section page; both replace
 // the tree inside the same frame (.a2-view-lesson / .a2-view-section vs .a2-view-tree). A part is edited in the modal.
 // Deleting lives inside: "Delete lesson" on the lesson page, "Delete section" on the section page, "Delete part" in the
@@ -30,11 +31,29 @@
     recount(tree);
   }
 
-  // state = 'reorder' (drag handles + Save/Cancel bar) or 'on' (Edit mode, variant 1.1); each has its own switch.
+  // Variant 1 + Edit mode: while Edit mode is off, a lesson opens read-only.
+  function isLock(tree) { return tree.getAttribute('data-variant') === 'lock'; }
+
+  function applyLock(tree) {
+    var v = qs(tree, '.a2-view-lesson');
+    if (!v || !isLock(tree)) return; // other variants keep their own disabled fields (the part select of the lists)
+    var ro = !tree.classList.contains('on');
+    v.classList.toggle('a2-readonly', ro);
+    qsa(v, 'input, select').forEach(function (el) { el.disabled = ro; });
+    qsa(v, '[contenteditable]').forEach(function (el) { el.setAttribute('contenteditable', ro ? 'false' : 'true'); });
+    qs(v, '.a2-actions [data-back]').textContent = ro ? 'Back' : 'Cancel';
+    // Subtitles: only the file name, without Replace and Remove (openLesson writes them fresh on every open)
+    var subs = qs(v, '[data-f="subs"]');
+    if (ro) subs.textContent = subs.textContent.split(' · ')[0];
+  }
+
+  // state = 'reorder' (drag handles + Save/Cancel bar) or 'on' (Edit mode, variants 1.1 and 1 + Edit mode); each has its own switch.
   function setState(tree, state, on, keep) {
     if (state === 'reorder') {
       if (on) snapshot(tree); else if (keep) tree.__order = null; else restore(tree);
     }
+    // In variant 1 + Edit mode, Reorder lives inside Edit mode: switching Edit mode off drops an unsaved order.
+    if (state === 'on' && !on && isLock(tree) && tree.classList.contains('reorder')) setState(tree, 'reorder', false);
     tree.classList.toggle(state, on);
     var sw = qs(tree, '.a2-toggle[data-state="' + state + '"] .a2-switch');
     if (sw) sw.classList.toggle('on', on);
@@ -257,8 +276,9 @@
     if (isLists(tree)) fillWhere(tree, v, section, part);
     v.__snapshot = lessonSnapshot(v);
     pageState = { tree: tree, type: 'lesson', node: cfg.node || null, listEl: cfg.listEl || null };
+    applyLock(tree);
     showView(tree, 'lesson');
-    qs(v, '[data-f="title"]').focus();
+    if (!v.classList.contains('a2-readonly')) qs(v, '[data-f="title"]').focus();
   }
 
   // Questions block: the head folds the whole block, a question row folds its details, a group folds its questions.
@@ -1132,6 +1152,7 @@
     if ((a = e.target.closest('.a2-toggle'))) {
       e.preventDefault();
       var state = a.getAttribute('data-state');
+      if (state === 'reorder' && isLock(tree) && !tree.classList.contains('on')) return; // greyed out until Edit mode is on
       setState(tree, state, !tree.classList.contains(state));
       return;
     }

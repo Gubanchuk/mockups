@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Course tree &middot; A2 admin mockup</title>
+  <title>Course tree + Edit mode &middot; A2 admin mockup</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="/assets/tree.css">
   <script src="/assets/tree.js" defer></script>
@@ -24,7 +24,7 @@
   </style>
 </head>
 <body>
-<nav class="mk-bar"><a class="mk-home" href="/a2">A2 admin mockup</a><a href="/tree-edit">Course tree + Edit mode</a><a href="/tree" aria-current="page">Course tree</a><a href="/edit-mode">Edit mode</a><a href="/hub">Hub page</a><a href="/dropdown">Dropdown</a><a href="/tabs">Tabs</a></nav>
+<nav class="mk-bar"><a class="mk-home" href="/a2">A2 admin mockup</a><a href="/tree-edit" aria-current="page">Course tree + Edit mode</a><a href="/tree">Course tree</a><a href="/edit-mode">Edit mode</a><a href="/hub">Hub page</a><a href="/dropdown">Dropdown</a><a href="/tabs">Tabs</a></nav>
 <div class="mk-screen">
 <div style="width: 100%; max-width: 1440px; min-height: 900px; background: #ffffff; font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; font-size: 14px; color: #333333;  box-sizing: border-box;">
 
@@ -53,7 +53,7 @@
 
 
   <!-- Opened by A2. Course tree as in the student sidebar; admin lists on the right. A lesson or a section opens as a page inside the same frame. -->
-  <div class="a2tree" data-variant="kebab">
+  <div class="a2tree" data-variant="lock">
   <div class="a2-view a2-view-tree">
     <div class="a2-title">A2 MasterClass</div>
     <div class="a2-counts"><span data-count="sections">9</span> sections · <span data-count="parts">4</span> parts · <span data-count="lessons">105</span> lessons</div>
@@ -63,7 +63,7 @@
           <h2>Course structure</h2>
           <div class="a2-controls">
             <label class="a2-hide"><input type="checkbox"> Hide unpublished</label>
-            <a href="#" class="a2-toggle" data-state="reorder"><span>Reorder</span><span class="a2-switch"><span class="a2-knob"></span></span></a>
+            <a href="#" class="a2-toggle" data-state="on"><span>Edit mode</span><span class="a2-switch"><span class="a2-knob"></span></span></a> <a href="#" class="a2-toggle" data-state="reorder"><span>Reorder</span><span class="a2-switch"><span class="a2-knob"></span></span></a>
           </div>
         </div>
         <div class="a2-reorder-bar"><span class="a2-hint">Drag rows to change the order, then save</span><span class="a2-reorder-btns"><a href="#" class="a2-btn a2-btn-primary" data-reorder="save">Save new order</a><a href="#" class="a2-btn" data-reorder="cancel">Cancel</a></span></div>

@@ -1,4 +1,4 @@
-/* Course tree (variants 1 and 1.1). State classes on .a2tree: data-variant="kebab|mode", .reorder = Reorder on, .on = Edit mode on (variant 1.1). */
+/* Course tree (variants 1, 1.1 and 1 + Edit mode). State classes on .a2tree: data-variant="kebab|mode|lock", .reorder = Reorder on, .on = Edit mode on (variants 1.1 and 1 + Edit mode). */
 .a2tree { width: 1080px; margin: 0 auto; padding: 26px 0 34px 0; }
 .a2tree a { text-decoration: none; }
 .a2-title { font-size: 32px; font-weight: 600; color: #183261; }
@@ -93,6 +93,17 @@
 .a2tree[data-variant="kebab"] .a2-acts-links { display: none; }
 .a2tree[data-variant="mode"] .a2-acts-kebab { display: none; }
 .a2tree[data-variant="mode"]:not(.on) .a2-acts-links, .a2tree[data-variant="mode"]:not(.on) .a2-add { display: none; }
+/* Variant 1 + Edit mode: the menus of variant 1, locked while Edit mode is off. A lesson keeps "Go to lesson";
+   sections and parts keep the place of their menu so the counters and dots stay in line. */
+.a2tree[data-variant="lock"] .a2-acts-links { display: none; }
+.a2tree[data-variant="lock"]:not(.on) .a2-menu [data-act="edit"],
+.a2tree[data-variant="lock"]:not(.on) .a2-menu [data-act="publish"],
+.a2tree[data-variant="lock"]:not(.on) .a2-menu [data-act="delete"],
+.a2tree[data-variant="lock"]:not(.on) .a2-add { display: none; }
+/* Reorder stays in place and greyed out, so switching Edit mode on does not shift the header (22.09) */
+.a2tree[data-variant="lock"]:not(.on) .a2-toggle[data-state="reorder"] { opacity: 0.4; pointer-events: none; cursor: default; }
+.a2tree[data-variant="lock"]:not(.on) .a2-section > .a2-row > .a2-acts-kebab,
+.a2tree[data-variant="lock"]:not(.on) .a2-part > .a2-row > .a2-acts-kebab { visibility: hidden; }
 
 /* Add rows */
 .a2-add { padding: 7px 0 3px 20px; border-top: 1px solid #eef2f8; font-size: 12px; }
@@ -438,3 +449,23 @@ input.a2-qgroup-rename:focus { outline: none; box-shadow: 0 0 0 2px rgba(30,82,1
 .a2-q-edit { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; flex: none; border-radius: 4px; color: #7c8ead; }
 .a2-q-row:hover .a2-q-edit { color: #5a6f92; }
 .a2tree .a2-q-edit:hover { color: #1E5290; background: #eaf1fa; text-decoration: none; }
+
+/* Variant 1 + Edit mode, Edit mode off: the lesson page is read-only. Everything that changes the lesson is hidden,
+   what only shows it stays: fields (disabled by tree.js), video details, answers and rationales, comments. */
+.a2-view-lesson.a2-readonly .a2-toolbar,
+.a2-view-lesson.a2-readonly [data-f="video-replace"],
+.a2-view-lesson.a2-readonly [data-f="subs"] a,
+.a2-view-lesson.a2-readonly .a2-q-edit,
+.a2-view-lesson.a2-readonly .a2-q-drag,
+.a2-view-lesson.a2-readonly .a2-qgroup-drag,
+.a2-view-lesson.a2-readonly .a2-qpen,
+.a2-view-lesson.a2-readonly .a2-qreorder,
+.a2-view-lesson.a2-readonly .a2-foot,
+.a2-view-lesson.a2-readonly .a2-qgroup-foot,
+.a2-view-lesson.a2-readonly .a2-qfoot,
+.a2-view-lesson.a2-readonly [data-page-delete],
+.a2-view-lesson.a2-readonly [data-page-save] { display: none !important; }
+.a2-view-lesson.a2-readonly .a2-field input:disabled,
+.a2-view-lesson.a2-readonly .a2-field select:disabled { background: #f7f9fc; color: #183261; cursor: default; }
+.a2-view-lesson.a2-readonly .a2-editor-body { background: #f7f9fc; }
+.a2-view-lesson.a2-readonly .a2-video-acts a + a::before { content: none; }
