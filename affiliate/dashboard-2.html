@@ -56,6 +56,8 @@
   .mock-seg button:hover { color: #fff; }
   .mock-seg button[aria-pressed="true"] { background: #f3f6fb; color: #16202e; }
   .mock-sample { margin-left: auto; padding: 6px 10px; border: 1px dashed #8d9bb0; border-radius: 4px; color: #e6edf6; }
+  .mock-sample--terms { display: none; margin-left: 0; }
+  body[data-section="terms"] .mock-sample--terms { display: block; }
   body[data-bare="1"] .mock-bar { display: none; }
 
   /* ---------- Site header (same as the login pages) ---------- */
@@ -116,7 +118,8 @@
   body[data-section="commissions"] .section--commissions,
   body[data-section="earnings"] .section--earnings,
   body[data-section="payouts"] .section--payouts,
-  body[data-section="settings"] .section--settings { display: block; }
+  body[data-section="settings"] .section--settings,
+  body[data-section="terms"] .section--terms { display: block; }
   .page-title { margin: 4px 0 18px; color: var(--navy); font-size: 26px; font-weight: 600; line-height: 1.25; }
   .page-lead { margin: -8px 0 20px; color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 70ch; }
 
@@ -287,6 +290,22 @@
   .btn-primary { margin-top: 18px; height: 44px; padding: 0 22px; border: 0; border-radius: 6px; background: var(--orange); color: #fff; font: 600 14.5px "Poppins", Arial, sans-serif; cursor: pointer; }
   .btn-primary:hover { background: var(--orange-hover); }
 
+  /* Terms: the program rules on one reading panel; numbers let a rule be referred to */
+  .terms { padding: 26px 32px 28px; }
+  .terms__list { list-style: none; margin: 0; padding: 0; counter-reset: term; }
+  .terms__item { counter-increment: term; padding: 20px 0; border-top: 1px solid var(--line); }
+  .terms__item:first-child { padding-top: 0; border-top: 0; }
+  .terms__item h2 { display: flex; gap: 10px; margin: 0; color: var(--navy); font-size: 17px; font-weight: 600; line-height: 1.35; }
+  .terms__item h2::before { content: counter(term) "."; min-width: 18px; color: var(--blue); font-variant-numeric: tabular-nums; }
+  .terms__item p { margin: 8px 0 0 28px; color: var(--ink); font-size: 14px; line-height: 1.65; max-width: 68ch; }
+  .terms__rates { margin: 14px 0 0 28px; padding: 0; max-width: 640px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .terms__rates thead th { padding: 10px 16px 8px; }
+  .terms__rates tbody td { padding: 11px 16px; }
+  .terms__rates tbody tr:last-child td { border-bottom: 0; }
+  .terms__rates tbody tr:not(.rates__group):hover td { background: none; }
+  .terms__tbd { margin: 10px 0 0 28px; max-width: 640px; padding: 10px 14px; border: 1px dashed var(--field); border-radius: 6px; color: var(--muted); font-size: 13px; font-weight: 500; }
+  .terms__foot { margin: 20px 0 0; padding: 18px 0 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+
   /* ---------- Footers (same as the login pages) ---------- */
   .footer-hesi { background: var(--navy-deep); color: #fff; }
   .footer-hesi__inner { max-width: 1140px; margin: 0 auto; padding: 40px 40px 34px; }
@@ -437,6 +456,8 @@
     .empty-row td::before { content: none !important; }
 
     .form-panel { padding: 20px 18px 22px; }
+    .terms { padding: 20px 18px 22px; }
+    .terms__item p, .terms__rates, .terms__tbd { margin-left: 0; }
     .footer-hesi__inner, .footer-light__inner { padding: 30px 20px 26px; }
     .footer-hesi__row, .footer-light__row { flex-direction: column; text-align: center; gap: 22px; }
     .footer-hesi__menu { gap: 28px; }
@@ -446,6 +467,10 @@
     .site-header__logo.program-logo img { width: 86px; }
     .program-logo__rule { height: 36px; }
     .program-logo__words { font-size: 12.5px; }
+  }
+  /* Five menu items fit one row on a 390px phone */
+  @media (max-width: 420px) {
+    .side .nav a, .topbar .nav a { padding-left: 7px; padding-right: 7px; }
   }
 </style>
 <style>
@@ -472,6 +497,7 @@
       <button data-value="earnings">Earnings</button>
       <button data-value="payouts">Payouts</button>
       <button data-value="settings">Settings</button>
+      <button data-value="terms">Terms</button>
     </div>
   </div>
   <div class="mock-group"><span>Header &amp; footer</span>
@@ -497,6 +523,7 @@
     </div>
   </div>
   <div class="mock-sample">Sample data</div>
+  <div class="mock-sample mock-sample--terms">Terms: draft for review</div>
 </div>
 
 <header class="site-header chrome chrome--program">
@@ -534,6 +561,7 @@
       <li><a href="#" data-go="earnings"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M16 15h2"/></svg>Earnings</a></li>
       <li><a href="#" data-go="payouts"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>Payouts</a></li>
       <li><a href="#" data-go="settings"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</a></li>
+      <li><a href="#" data-go="terms"><svg class="icon" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>Terms</a></li>
     </ul>
     <button class="logout" type="button"><svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>Log out</button>
   </aside>
@@ -546,6 +574,7 @@
         <li><a href="#" data-go="earnings">Earnings</a></li>
         <li><a href="#" data-go="payouts">Payouts</a></li>
         <li><a href="#" data-go="settings">Settings</a></li>
+        <li><a href="#" data-go="terms">Terms</a></li>
       </ul>
       <div class="who-inline"><strong>Jordan Lee</strong><button class="logout" type="button"><svg class="icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>Log out</button></div>
     </nav>
@@ -720,6 +749,54 @@
         <button class="btn-primary" type="submit">Save changes</button>
       </form>
     </section>
+
+    <!-- Terms -->
+    <section class="section section--terms">
+      <h1 class="page-title">Program terms</h1>
+      <p class="page-lead">The rules of the YourBestGrade Affiliate Program.</p>
+      <div class="panel terms">
+        <ol class="terms__list">
+          <li class="terms__item">
+            <h2>Commission</h2>
+            <p>You earn a fixed amount for each HESI Exam Study purchase made through your links. The amount is set at the time of purchase and stays the same if the student pays with a payment plan.</p>
+            <div class="rates terms__rates"><div class="rates__body"></div></div>
+          </li>
+          <li class="terms__item">
+            <h2>What counts</h2>
+            <p>A purchase counts for you if the buyer clicked your link within the last 30 days and your link was the last affiliate link they clicked. Card, Afterpay, Affirm, Klarna and PayPal payments all count. HESI A2 MasterClass purchases don't earn a commission.</p>
+          </li>
+          <li class="terms__item">
+            <h2>Hold</h2>
+            <p>Each commission is on hold for 30 days after the purchase. Then it becomes available.</p>
+          </li>
+          <li class="terms__item">
+            <h2>Payouts</h2>
+            <p>We pay your available commissions to your PayPal account once they add up to $50. You can change your PayPal email in <a href="#" data-go="settings">Settings</a>.</p>
+          </li>
+          <li class="terms__item">
+            <h2>Refunds</h2>
+            <p>If an order is refunded, its commission is cancelled. If the commission was already paid out, it's deducted from your next payout.</p>
+          </li>
+          <li class="terms__item">
+            <h2>Who can join</h2>
+            <p>Anyone can apply. We review every application and email you once it's approved.</p>
+          </li>
+          <li class="terms__item">
+            <h2>How you can promote your links</h2>
+            <div class="terms__tbd">TBD</div>
+          </li>
+          <li class="terms__item">
+            <h2>Purchases through your own link</h2>
+            <div class="terms__tbd">TBD</div>
+          </li>
+          <li class="terms__item">
+            <h2>Changes to these terms</h2>
+            <div class="terms__tbd">TBD</div>
+          </li>
+        </ol>
+        <p class="terms__foot">Questions about these terms? Email <a href="mailto:support@yourbestgrade.com">support@yourbestgrade.com</a>.</p>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -765,7 +842,7 @@
   (function () {
     var body = document.body;
     var KEYS = ['variant', 'orders', 'section', 'chrome', 'menu', 'email', 'state', 'filter', 'page', 'bare'];
-    var TITLES = { links: 'Links', commissions: 'Commissions', earnings: 'Earnings', payouts: 'Payouts', settings: 'Settings' };
+    var TITLES = { links: 'Links', commissions: 'Commissions', earnings: 'Earnings', payouts: 'Payouts', settings: 'Settings', terms: 'Terms' };
     var FILTERS = { all: 'All orders', hold: 'On hold', avail: 'Available', paid: 'Paid out', refund: 'Refunded' };
     var STATUS = { hold: ['st-hold', 'On hold'], avail: ['st-avail', 'Available'], paid: ['st-paid', 'Paid out'], refund: ['st-refund', 'Refunded'] };
     var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
