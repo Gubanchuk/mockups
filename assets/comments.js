@@ -21,8 +21,9 @@
     var view = qs(tree, '.a2-view-comments');
     // tab / lesson / q: filters of the inbox; sel: the thread on the right; from: the lesson page this screen was opened from;
     // open: the lesson on screen (by lesson); reply / confirm: the thread with an open reply box / delete question
+    // edit: the comment or reply whose text is open for editing ("c5" or "c5:0"), editError: its Save was pressed empty
     var st = { tab: 'awaiting', lesson: '', q: '', sel: null, from: null, open: null, only: false,
-               reply: null, confirm: null, error: null, lastLesson: null };
+               reply: null, confirm: null, error: null, edit: null, editError: false, lastLesson: null };
 
     function waiting(c) { return c.status === 'awaiting'; }
     function byId(id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
@@ -112,22 +113,38 @@
         '<a href="#" class="a2-btn a2-btn-primary" data-cm-reply="' + c.id + '">' + label + '</a></div></div>';
     }
 
+    // Edit (as in the A2 admin today): the text opens in a field right in the card, Save keeps it, Cancel drops it
+    function editBox(key, text) {
+      return '<div class="cm-edit"><textarea rows="3" data-cm-edit-text="' + key + '"' + (st.editError ? ' aria-invalid="true"' : '') +
+        ' aria-label="Comment text">' + esc(text) + '</textarea>' +
+        '<div class="cm-replyacts">' + (st.editError ? '<span class="cm-err">The comment cannot be empty.</span>' : '') +
+        '<a href="#" class="a2-btn" data-cm-edit-cancel>Cancel</a>' +
+        '<a href="#" class="a2-btn a2-btn-primary" data-cm-edit-save="' + key + '">Save</a></div></div>';
+    }
+
+    // Text of a comment or a reply, or its field while it is edited; the row of actions below it,
+    // replaced by the delete question or hidden while editing, so one set of controls is in view at a time
+    function body(key, text, acts, confirm) {
+      if (st.edit === key) return editBox(key, text);
+      return '<div class="cm-text">' + esc(text) + '</div>' + (st.confirm === key ? confirm : acts);
+    }
+
     // A thread: the comment, its actions, its replies. The inbox always shows the reply box;
     // the lessons version opens it from "Reply", as under a lesson.
     function thread(c) {
       var w = waiting(c), inbox = kind === 'inbox';
       var acts = (w ? '<a href="#" class="a2-btn a2-btn-primary" data-cm-approve="' + c.id + '">Approve</a>' : '') +
         (inbox ? '' : '<a href="#" class="cm-link" data-cm-replyto="' + c.id + '">Reply</a>') +
+        '<a href="#" class="cm-link" data-cm-edit="' + c.id + '">Edit</a>' +
         '<a href="#" class="cm-del" data-cm-del="' + c.id + '">Delete</a>';
       var replies = c.replies.map(function (r, i) {
         var key = c.id + ':' + i;
-        // while the delete question is open it replaces the row of actions: one Delete in view, not two
-        return '<div class="cm-r">' + who(r, false) + '<div class="cm-text">' + esc(r.text) + '</div>' +
-          (st.confirm === key ? confirmBox(key, 0) : '<div class="cm-acts cm-acts-r"><a href="#" class="cm-del" data-cm-del="' + key + '">Delete</a></div>') + '</div>';
+        return '<div class="cm-r">' + who(r, false) +
+          body(key, r.text, '<div class="cm-acts cm-acts-r"><a href="#" class="cm-link" data-cm-edit="' + key + '">Edit</a>' +
+            '<a href="#" class="cm-del" data-cm-del="' + key + '">Delete</a></div>', confirmBox(key, 0)) + '</div>';
       }).join('');
       return '<div class="cm-c' + (w ? ' wait' : '') + '" data-cm-id="' + c.id + '">' +
-        who(c, w) + '<div class="cm-text">' + esc(c.text) + '</div>' +
-        (st.confirm === c.id ? confirmBox(c.id, c.replies.length, w) : '<div class="cm-acts">' + acts + '</div>') +
+        who(c, w) + body(c.id, c.text, '<div class="cm-acts">' + acts + '</div>', confirmBox(c.id, c.replies.length, w)) +
         (replies ? '<div class="cm-replies">' + replies + '</div>' : '') +
         (inbox || st.reply === c.id ? replyBox(c, !inbox) : '') + '</div>';
     }
@@ -238,7 +255,7 @@
 
     function openFromLesson(lid) {
       flash('');
-      st.from = lid; st.reply = null; st.confirm = null; st.error = null;
+      st.from = lid; st.reply = null; st.confirm = null; st.error = null; st.edit = null;
       if (kind === 'inbox') {
         st.lesson = lid; st.q = ''; st.sel = null;
         qs(view, '[data-cm-search]').value = '';
@@ -281,6 +298,24 @@
       render();
     }
 
+    function saveEdit(key) {
+      var box = qs(view, '[data-cm-edit-text="' + key + '"]'), text = box ? box.value.trim() : '';
+      if (!text) {
+        // marked in place: a re-render would put the old text back into the field the admin just cleared
+        st.editError = true;
+        box.setAttribute('aria-invalid', 'true');
+        var acts = box.parentElement.querySelector('.cm-replyacts');
+        if (!acts.querySelector('.cm-err')) acts.insertAdjacentHTML('afterbegin', '<span class="cm-err">The comment cannot be empty.</span>');
+        box.focus();
+        return;
+      }
+      var c = byId(key.split(':')[0]);
+      if (key.indexOf(':') > 0) c.replies[Number(key.split(':')[1])].text = text; else c.text = text;
+      st.edit = null; st.editError = false;
+      flash('The comment is updated.');
+      render();
+    }
+
     function reply(c) {
       var box = qs(view, '[data-cm-text="' + c.id + '"]'), text = box ? box.value.trim() : '';
       if (!text) { st.error = c.id; render(); var b = qs(view, '[data-cm-text="' + c.id + '"]'); if (b) b.focus(); return; }
@@ -298,7 +333,7 @@
       if (lesson) { st.lastLesson = lesson.getAttribute('data-lid'); setTimeout(lessonBadge, 0); return; }
       if (e.target.closest('[data-cm-open]')) {
         stop(e); flash('');
-        st.from = null; st.open = null; st.reply = null; st.confirm = null;
+        st.from = null; st.open = null; st.reply = null; st.confirm = null; st.edit = null;
         if (kind === 'inbox') { st.lesson = ''; st.tab = 'awaiting'; }
         show();
         return;
@@ -318,13 +353,13 @@
       }
       if ((a = e.target.closest('[data-cm-tab]'))) {
         stop(e); flash('');
-        st.tab = a.getAttribute('data-cm-tab'); st.sel = null; st.confirm = null; st.error = null;
+        st.tab = a.getAttribute('data-cm-tab'); st.sel = null; st.confirm = null; st.error = null; st.edit = null;
         render();
         return;
       }
       if ((a = e.target.closest('[data-cm-sel]'))) {
         stop(e); flash('');
-        st.sel = a.getAttribute('data-cm-sel'); st.confirm = null; st.error = null;
+        st.sel = a.getAttribute('data-cm-sel'); st.confirm = null; st.error = null; st.edit = null;
         render();
         return;
       }
@@ -334,13 +369,23 @@
         render();
         return;
       }
-      if ((a = e.target.closest('[data-cm-approve]'))) { stop(e); approve(byId(a.getAttribute('data-cm-approve'))); return; }
-      if ((a = e.target.closest('[data-cm-del]'))) { stop(e); st.confirm = a.getAttribute('data-cm-del'); render(); return; }
+      if ((a = e.target.closest('[data-cm-approve]'))) { stop(e); st.edit = null; approve(byId(a.getAttribute('data-cm-approve'))); return; }
+      if ((a = e.target.closest('[data-cm-edit]'))) {
+        stop(e);
+        st.edit = a.getAttribute('data-cm-edit'); st.editError = false; st.confirm = null; st.reply = null; st.error = null;
+        render();
+        var ed = qs(view, '[data-cm-edit-text="' + st.edit + '"]');
+        if (ed) { ed.focus(); ed.setSelectionRange(ed.value.length, ed.value.length); }
+        return;
+      }
+      if ((a = e.target.closest('[data-cm-edit-save]'))) { stop(e); saveEdit(a.getAttribute('data-cm-edit-save')); return; }
+      if (e.target.closest('[data-cm-edit-cancel]')) { stop(e); st.edit = null; st.editError = false; render(); return; }
+      if ((a = e.target.closest('[data-cm-del]'))) { stop(e); st.edit = null; st.confirm = a.getAttribute('data-cm-del'); render(); return; }
       if ((a = e.target.closest('[data-cm-del-yes]'))) { stop(e); remove(a.getAttribute('data-cm-del-yes')); return; }
       if (e.target.closest('[data-cm-del-no]')) { stop(e); st.confirm = null; render(); return; }
       if ((a = e.target.closest('[data-cm-replyto]'))) {
         stop(e);
-        st.reply = a.getAttribute('data-cm-replyto'); st.error = null; st.confirm = null;
+        st.reply = a.getAttribute('data-cm-replyto'); st.error = null; st.confirm = null; st.edit = null;
         render();
         var t = qs(view, '[data-cm-text="' + st.reply + '"]');
         if (t) t.focus();
@@ -351,18 +396,24 @@
       if ((a = e.target.closest('[data-cm-open-lesson]')) || (a = e.target.closest('tr[data-cm-row]'))) {
         stop(e); flash('');
         st.open = a.getAttribute('data-cm-open-lesson') || a.getAttribute('data-cm-row');
-        st.reply = null; st.confirm = null;
+        st.reply = null; st.confirm = null; st.edit = null;
         render();
         window.scrollTo(0, 0);
         return;
       }
-      if (e.target.closest('[data-cm-index]')) { stop(e); flash(''); st.open = null; st.from = null; render(); return; }
+      if (e.target.closest('[data-cm-index]')) { stop(e); flash(''); st.open = null; st.from = null; st.edit = null; render(); return; }
       if (e.target.closest('[data-cm-only-off]')) { stop(e); st.only = false; render(); return; }
       if (e.target.closest('.cm-email')) { stop(e); return; } // the user card lives outside this mockup
     }, true);
 
     view.addEventListener('input', function (e) {
       if (e.target.matches('[data-cm-search]')) { st.q = e.target.value; flash(''); render(); }
+      if (e.target.matches('[data-cm-edit-text]') && st.editError) {
+        st.editError = false;
+        var eerr = qs(view, '.cm-edit .cm-err');
+        if (eerr) eerr.remove();
+        e.target.removeAttribute('aria-invalid');
+      }
       if (e.target.matches('[data-cm-text]') && st.error) {
         st.error = null;
         var err = qs(view, '.cm-err');

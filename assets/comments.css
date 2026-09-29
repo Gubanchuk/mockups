@@ -86,9 +86,11 @@
 .cm-r .cm-ava { width: 28px; height: 28px; font-size: 11px; }
 .cm-r .cm-text, .cm-r .cm-acts, .cm-r .cm-confirm { margin-left: 38px; }
 .cm-replybox { margin: 16px 0 0 44px; }
-.cm-replybox textarea { display: block; width: 100%; min-height: 72px; padding: 9px 11px; border: 1px solid #cccccc; border-radius: 6px;
+.cm-edit { margin: 8px 0 0 44px; }
+.cm-r .cm-edit { margin-left: 38px; }
+.cm-replybox textarea, .cm-edit textarea { display: block; width: 100%; min-height: 72px; padding: 9px 11px; border: 1px solid #cccccc; border-radius: 6px;
   background: #ffffff; resize: vertical; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.45; color: #333333; }
-.cm-replybox textarea[aria-invalid="true"] { border-color: #a94442; }
+.cm-replybox textarea[aria-invalid="true"], .cm-edit textarea[aria-invalid="true"] { border-color: #a94442; }
 .cm-replyacts { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 8px; font-size: 13px; }
 .cm-err { margin-right: auto; font-size: 12px; color: #a94442; }
 
