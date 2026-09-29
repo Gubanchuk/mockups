@@ -624,6 +624,7 @@ input.a2-qgroup-rename:focus { outline: none; box-shadow: 0 0 0 2px rgba(30,82,1
       <div class="a2-actions"><a href="#" class="a2-modal-delete" data-page-delete>Delete section</a><span class="a2-modal-spacer"></span><a href="#" class="a2-btn" data-back>Cancel</a><a href="#" class="a2-btn a2-btn-primary" data-page-save>Save</a></div>
     </div>
   </div>
+  
     <div class="a2-modal" hidden>
       <div class="a2-modal-box">
         <div class="a2-modal-head"><div class="a2-modal-title">Edit</div>
@@ -799,6 +800,7 @@ input.a2-qgroup-rename:focus { outline: none; box-shadow: 0 0 0 2px rgba(30,82,1
       <div class="a2-actions"><a href="#" class="a2-modal-delete" data-page-delete>Delete section</a><span class="a2-modal-spacer"></span><a href="#" class="a2-btn" data-back>Cancel</a><a href="#" class="a2-btn a2-btn-primary" data-page-save>Save</a></div>
     </div>
   </div>
+  
     <div class="a2-modal" hidden>
       <div class="a2-modal-box">
         <div class="a2-modal-head"><div class="a2-modal-title">Edit</div>
@@ -2771,6 +2773,13 @@ input.a2-qgroup-rename:focus { outline: none; box-shadow: 0 0 0 2px rgba(30,82,1
       }
     });
   }
+
+  // comments.js (comment moderation pages) switches views of the same frame through these
+  window.a2Tree = {
+    showView: showView,
+    backToTree: backToTree,
+    openLesson: function (tree, node) { openLesson(tree, { node: node }); }
+  };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

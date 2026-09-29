@@ -1,0 +1,116 @@
+/* Comment moderation (29.09): two versions of one screen inside the frame of variant 1 + Edit mode.
+   .cm-inbox = list + thread, .cm-bylesson = lessons with comments, then the threads of one lesson.
+   Same world as the tree: Poppins for titles and names, the old admin face for text and tables, a2-btn buttons.
+   Orange (#ef561f) marks only what waits for review; the pale yellow card is the waiting comment itself. */
+.a2-view-comments { padding-bottom: 20px; }
+.a2-view-comments ::selection { background: #cfe0f5; color: #183261; }
+.a2-view-comments a:focus-visible, .a2-view-comments input:focus-visible,
+.a2-view-comments select:focus-visible, .a2-view-comments textarea:focus-visible { outline: 2px solid #1E5290; outline-offset: 2px; }
+.a2-badge[hidden] { display: none !important; }
+
+/* The message after Approve / Delete / Reply sits on the line of the crumbs, so nothing under it moves between clicks */
+.cm-top { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; }
+.cm-flash { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; line-height: 1.4; color: #3c763d; text-align: right; }
+.cm-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin: 4px 0 20px 0; }
+.cm-tools { display: flex; align-items: center; gap: 10px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; color: #333333; }
+
+/* Awaiting review | All */
+.cm-seg { display: inline-flex; border: 1px solid #c3cfe0; border-radius: 6px; overflow: hidden; background: #ffffff; }
+.cm-seg a { display: inline-flex; align-items: center; gap: 7px; padding: 6px 13px; color: #183261; font-size: 13px; }
+.cm-seg a + a { border-left: 1px solid #c3cfe0; }
+.cm-seg a:not(.cur):hover { background: #f3f7fc; }
+.cm-seg a.cur { background: #183261; color: #ffffff; }
+.cm-n { color: #5f6e84; font-variant-numeric: tabular-nums; }
+.cm-seg a.cur .cm-n { color: rgba(255, 255, 255, 0.72); }
+.cm-select, .cm-search { height: 32px; border: 1px solid #cccccc; border-radius: 4px; padding: 0 10px; background: #ffffff;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; color: #333333; }
+.cm-select { max-width: 240px; }
+.cm-search { width: 180px; }
+.cm-search::placeholder, .cm-replybox textarea::placeholder { color: #647389; }
+
+/* Inbox: list on the left, thread on the right */
+.cm-cols { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 24px; align-items: start; }
+.cm-cols.is-empty { grid-template-columns: minmax(0, 1fr); }
+.cm-cols.is-empty .cm-pane { display: none; }
+.cm-list { border: 1px solid #dfe7f2; border-radius: 10px; background: #ffffff; overflow: hidden;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+.cm-cols.is-empty .cm-list { border: 0; background: none; }
+.cm-item { display: block; padding: 11px 14px 12px 14px; border-top: 1px solid #eef2f8; color: #333333; }
+.cm-item:first-child { border-top: 0; }
+.cm-item:hover { background: #f7fafd; }
+.cm-item.cur { background: #e8f0fa; }
+.cm-item-top { display: flex; align-items: center; gap: 8px; }
+.cm-item-top b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; font-size: 13px; font-weight: 600; color: #183261; }
+.cm-dot { flex: none; width: 8px; height: 8px; border-radius: 4px; background: #ef561f; }
+.cm-dot-off { visibility: hidden; } /* keeps the names of the list in one column */
+.cm-when { flex: none; font-size: 12px; color: #5f6e84; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cm-item-where { display: block; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: #5f6e84; }
+.cm-item-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin-top: 5px; font-size: 13px; line-height: 1.45; color: #333333; }
+.cm-item-meta { display: block; margin-top: 4px; font-size: 12px; color: #5f6e84; }
+
+.cm-pane { position: sticky; top: 56px; }
+.cm-thread-where { margin: 0 0 10px 2px; font-size: 13px; }
+.cm-thread-where a, .cm-ltable td:first-child a { color: #1E5290; }
+.cm-thread-where a:hover, .cm-ltable td:first-child a:hover { text-decoration: underline; }
+
+/* A thread: the comment, its actions, its replies, the reply box */
+.cm-c { padding: 16px 18px 18px 18px; border: 1px solid #dfe7f2; border-radius: 10px; background: #ffffff;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #333333; }
+.cm-c.wait { background: #fcf8e3; border-color: #f3e2b3; }
+.cm-threads .cm-c + .cm-c { margin-top: 12px; }
+.cm-who { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.cm-ava { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%;
+  background: #e3ecf9; color: #1E5290; font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; font-size: 12px; font-weight: 600; }
+.cm-ava.admin { background: #183261; color: #ffffff; }
+.cm-name { font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 600; color: #183261; white-space: nowrap; }
+.cm-admin { padding: 1px 8px; border: 1px solid #1E5290; border-radius: 10px; font-size: 11px; font-weight: 600; color: #1E5290; }
+.cm-email { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: #5f6e84; }
+.cm-email:hover { color: #1E5290; text-decoration: underline; }
+.cm-right { margin-left: auto; display: inline-flex; align-items: center; gap: 12px; }
+.cm-chip { font-size: 12px; font-weight: 700; color: #8a6d3b; white-space: nowrap; }
+.cm-text { margin: 8px 0 0 44px; max-width: 65ch; line-height: 1.55; white-space: pre-wrap; }
+.cm-acts { display: flex; align-items: center; gap: 16px; margin: 12px 0 0 44px; font-size: 13px; }
+.cm-acts .a2-btn { font-size: 13px; padding: 5px 14px; }
+.cm-link { color: #1E5290; }
+.cm-link:hover { text-decoration: underline; }
+.cm-del { color: #a94442; }
+.cm-del:hover { text-decoration: underline; }
+.cm-acts-r { margin-top: 6px; font-size: 12px; }
+.cm-confirm { display: flex; align-items: center; gap: 8px; margin: 12px 0 0 44px; padding: 9px 10px 9px 12px;
+  border: 1px solid #ebccd1; border-radius: 6px; background: #f2dede; color: #a94442; font-size: 13px; }
+.cm-confirm span { flex: 1; }
+.cm-replies { margin: 16px 0 0 44px; padding-left: 16px; border-left: 1px solid #dfe7f2; }
+.cm-r + .cm-r { margin-top: 14px; }
+.cm-r .cm-ava { width: 28px; height: 28px; font-size: 11px; }
+.cm-r .cm-text, .cm-r .cm-acts, .cm-r .cm-confirm { margin-left: 38px; }
+.cm-replybox { margin: 16px 0 0 44px; }
+.cm-replybox textarea { display: block; width: 100%; min-height: 72px; padding: 9px 11px; border: 1px solid #cccccc; border-radius: 6px;
+  background: #ffffff; resize: vertical; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.45; color: #333333; }
+.cm-replybox textarea[aria-invalid="true"] { border-color: #a94442; }
+.cm-replyacts { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 8px; font-size: 13px; }
+.cm-err { margin-right: auto; font-size: 12px; color: #a94442; }
+
+/* Empty queue or no match */
+.cm-empty { padding: 44px 24px; border: 1px dashed #c8d6ea; border-radius: 10px; background: #ffffff; text-align: center;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; }
+.cm-empty b { display: block; margin-bottom: 8px; font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif; font-size: 17px; font-weight: 600; color: #183261; }
+.cm-empty a { color: #1E5290; }
+.cm-empty a:hover { text-decoration: underline; }
+
+/* By lesson: the lessons table */
+.cm-only { font-size: 13px; color: #183261; }
+.cm-ltable { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333333; }
+.cm-ltable tr[data-cm-row] { cursor: pointer; }
+.cm-ltable td { vertical-align: middle; padding-top: 9px; padding-bottom: 9px; }
+.cm-ltable td:first-child a { font-weight: 700; }
+.cm-sec { display: block; margin-top: 1px; font-size: 12px; color: #5f6e84; }
+/* .a2-ltable td sets text-align: left, so the right alignment needs the table in the selector */
+.cm-ltable td.cm-num, .cm-ltable th.cm-num { text-align: right; font-variant-numeric: tabular-nums; }
+.cm-ltable th:nth-child(2) { width: 150px; }
+.cm-ltable th:nth-child(3) { width: 110px; padding-right: 28px; }
+.cm-ltable td.cm-num { padding-right: 28px; }
+.cm-ltable th:nth-child(4) { width: 140px; }
+.cm-last { color: #666666; white-space: nowrap; }
+.cm-none { color: #b8c3d3; }

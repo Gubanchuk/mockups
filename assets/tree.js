@@ -1446,5 +1446,12 @@
     });
   }
 
+  // comments.js (comment moderation pages) switches views of the same frame through these
+  window.a2Tree = {
+    showView: showView,
+    backToTree: backToTree,
+    openLesson: function (tree, node) { openLesson(tree, { node: node }); }
+  };
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
