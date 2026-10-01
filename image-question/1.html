@@ -1,0 +1,1111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Labeling Question</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #183261;
+    --blue: #1E5290;
+    --page: #EDF6FF;
+    --slot-line: #CEDFF1;
+    --card-line: #E5E5E5;
+    --ok: #1CBB3F;
+    --bad: #F25222;
+    --row-alt: #F6FBFF;
+    --stage: #E6EAF0;
+    --stage-ink: #4E5D72;
+    --bezel: #141B26;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--stage); color: var(--ink); font: 400 16px/1.4 "Inter", sans-serif; -webkit-font-smoothing: antialiased; }
+  ::selection { background: #CFE2F7; color: var(--ink); }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  img { display: block; }
+
+  /* Mockup toolbar (same as the other YBG mockups) */
+  .mock-bar { position: sticky; top: 0; z-index: 50; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 10px 20px; background: #16202e; color: #c7d2e1; font: 500 12px/1 "Poppins", Arial, sans-serif; }
+  .mock-group { display: flex; align-items: center; gap: 8px; }
+  .mock-group span { color: #8d9bb0; }
+  .mock-seg { display: flex; background: #243142; border-radius: 6px; padding: 2px; }
+  .mock-seg button { color: #c7d2e1; padding: 7px 10px; border-radius: 4px; }
+  .mock-seg button:hover { color: #fff; }
+  .mock-seg button[aria-pressed="true"] { background: #f3f6fb; color: #16202e; }
+  body[data-bare="1"] .mock-bar { display: none; }
+  body[data-screen="laptop"] .mock-group--variant { opacity: .45; }
+
+  /* Stage with device frames */
+  .stage { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 36px 48px; padding: 32px 24px 64px; }
+  .device { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .device figcaption { font: 500 12px/1 "Poppins", Arial, sans-serif; color: var(--stage-ink); letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+  .bezel { background: var(--bezel); box-shadow: 0 24px 48px -24px rgba(20, 27, 38, .55); }
+  .device--phone .bezel { padding: 10px; border-radius: 38px; }
+  .device--phone .screen { border-radius: 28px; }
+  .device--phone.is-turning .bezel { animation: turn .26s var(--ease); }
+  @keyframes turn { from { transform: rotate(90deg) scale(.86); } to { transform: none; } }
+  .device--laptop .bezel { padding: 14px 14px 18px; border-radius: 16px 16px 4px 4px; }
+  .device--laptop .base { height: 14px; background: #2A3342; border-radius: 0 0 14px 14px; margin: 0 -40px; }
+  .laptop-fit { transform-origin: top left; }
+  .screen { position: relative; overflow: hidden; background: var(--page); }
+  .scroller { position: absolute; inset: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+  .device--phone .scroller { scrollbar-width: none; }
+  .device--phone .scroller::-webkit-scrollbar { display: none; }
+  .device--laptop .scroller { scrollbar-width: thin; scrollbar-color: #B9CBE2 transparent; }
+  body[data-solo="1"] .stage { padding: 0; gap: 0; }
+  body[data-solo="1"] .device { gap: 0; }
+  body[data-solo="1"] .device figcaption { display: none; }
+  body[data-solo="1"] .bezel { padding: 0; border-radius: 0; background: none; box-shadow: none; }
+  body[data-solo="1"] .screen { border-radius: 0; }
+
+  /* Lesson page inside the device */
+  .pg { padding: 12px; min-height: 100%; }
+  .pg-box { background: #fff; border-radius: 16px; padding: 16px; }
+  .lp { display: grid; grid-template-columns: 350px 1fr; gap: 24px; padding: 20px; min-height: 100%; align-items: start; }
+  .side { position: sticky; top: 20px; background: #fff; border-radius: 20px; padding: 20px 16px 24px; font: 500 14px/1.3 "Poppins", Arial, sans-serif; color: var(--blue); }
+  .side-toggle { display: flex; justify-content: flex-end; padding: 0 10px 14px; color: var(--blue); }
+  .side-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; }
+  .side-item svg { width: 18px; height: 18px; flex: none; }
+  .side-item img { width: 20px; height: 20px; flex: none; }
+  .side-item--top { font-size: 16px; font-weight: 600; }
+  .side-item--top .side-count { font-size: 14px; font-weight: 500; white-space: nowrap; }
+  .side-item--open { background: #EEEFF5; }
+  .side-count { margin-left: auto; font-weight: 600; color: var(--ok); }
+  .side-count--todo { color: var(--blue); }
+  .side-sections { padding-left: 20px; }
+  .side-lessons { padding: 4px 0 6px 20px; font-weight: 400; font-size: 14px; }
+  .side-lesson { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 10px; }
+  .side-lesson svg { width: 14px; height: 14px; flex: none; color: var(--ok); }
+  .side-lesson[aria-current] { background: #EEEFF5; font-weight: 600; }
+  .main { background: #fff; border-radius: 20px; padding: 24px; }
+
+  .card { border: 1px solid var(--card-line); border-radius: 10px; padding: 12px; background: #fff; }
+  .device--laptop .card { padding: 16px; }
+  .q-title { font: 400 16px/20px "Poppins", Arial, sans-serif; color: var(--ink); margin: 4px 0 14px; }
+  .q-instr { font: 400 16px/20px "Inter", sans-serif; color: var(--ink); margin: 0; }
+  .q-head { font: 700 20px/28px "Poppins", Arial, sans-serif; color: var(--blue); margin: 18px 0 14px; }
+  .q-text { font: 400 16px/24px "Inter", sans-serif; color: var(--blue); margin: 0 0 18px; }
+  .q-text p { margin: 0; }
+
+  /* Question image and cells */
+  .fig { position: relative; margin: 0; user-select: none; }
+  .fig > img { width: 100%; height: 100%; }
+  .device--phone .card > .fig { margin: 0 -12px; }
+  .cell { position: absolute; display: grid; place-items: center; border: 2px solid var(--slot-line); background: #fff; color: var(--ink); text-align: center; cursor: pointer; outline: 0 solid transparent; transition: outline-color .2s var(--ease), border-color .2s var(--ease); }
+  .cell:not(.cell--compact):not(.cell--icon) { padding: 0 4px 0 11px; }
+  .cell-text { display: block; max-width: 100%; overflow: hidden; font-family: "Inter", sans-serif; line-height: 1.05; }
+  .cell-text > span { display: block; white-space: nowrap; }
+  .cell-eye { display: inline-block; vertical-align: -0.12em; margin-left: 3px; color: var(--ink); }
+  .cell-eye svg { display: block; width: 100%; height: 100%; }
+  .cell .badge { position: absolute; left: -9px; top: -9px; }
+  .cell .badge--sm { width: 16px; height: 16px; border-radius: 50%; font-size: 11px; left: -7px; top: -7px; }
+  .cell-icon { width: 24px; height: 24px; }
+  .cell--icon { background: transparent; border: 2px dashed rgba(30, 82, 144, .55); }
+  .cell--icon.is-filled { border-color: transparent; }
+  .cell.is-picked-target { border-color: var(--blue); }
+  .cell.is-active { border-color: var(--blue); outline: 3px solid rgba(30, 82, 144, .22); z-index: 2; }
+  .cell.is-ok { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .cell.is-bad { background: var(--bad); border-color: var(--bad); color: #fff; }
+  .cell.is-ok .cell-eye, .cell.is-bad .cell-eye { color: #fff; }
+  .cell--icon.is-ok, .cell--icon.is-bad { background: transparent; }
+  .cell--icon.is-ok { border: 2px solid var(--ok); }
+  .cell--icon.is-bad { border: 2px solid var(--bad); }
+  .fig.is-locked .cell { cursor: default; }
+
+  .badge { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 10px; background: var(--blue); color: #fff; font: 600 13px/1 "Inter", sans-serif; font-variant-numeric: tabular-nums; flex: none; }
+
+  /* Compact cells on the phone image: number inside the cell */
+  .cell--compact { border-width: 1.5px; border-color: rgba(30, 82, 144, .5); padding: 0; }
+  .cell--compact .cell-num { font: 600 11px/1 "Inter", sans-serif; color: var(--blue); font-variant-numeric: tabular-nums; }
+  .cell--compact.is-filled:not(.cell--icon) { background: var(--blue); border-color: var(--blue); }
+  .cell--compact.is-filled .cell-num { color: #fff; }
+  .cell--compact.is-filled.is-ok:not(.cell--icon) { background: var(--ok); border-color: var(--ok); }
+  .cell--compact.is-filled.is-bad:not(.cell--icon) { background: var(--bad); border-color: var(--bad); }
+  .cell--compact.is-ok .cell-num, .cell--compact.is-bad .cell-num { color: #fff; }
+  .cell--compact.cell--icon { border-width: 1.5px; }
+  .cell--compact.cell--icon .cell-icon { width: 16px; height: 16px; }
+  .cell--compact.is-active { border: 2px solid var(--blue); }
+  .cell--compact.is-active:not(.is-filled) { background: #fff; }
+  .cell--compact.is-active:not(.is-filled) .cell-num { color: var(--blue); }
+  .is-pulse { animation: pulse .26s var(--ease); }
+  @keyframes pulse { 0% { outline-offset: 5px; outline-color: rgba(30, 82, 144, 0); } 100% { outline-offset: 0; outline-color: rgba(30, 82, 144, .22); } }
+
+  .fig-tools { display: flex; justify-content: flex-end; margin-top: 8px; }
+  .link-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 4px; font: 500 14px/1 "Poppins", Arial, sans-serif; color: var(--blue); border-radius: 10px; }
+  .link-btn svg { width: 18px; height: 18px; }
+  .link-btn:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* Phone 1: rows */
+  .rows { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
+  .row { width: 100%; display: grid; grid-template-columns: 20px 1fr; align-items: center; gap: 10px; text-align: left; }
+  .row-box { display: flex; align-items: center; min-height: 40px; padding: 8px 12px; border: 2px solid var(--slot-line); border-radius: 10px; background: #fff; font: 400 16px/20px "Inter", sans-serif; color: var(--ink); outline: 0 solid transparent; transition: outline-color .2s var(--ease), border-color .2s var(--ease); }
+  .row-box .cell-icon { width: 22px; height: 22px; }
+  .row.is-active .row-box { border-color: var(--blue); outline: 3px solid rgba(30, 82, 144, .22); }
+  .row.is-active .row-box.is-pulse { animation: pulse .26s var(--ease); }
+  .row.is-ok .row-box { background: #E8F8EC; border-color: var(--ok); }
+  .row.is-bad .row-box { background: #FEEBE4; border-color: var(--bad); }
+  .row-mark { margin-left: auto; padding-left: 10px; display: grid; }
+  .row-mark svg { width: 20px; height: 20px; }
+  .rows.is-locked .row { cursor: default; }
+  .rows li { position: relative; }
+  .row.is-filled .row-box { padding-right: 48px; }
+  .row-remove { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; color: var(--blue); }
+  .row-remove:hover { background: #F4F9FF; }
+  .row-remove svg { width: 18px; height: 18px; }
+  .text-btn { display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 10px; border-radius: 10px; font: 500 14px/1 "Poppins", Arial, sans-serif; color: var(--blue); flex: none; }
+  .text-btn:hover { background: #F4F9FF; }
+  .text-btn svg { width: 16px; height: 16px; }
+  .chip--remove { gap: 4px; color: var(--blue); font-family: "Poppins", Arial, sans-serif; font-weight: 500; }
+  .chip--remove svg { width: 16px; height: 16px; }
+
+  /* Answer bank */
+  .bank { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding: 12px; background: var(--page); border-radius: 10px; min-height: 64px; }
+  .chip { display: inline-flex; align-items: center; min-height: 38px; padding: 8px; background: #fff; border: 1px solid var(--blue); border-radius: 10px; font: 400 16px/20px "Inter", sans-serif; color: var(--ink); transition: background-color .15s, color .15s; }
+  .chip .cell-icon { width: 24px; height: 24px; }
+  .chip:hover { background: #F4F9FF; }
+  .chip[aria-pressed="true"] { background: var(--blue); color: #fff; }
+  .chip[aria-pressed="true"] .cell-icon { background: #fff; border-radius: 6px; }
+  .chip--placed { gap: 8px; background: var(--blue); color: #fff; }
+  .chip--placed:hover { background: #18467D; }
+  .chip--placed .cell-icon { background: #fff; border-radius: 6px; }
+  .chip-num { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 10px; background: #fff; color: var(--blue); font: 600 12px/1 "Inter", sans-serif; font-variant-numeric: tabular-nums; flex: none; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; margin-top: 16px; border-radius: 10px; background: var(--blue); color: #fff; font: 600 14px/1 "Poppins", Arial, sans-serif; border: 1px solid transparent; }
+  .btn:hover { background: #18467D; }
+  .btn svg { width: 18px; height: 18px; }
+  .btn--outline { background: #fff; color: var(--blue); border-color: var(--blue); }
+  .btn--outline:hover { background: #F4F9FF; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .btn-row .btn { margin-top: 16px; }
+
+  /* Results */
+  .result { margin-top: 20px; padding: 16px; background: var(--page); border-radius: 10px; }
+  .result-head { display: flex; align-items: center; gap: 12px; font: 400 16px/1.35 "Poppins", Arial, sans-serif; color: var(--ink); }
+  .device--phone .result-head { font-size: 20px; }
+  .result-head svg { width: 24px; height: 24px; flex: none; }
+  .result-img { display: block; width: 100%; margin-top: 14px; padding: 12px; background: #fff; border-radius: 6px; cursor: zoom-in; }
+  .result-img img { width: 100%; height: auto; }
+  .result .fig-tools { margin-top: 6px; }
+  .answers { width: 100%; margin-top: 18px; border-collapse: separate; border-spacing: 0; border: 1px solid var(--slot-line); border-radius: 10px; overflow: hidden; font: 600 16px/1.3 "Poppins", Arial, sans-serif; color: var(--ink); }
+  .answers td { padding: 12px 14px; border-top: 1px solid var(--slot-line); vertical-align: middle; }
+  .answers tr:first-child td { border-top: 0; }
+  .answers tr:nth-child(odd) td { background: var(--row-alt); }
+  .answers td:first-child { width: 64px; text-align: center; font-weight: 400; border-right: 1px solid var(--slot-line); font-variant-numeric: tabular-nums; }
+  .answers .cell-icon { width: 22px; height: 22px; }
+  .answers-cell { display: flex; align-items: center; }
+  .answers tr.is-ok td { background: #E8F8EC; }
+  .answers tr.is-bad td { background: #FEEBE4; }
+
+  /* Phone 2: magnifier sheet */
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; max-height: 78%; display: flex; flex-direction: column; background: #fff; border-radius: 16px 16px 0 0; box-shadow: 0 -12px 32px -12px rgba(14, 23, 38, .3); }
+  .sheet.is-entering { animation: sheet-in .26s var(--ease); }
+  @keyframes sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+  .sheet-grip { width: 36px; height: 4px; border-radius: 2px; background: var(--slot-line); margin: 8px auto 2px; }
+  .sheet-head { display: flex; align-items: center; gap: 4px; padding: 4px 8px 8px; }
+  .sheet-head .badge { margin-left: 6px; }
+  .sheet-count { margin: 0 6px 0 8px; font: 400 14px/20px "Inter", sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .icon-btn { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; color: var(--blue); flex: none; }
+  .icon-btn:hover { background: #F4F9FF; }
+  .icon-btn:disabled { color: #A9BCD6; cursor: default; background: none; }
+  .icon-btn svg { width: 22px; height: 22px; }
+  .sheet-close { margin-left: auto; }
+  .loupe { position: relative; height: 196px; margin: 0 12px; border: 1px solid var(--card-line); border-radius: 10px; overflow: hidden; background: #fff; flex: none; }
+  .loupe-stage { position: absolute; left: 0; top: 0; transition: transform .26s var(--ease); }
+  .loupe-stage .fig > img { width: 100%; }
+  .sheet .bank { margin: 12px; overflow-y: auto; }
+
+  /* Phone 3: full screen overlay */
+  .full { position: absolute; inset: 0; z-index: 6; background: #fff; }
+  .full-stage { position: absolute; inset: 0; display: grid; place-items: center; padding: 12px 84px 12px 12px; }
+  .full-done { position: absolute; top: 10px; right: 10px; margin: 0; height: 36px; padding: 0 16px; }
+  .pop { position: absolute; z-index: 3; width: 260px; padding: 10px; background: #fff; border: 1px solid var(--slot-line); border-radius: 12px; box-shadow: 0 12px 28px -10px rgba(14, 23, 38, .35); }
+  .pop.is-entering { animation: pop-in .2s var(--ease); }
+  @keyframes pop-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .pop .bank { margin: 0; padding: 0; background: none; min-height: 0; gap: 6px; }
+  .pop .chip { font-size: 14px; line-height: 18px; min-height: 36px; padding: 6px 8px; }
+  .pop .chip .cell-icon { width: 20px; height: 20px; }
+  .full--portrait { display: grid; place-items: center; padding: 24px; }
+  .turn-card { display: grid; justify-items: center; gap: 14px; max-width: 280px; text-align: center; font: 400 16px/1.4 "Inter", sans-serif; color: var(--ink); }
+  .turn-card svg { width: 56px; height: 56px; color: var(--blue); }
+  .turn-card p { margin: 0; }
+  .turn-card .btn { margin: 0; }
+
+  /* Image viewer (phone) and lightbox (laptop) */
+  .viewer { position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; background: #0E1726; color: #fff; }
+  .viewer--side { flex-direction: row; }
+  .viewer-bar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px; }
+  .viewer--side .viewer-bar { flex-direction: column-reverse; padding: 8px 6px; }
+  .viewer .icon-btn { color: #fff; }
+  .viewer .icon-btn:hover { background: rgba(255, 255, 255, .1); }
+  .viewer-pan { flex: 1; display: flex; overflow: auto; scrollbar-width: none; cursor: grab; }
+  .viewer-pan::-webkit-scrollbar { display: none; }
+  .viewer-canvas { flex: none; background: #fff; margin: auto; }
+  .viewer-canvas img { width: 100%; height: auto; }
+  .zoom { display: inline-flex; align-items: center; gap: 2px; padding: 3px; background: rgba(255, 255, 255, .12); border-radius: 12px; font: 500 14px/1 "Poppins", Arial, sans-serif; font-variant-numeric: tabular-nums; }
+  .zoom output { min-width: 56px; text-align: center; }
+  .viewer--side .zoom { flex-direction: column-reverse; }
+  .viewer--side .zoom output { min-width: 0; padding: 4px 0; }
+  .lightbox { position: absolute; inset: 0; z-index: 8; display: grid; place-items: center; background: rgba(14, 23, 38, .72); }
+  .lightbox-panel { position: relative; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 30px 60px -20px rgba(14, 23, 38, .6); }
+  .lightbox-panel img { width: auto; height: auto; max-width: 1100px; max-height: 640px; }
+  .lightbox .icon-btn { position: absolute; top: -48px; right: -8px; color: #fff; }
+  .lightbox .icon-btn:hover { background: rgba(255, 255, 255, .12); }
+
+  @media (max-width: 719px) {
+    .mock-bar { padding: 10px 12px; gap: 8px 12px; }
+    .mock-group, .mock-seg { flex-wrap: wrap; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+<style>
+  .mock-version { color: #c7d2e1; text-decoration: none; white-space: nowrap; }
+  .mock-version:hover { color: #ffffff; }
+  .mock-version-name { color: #ffffff; font-weight: 600; white-space: nowrap; margin-right: 8px; }
+  @media (max-width: 767px) { .mock-version-name { white-space: normal; } }
+</style>
+</head>
+<body data-variant="list" data-screen="phone" data-q="microscope" data-state="empty">
+
+<div class="mock-bar" role="toolbar" aria-label="Mockup options">
+  <a class="mock-version" href="/image-question">&larr; Image labeling question</a><span class="mock-version-name">Version 1 &middot; Image + list</span>
+  <div class="mock-group"><span>Screen</span>
+    <div class="mock-seg" data-key="screen">
+      <button data-value="phone">Phone</button>
+      <button data-value="laptop">Laptop 1280</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Question</span>
+    <div class="mock-seg" data-key="q">
+      <button data-value="microscope">Microscope</button>
+      <button data-value="cycle">Cycle</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>State</span>
+    <div class="mock-seg" data-key="state">
+      <button data-value="empty">Empty</button>
+      <button data-value="partial">Partly placed</button>
+      <button data-value="checked">Checked</button>
+      <button data-value="zoom">Answer image</button>
+    </div>
+  </div>
+</div>
+
+<main class="stage" id="stage"></main>
+
+<script>
+(function () {
+  var ICON = {
+    eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+    close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    expand: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-6.5 6.5M4 20l6.5-6.5"/></svg>',
+    left: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>',
+    right: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>',
+    minus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>',
+    plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+    ok: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1CBB3F"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    bad: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#F25222"/><path d="M8.2 8.2l7.6 7.6M15.8 8.2l-7.6 7.6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
+    tick: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="8" fill="currentColor"/><path d="M4.6 8.3l2.2 2.2 4.6-4.8" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    grid: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="8" height="10" rx="1.5"/><rect x="13" y="3" width="8" height="6" rx="1.5"/><rect x="13" y="11" width="8" height="10" rx="1.5"/><rect x="3" y="15" width="8" height="6" rx="1.5"/></svg>',
+    book: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 5.5C4.5 4 8 4 11 5.5V20c-3-1.5-6.5-1.5-9 0zM22 5.5C19.5 4 16 4 13 5.5V20c3-1.5 6.5-1.5 9 0z"/></svg>',
+    panel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M9.5 3.5v17"/></svg>',
+    chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>',
+    chevronDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+    turn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="9" width="18" height="11" rx="2"/><path d="M8 5.5A7 7 0 0 1 17.5 6"/><path d="M17.8 3v3.2h-3.2"/></svg>',
+    dot: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="5"/></svg>'
+  };
+  var PICT = { cross: 'assets/cross.png', circle: 'assets/circle.png' };
+
+  var Q = {
+    microscope: {
+      title: 'Light Microscope',
+      text: ['Place each label at the correct position in the image.', 'Place the cross at the part that adjusts the level of magnification.', 'Place the circle at the part that sharpens the image.'],
+      img: 'assets/microscope-question.png', iw: 1024, ih: 541,
+      rationale: 'assets/microscope-rationale.png', rw: 1008, rh: 528,
+      slots: [
+        { n: 1, a: 'Coarse focusing knob', x: 72.9, y: 53.9, w: 11.8, h: 8.2 },
+        { n: 2, a: 'Fine focusing knob', x: 68.0, y: 64.0, w: 13.0, h: 7.8 },
+        { n: 3, a: 'Stage', x: 8.0, y: 46.0, w: 13.1, h: 8.4 },
+        { n: 4, a: 'Diaphragm', x: 11.7, y: 62.1, w: 13.1, h: 8.0 },
+        { n: 5, a: 'Light source', x: 13.2, y: 73.9, w: 15.1, h: 10.0 },
+        { n: 6, a: 'Objective lenses', x: 13.1, y: 33.8, w: 11.1, h: 8.4 },
+        { n: 7, a: 'Eye piece', x: 64.5, y: 10.5, w: 11.1, h: 7.8 },
+        { n: 8, a: 'cross', x: 38.1, y: 38.9, w: 11.1, h: 9.8 },
+        { n: 9, a: 'circle', x: 49.8, y: 59.0, w: 11.1, h: 10.0 }
+      ],
+      bank: ['Diaphragm', 'cross', 'Fine focusing knob', 'Light source', 'Coarse focusing knob', 'Eye piece', 'circle', 'Stage', 'Objective lenses'],
+      partial: { placed: { 7: 'Eye piece', 3: 'Stage', 5: 'Light source', 1: 'Coarse focusing knob', 8: 'cross' }, active: 2, picked: 'Fine focusing knob' },
+      swap: [1, 2],
+      nav: { open: 'Biology', lesson: 'Scientific Method and the Microscope' }
+    },
+    cycle: {
+      title: 'Drag each label to correct position in the image:',
+      text: [],
+      img: 'assets/cycle-question.png', iw: 880, ih: 723,
+      rationale: 'assets/cycle-rationale.png', rw: 854, rh: 692,
+      slots: [
+        { n: 1, a: 'LH', x: 6.9, y: 24.0, w: 14.9, h: 4.2 },
+        { n: 2, a: 'FSH', x: 7.1, y: 29.8, w: 14.4, h: 4.4 },
+        { n: 3, a: 'estrogen', x: 7.5, y: 36.2, w: 14.0, h: 4.4 },
+        { n: 4, a: 'progesterone', x: 7.6, y: 42.0, w: 13.7, h: 4.0 },
+        { n: 5, a: 'follicular phase', x: 32.9, y: 5.7, w: 14.2, h: 5.1 },
+        { n: 6, a: 'ovulation', x: 49.9, y: 4.3, w: 13.8, h: 5.1 },
+        { n: 7, a: 'luteal phase', x: 67.8, y: 4.7, w: 14.8, h: 5.1 },
+        { n: 8, a: 'menstruation', x: 20.5, y: 95.0, w: 13.4, h: 5.1 },
+        { n: 9, a: 'proliferation', x: 38.8, y: 94.6, w: 13.7, h: 5.1 },
+        { n: 10, a: 'secretory phase', x: 70.3, y: 94.8, w: 13.7, h: 5.1 }
+      ],
+      bank: ['FSH', 'ovulation', 'estrogen', 'luteal phase', 'secretory phase', 'LH', 'follicular phase', 'menstruation', 'progesterone', 'proliferation'],
+      partial: { placed: { 1: 'LH', 2: 'FSH', 5: 'follicular phase', 6: 'ovulation', 8: 'menstruation' }, active: 3, picked: 'estrogen' },
+      swap: [3, 4],
+      nav: { open: 'Anatomy and Physiology', lesson: 'Female Reproductive System' }
+    }
+  };
+
+  var NAV = [
+    { name: 'Introduction', icon: 'introduction', count: '0/4', todo: true },
+    { name: 'Biology', icon: 'biology', count: '13/13', lessons: ['Introduction to Biology', 'Ecology', 'Scientific Method and the Microscope', 'The Cell', 'Cellular organelles', 'Passive Transport', 'Active Transport', 'Energy', 'DNA', 'Cellular Reproduction I: Mitosis', 'Cellular Reproduction II: Meiosis', 'Genetics', 'Nutrition'] },
+    { name: 'Chemistry', icon: 'chemistry', count: '10/10' },
+    { name: 'Anatomy and Physiology', icon: 'anatomy', count: '15/15', lessons: ['Introduction to A&P (General Terminology)', 'Histology and Skin', 'Musculoskeletal I: Bones and Joints', 'Musculoskeletal II: Muscle', 'Nervous System', 'Senses (Vision and Hearing)', 'Endocrine System (Hormones)', 'Male Reproductive System', 'Female Reproductive System', 'Urinary System', 'Cardiovascular System I: The Heart', 'Cardiovascular System II: Vasculature and Blood', 'Respiratory System', 'Gastrointestinal Tract', 'Immune System'] },
+    { name: 'Math', icon: 'math', count: '12/12' },
+    { name: 'Reading Comprehension', icon: 'reading', count: '10/10' }
+  ];
+
+  var DESKTOP_W = 920;          // the live site renders the image at 920 px; cell sizes are relative to that
+  // Cell boxes above are measured on beta at 920 px without the number badge, in % of the picture
+  var PHONE_H = 705;
+  var body = document.body;
+  var stage = document.getElementById('stage');
+  var KEYS = ['screen', 'q', 'state', 'bare', 'solo'];
+
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function isIcon(label) { return label === 'cross' || label === 'circle'; }
+  function pict(label, cls) { return '<img class="cell-icon' + (cls ? ' ' + cls : '') + '" src="' + PICT[label] + '" alt="' + label + '">'; }
+  function labelHtml(label) { return isIcon(label) ? pict(label) : esc(label); }
+
+  // Text fitting. The live site cuts a long label mid-word and shows the eye with the full text.
+  // Here a long word is shortened with a period (at least 3 letters kept), later words are dropped before
+  // any word gets shorter than that, the eye stays after the text, and a low cell gets a slightly smaller size.
+  var measureCtx = document.createElement('canvas').getContext('2d');
+  function textWidth(text, px) { measureCtx.font = '400 ' + px + 'px Inter, sans-serif'; return measureCtx.measureText(text).width; }
+  function wrapWords(words, px, avail) {
+    var lines = [], line = '';
+    for (var i = 0; i < words.length; i++) {
+      if (textWidth(words[i], px) > avail) return null;
+      var next = line ? line + ' ' + words[i] : words[i];
+      if (textWidth(next, px) <= avail) { line = next; continue; }
+      lines.push(line);
+      line = words[i];
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+  var MIN_PX = 11;
+  function fitLabel(label, boxW, boxH, px) {
+    var letters = label.replace(/ /g, '').length;
+    var best = null, bestKeep = -1;
+    for (var size = px; size >= Math.max(MIN_PX, px - 4); size--) {
+      var res = fitAt(label, boxW, boxH, size);
+      var keep = res.lines.join('').replace(/[ .]/g, '').length / letters;
+      if (!res.cut || keep >= 0.75) return res;
+      if (keep > bestKeep) { best = res; bestKeep = keep; }
+    }
+    return best;
+  }
+  function fitAt(label, boxW, boxH, px) {
+    var inner = boxH - 4;
+    // Line height 1.05 as on the live site, where two 16 px lines fit a 40 px cell
+    px = Math.max(MIN_PX, Math.min(px, Math.floor((inner - 1) / 1.05)));
+    var maxLines = Math.max(1, Math.floor(inner / (px * 1.05)));
+    var avail = boxW - 23;
+    var words = label.split(' ');
+    var full = wrapWords(words, px, avail);
+    if (full && full.length <= maxLines) return { lines: full, cut: false, px: px };
+    var eye = px + 3;
+    function tryWords(list) {
+      var lines = wrapWords(list, px, avail);
+      if (!lines || lines.length > maxLines) return null;
+      if (textWidth(lines[lines.length - 1], px) > avail - eye) return null;
+      return lines;
+    }
+    for (var n = words.length; n >= 1; n--) {
+      var cur = words.slice(0, n);
+      var got = tryWords(cur);
+      if (got) return { lines: got, cut: true, px: px };
+      var order = cur.map(function (w, i) { return i; }).filter(function (i) { return i > 0; })
+        .sort(function (a, b) { return cur[b].length - cur[a].length; });
+      order.push(0);
+      var base = cur.slice();
+      for (var o = 0; o < order.length; o++) {
+        var idx = order[o], w = base[idx];
+        if (w.length <= 4) continue;
+        for (var k = w.length - 1; k >= 3; k--) {
+          cur[idx] = w.slice(0, k) + '.';
+          got = tryWords(cur);
+          if (got) return { lines: got, cut: true, px: px };
+        }
+      }
+    }
+    // Nothing readable fits: the first letters with a period, or only the eye
+    var first = words[0];
+    for (var j = Math.min(first.length - 1, 6); j >= 1; j--) {
+      if (textWidth(first.slice(0, j) + '.', px) <= avail - eye) return { lines: [first.slice(0, j) + '.'], cut: true, px: px };
+    }
+    return { lines: [''], cut: true, px: px };
+  }
+
+  function presetFor(qKey, stateKey) {
+    var q = Q[qKey];
+    var s = { placed: {}, active: null, picked: null, checked: false, viewer: null, loupe: null, full: false, pop: null, zoom: 1, pulse: false };
+    if (stateKey === 'partial') {
+      s.placed = Object.assign({}, q.partial.placed);
+      s.active = q.partial.active;
+      s.picked = null;
+    }
+    if (stateKey === 'checked' || stateKey === 'zoom') {
+      q.slots.forEach(function (slot) { s.placed[slot.n] = slot.a; });
+      var a = q.swap[0], b = q.swap[1];
+      s.placed[a] = q.slots[b - 1].a;
+      s.placed[b] = q.slots[a - 1].a;
+      s.checked = true;
+    }
+    if (stateKey === 'zoom') s.viewer = { kind: 'rationale' };
+    return s;
+  }
+
+  function Instance(opts) {
+    this.device = opts.device;      // phone | laptop
+    this.width = opts.width;
+    this.height = opts.height;
+    this.qKey = opts.q;
+    this.q = Q[opts.q];
+    this.variant = opts.variant;
+    this.solo = !!opts.solo;
+    this.state = presetFor(opts.q, opts.state);
+    this.landscape = false;
+    if (this.device === 'phone' && opts.state === 'partial') {
+      if (this.variant === 'loupe') { this.state.loupe = this.q.partial.active; this.state.active = null; this.enterSheet = true; }
+      if (this.variant === 'full') { this.state.full = true; this.state.pop = this.q.partial.active; this.state.active = null; this.landscape = true; }
+    }
+    if (this.device === 'phone' && this.state.viewer && !this.solo) { this.landscape = true; this.viewerTurned = true; }
+    if (this.device === 'laptop' && opts.state === 'partial') { this.state.active = null; this.state.picked = this.q.partial.picked; }
+    this.build();
+  }
+
+  Instance.prototype.build = function () {
+    var fig = document.createElement('figure');
+    fig.className = 'device device--' + this.device;
+    this.el = fig;
+    this.bezel = document.createElement('div');
+    this.bezel.className = 'bezel';
+    this.screen = document.createElement('div');
+    this.screen.className = 'screen';
+    this.scroller = document.createElement('div');
+    this.scroller.className = 'scroller';
+    this.overlay = document.createElement('div');
+    this.screen.appendChild(this.scroller);
+    this.screen.appendChild(this.overlay);
+    this.bezel.appendChild(this.screen);
+    if (this.device === 'laptop') {
+      this.fit = document.createElement('div');
+      this.fit.className = 'laptop-fit';
+      this.fit.appendChild(this.bezel);
+      var base = document.createElement('div');
+      base.className = 'base';
+      this.fit.appendChild(base);
+      this.fitWrap = document.createElement('div');
+      this.fitWrap.appendChild(this.fit);
+      fig.appendChild(this.fitWrap);
+    } else {
+      fig.appendChild(this.bezel);
+    }
+    this.caption = document.createElement('figcaption');
+    fig.appendChild(this.caption);
+    var self = this;
+    fig.addEventListener('click', function (e) { self.onClick(e); });
+  };
+
+  Instance.prototype.size = function () {
+    if (this.device === 'laptop') return { w: 1280, h: 800 };
+    if (this.solo) return { w: this.width, h: this.height };
+    return this.landscape ? { w: this.height, h: this.width } : { w: this.width, h: this.height };
+  };
+
+  // Width of the image column inside the card
+  Instance.prototype.figWidth = function () {
+    if (this.device === 'laptop') return 1280 - 20 - 350 - 24 - 20 - 48 - 34;
+    return this.width - 24 - 32 - 2;
+  };
+
+  Instance.prototype.render = function () {
+    var size = this.size();
+    this.screen.style.width = size.w + 'px';
+    this.screen.style.height = size.h + 'px';
+    this.el.classList.toggle('is-landscape', this.landscape);
+    this.caption.textContent = size.w + ' × ' + size.h;
+    if (this.device === 'laptop') this.scaleLaptop();
+    var top = this.scroller.scrollTop;
+    this.scroller.innerHTML = this.device === 'laptop' ? this.laptopPage() : this.phonePage();
+    this.scroller.scrollTop = top;
+    this.overlay.innerHTML = this.overlayHtml();
+    this.afterRender();
+  };
+
+  Instance.prototype.scaleLaptop = function () {
+    var full = 1280 + 28;
+    var room = Math.min(stage.clientWidth - 48, window.innerWidth - 48);
+    var k = Math.min(1, room / full);
+    this.fit.style.transform = 'scale(' + k + ')';
+    this.fitWrap.style.width = Math.round(full * k) + 'px';
+    this.fitWrap.style.height = Math.round((800 + 32 + 14) * k) + 'px';
+  };
+
+  // ---------- Page markup ----------
+
+  Instance.prototype.header = function () {
+    var q = this.q;
+    var html = '<div class="q-title">' + esc(q.title) + '</div>' +
+      '<p class="q-instr">❗ Drag and drop or click and drop the correct option to the image.</p>' +
+      '<div class="q-head">Question 1</div>';
+    if (q.text.length) html += '<div class="q-text">' + q.text.map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('') + '</div>';
+    return html;
+  };
+
+  Instance.prototype.remaining = function () {
+    var used = {};
+    var placed = this.state.placed;
+    Object.keys(placed).forEach(function (n) { used[placed[n]] = true; });
+    return this.q.bank.filter(function (label) { return !used[label]; });
+  };
+
+  Instance.prototype.bankHtml = function (withPlaced) {
+    var picked = this.state.picked;
+    var where = {};
+    var placed = this.state.placed;
+    Object.keys(placed).forEach(function (n) { where[placed[n]] = n; });
+    var labels = withPlaced ? this.q.bank : this.remaining();
+    var chips = labels.map(function (label) {
+      if (where[label]) {
+        return '<button class="chip chip--placed" data-placed="' + where[label] + '" data-label="' + esc(label) + '" aria-label="' + esc(label) + ' is on place ' + where[label] + '"><span class="chip-num">' + where[label] + '</span>' + labelHtml(label) + '</button>';
+      }
+      return '<button class="chip" data-chip="' + esc(label) + '" aria-pressed="' + (picked === label) + '">' + labelHtml(label) + '</button>';
+    }).join('');
+    return '<div class="bank" aria-label="Answer options">' + chips + '</div>';
+  };
+
+  Instance.prototype.slotStatus = function (slot) {
+    var label = this.state.placed[slot.n];
+    if (!this.state.checked || !label) return '';
+    return label === slot.a ? 'is-ok' : 'is-bad';
+  };
+
+  // Full cells: the look of the live site, sizes scaled with the image
+  Instance.prototype.cellsFull = function (dispW, opts) {
+    opts = opts || {};
+    var self = this;
+    var s = dispW / DESKTOP_W;
+    var dispH = dispW * this.q.ih / this.q.iw;
+    var px = opts.px || Math.max(11, Math.round(16 * s));
+    var radius = Math.max(6, Math.round(10 * s));
+    var badgeCls = s < 0.7 ? 'badge badge--sm' : 'badge';
+    return this.q.slots.map(function (slot) {
+      var label = self.state.placed[slot.n];
+      var w = slot.w / 100 * dispW, h = slot.h / 100 * dispH;
+      var cls = 'cell';
+      if (slot.a === 'cross' || slot.a === 'circle') cls += ' cell--icon';
+      if (label) cls += ' is-filled';
+      var status = self.slotStatus(slot);
+      if (status) cls += ' ' + status;
+      if (opts.active === slot.n) cls += ' is-active';
+      var inner = '';
+      if (label && isIcon(label)) inner = pict(label);
+      else if (label) {
+        var fit = fitLabel(label, w, h, px);
+        var eyeHtml = fit.cut ? '<span class="cell-eye" title="' + esc(label) + '" style="width:' + (fit.px - 1) + 'px;height:' + (fit.px - 1) + 'px">' + ICON.eye + '</span>' : '';
+        inner = '<span class="cell-text" style="font-size:' + fit.px + 'px">' + fit.lines.map(function (l, i) {
+          return '<span>' + esc(l) + (i === fit.lines.length - 1 ? eyeHtml : '') + '</span>';
+        }).join('') + '</span>';
+      }
+      // Cross and circle take the size of their cell, never more than on the live site
+      var iconSize = Math.max(10, Math.floor(Math.min(24, h - 8, w - 8)));
+      if (label && isIcon(label)) inner = inner.replace('class="cell-icon"', 'class="cell-icon" style="width:' + iconSize + 'px;height:' + iconSize + 'px"');
+      return '<button class="' + cls + '" data-slot="' + slot.n + '" style="left:' + slot.x + '%;top:' + slot.y + '%;width:' + slot.w + '%;height:' + slot.h + '%;border-radius:' + radius + 'px" aria-label="Place ' + slot.n + '">' +
+        '<span class="' + badgeCls + '">' + slot.n + '</span>' + inner + '</button>';
+    }).join('');
+  };
+
+  // Compact cells on the phone image: same place and size, number inside
+  Instance.prototype.cellsCompact = function (dispW, opts) {
+    opts = opts || {};
+    var self = this;
+    var radius = Math.max(3, Math.round(10 * dispW / DESKTOP_W));
+    return this.q.slots.map(function (slot) {
+      var label = self.state.placed[slot.n];
+      var cls = 'cell cell--compact';
+      if (slot.a === 'cross' || slot.a === 'circle') cls += ' cell--icon';
+      if (label) cls += ' is-filled';
+      var status = self.slotStatus(slot);
+      if (status) cls += ' ' + status;
+      if (opts.active === slot.n) cls += ' is-active' + (self.state.pulse ? ' is-pulse' : '');
+      var cw = slot.w / 100 * dispW, ch = slot.h / 100 * dispW * self.q.ih / self.q.iw;
+      var num = Math.max(8, Math.min(11, Math.floor(ch - 5)));
+      var icon = Math.max(8, Math.floor(Math.min(16, ch - 5, cw - 5)));
+      var inner = label && isIcon(label)
+        ? pict(label).replace('class="cell-icon"', 'class="cell-icon" style="width:' + icon + 'px;height:' + icon + 'px"')
+        : '<span class="cell-num" style="font-size:' + num + 'px">' + slot.n + '</span>';
+      return '<button class="' + cls + '" data-slot="' + slot.n + '" style="left:' + slot.x + '%;top:' + slot.y + '%;width:' + slot.w + '%;height:' + slot.h + '%;border-radius:' + radius + 'px" aria-label="Place ' + slot.n + '">' + inner + '</button>';
+    }).join('');
+  };
+
+  Instance.prototype.figure = function (dispW, kind, opts) {
+    var cells = kind === 'compact' ? this.cellsCompact(dispW, opts) : this.cellsFull(dispW, opts);
+    var locked = this.state.checked ? ' is-locked' : '';
+    // The ratio is set up front so cells and anything measured against them are in place before the picture loads
+    return '<figure class="fig' + locked + '" style="aspect-ratio:' + this.q.iw + ' / ' + this.q.ih + '"><img src="' + this.q.img + '" alt="" draggable="false">' + cells + '</figure>';
+  };
+
+  Instance.prototype.resultHtml = function () {
+    var q = this.q, st = this.state;
+    var correct = q.slots.every(function (slot) { return st.placed[slot.n] === slot.a; });
+    return '<section class="result">' +
+      '<div class="result-head">' + (correct ? ICON.ok : ICON.bad) + '<span>Your answer was ' + (correct ? 'correct' : 'incorrect') + '</span></div>' +
+      '<button class="result-img" data-open="rationale" aria-label="Enlarge the answer image"><img src="' + q.rationale + '" alt="Correct answer"></button>' +
+      '<div class="fig-tools"><button class="link-btn" data-open="rationale">' + ICON.expand + 'Enlarge image</button></div>' +
+      '</section>';
+  };
+
+  Instance.prototype.answersTable = function () {
+    var self = this, st = this.state;
+    return '<table class="answers"><tbody>' + this.q.slots.map(function (slot) {
+      var label = st.placed[slot.n];
+      var status = self.slotStatus(slot);
+      var mark = status ? '<span class="row-mark">' + (status === 'is-ok' ? ICON.ok : ICON.bad) + '</span>' : '';
+      return '<tr class="' + status + '"><td>' + slot.n + '</td><td><span class="answers-cell">' + (label ? labelHtml(label) : '') + mark + '</span></td></tr>';
+    }).join('') + '</tbody></table>';
+  };
+
+  Instance.prototype.phonePage = function () {
+    var st = this.state;
+    var dispW = this.figWidth();
+    var html = '<div class="pg"><div class="pg-box"><article class="card">' + this.header();
+    if (this.variant === 'list') {
+      html += this.figure(dispW, 'compact', { active: st.active });
+      html += '<div class="fig-tools"><button class="link-btn" data-open="question">' + ICON.expand + 'Enlarge image</button></div>';
+      html += this.rowsHtml();
+      if (!st.checked) html += this.bankHtml() + '<button class="btn" data-action="check">Show Results</button>';
+      else html += this.resultHtml();
+    } else if (this.variant === 'loupe') {
+      html += this.figure(dispW, 'compact', { active: st.loupe });
+      if (!st.checked) html += this.bankHtml(true) + '<button class="btn" data-action="check">Show Results</button>';
+      else html += this.answersTable() + this.resultHtml();
+    } else {
+      html += this.figure(dispW, 'compact', {});
+      if (!st.checked) html += '<div class="btn-row"><button class="btn btn--outline" data-action="full">' + ICON.expand + 'Answer in full screen</button><button class="btn" data-action="check">Show Results</button></div>';
+      else html += this.answersTable() + this.resultHtml();
+    }
+    html += '</article></div></div>';
+    return html;
+  };
+
+  Instance.prototype.rowsHtml = function () {
+    var self = this, st = this.state;
+    return '<ol class="rows' + (st.checked ? ' is-locked' : '') + '">' + this.q.slots.map(function (slot) {
+      var label = st.placed[slot.n];
+      var cls = 'row';
+      if (label && !st.checked) cls += ' is-filled';
+      if (st.active === slot.n) cls += ' is-active';
+      var status = self.slotStatus(slot);
+      if (status) cls += ' ' + status;
+      var mark = status ? '<span class="row-mark">' + (status === 'is-ok' ? ICON.ok : ICON.bad) + '</span>' : '';
+      var box = '<span class="row-box' + (st.active === slot.n && st.pulse ? ' is-pulse' : '') + '">' + (label ? labelHtml(label) : '') + mark + '</span>';
+      var remove = label && !st.checked ? '<button class="row-remove" data-remove="' + slot.n + '" aria-label="Remove the label from place ' + slot.n + '">' + ICON.close + '</button>' : '';
+      return '<li><button class="' + cls + '" data-slot="' + slot.n + '" aria-label="Place ' + slot.n + (label ? ': ' + esc(label) : '') + '"><span class="badge">' + slot.n + '</span>' + box + '</button>' + remove + '</li>';
+    }).join('') + '</ol>';
+  };
+
+  Instance.prototype.sidebar = function () {
+    var open = this.q.nav.open, lesson = this.q.nav.lesson;
+    var sections = NAV.map(function (sec) {
+      var isOpen = sec.name === open;
+      var row = '<div class="side-item' + (isOpen ? ' side-item--open' : '') + '"><img src="assets/nav/' + sec.icon + '.svg" alt="">' + '<span>' + esc(sec.name) + '</span><span class="side-count' + (sec.todo ? ' side-count--todo' : '') + '">(' + sec.count + ')</span>' + (isOpen ? ICON.chevronDown : ICON.chevron) + '</div>';
+      if (!isOpen || !sec.lessons) return row;
+      return row + '<div class="side-lessons">' + sec.lessons.map(function (name) {
+        return '<div class="side-lesson"' + (name === lesson ? ' aria-current="page"' : '') + '>' + ICON.tick + '<span>' + esc(name) + '</span></div>';
+      }).join('') + '</div>';
+    }).join('');
+    return '<nav class="side" aria-label="Lessons">' +
+      '<div class="side-toggle">' + ICON.panel.replace('<svg', '<svg width="22" height="22"') + '</div>' +
+      '<div class="side-item side-item--top"><img src="assets/nav/dashboard.svg" alt=""><span>Dashboard</span></div>' +
+      '<div class="side-item side-item--top side-item--open"><img src="assets/nav/book.svg" alt=""><span>Lessons</span><span class="side-count side-count--todo">(13/105 completed)</span>' + ICON.chevronDown + '</div>' +
+      '<div class="side-sections">' + sections + '</div></nav>';
+  };
+
+  Instance.prototype.laptopPage = function () {
+    var st = this.state;
+    var html = '<div class="lp">' + this.sidebar() + '<div class="main"><article class="card">' + this.header();
+    html += this.figure(this.figWidth(), 'full', { px: 16 });
+    if (!st.checked) html += this.bankHtml() + '<button class="btn" data-action="check">Show Results</button>';
+    else html += this.resultHtml();
+    html += '</article></div></div>';
+    return html;
+  };
+
+  // ---------- Overlays ----------
+
+  Instance.prototype.overlayHtml = function () {
+    var st = this.state;
+    if (st.viewer) return this.device === 'laptop' ? this.lightboxHtml() : this.viewerHtml();
+    if (this.device !== 'phone') return '';
+    if (this.variant === 'loupe' && st.loupe) return this.sheetHtml();
+    if (this.variant === 'full' && st.full) return this.fullHtml();
+    return '';
+  };
+
+  Instance.prototype.sheetHtml = function () {
+    var st = this.state, n = st.loupe, total = this.q.slots.length;
+    var LZ = 0.95;
+    var dispW = Math.round(DESKTOP_W * LZ);
+    return '<div class="sheet' + (this.enterSheet ? ' is-entering' : '') + '" role="dialog" aria-label="Place ' + n + '">' +
+      '<div class="sheet-grip"></div>' +
+      '<div class="sheet-head">' +
+        '<button class="icon-btn" data-step="-1" aria-label="Previous place"' + (n <= 1 ? ' disabled' : '') + '>' + ICON.left + '</button>' +
+        '<span class="badge">' + n + '</span><span class="sheet-count">of ' + total + '</span>' +
+        '<button class="icon-btn" data-step="1" aria-label="Next place"' + (n >= total ? ' disabled' : '') + '>' + ICON.right + '</button>' +
+        (st.placed[n] ? '<button class="text-btn sheet-close" data-remove="' + n + '">' + ICON.close + 'Remove</button>' +
+          '<button class="icon-btn" data-action="close" aria-label="Close">' + ICON.close + '</button>'
+          : '<button class="icon-btn sheet-close" data-action="close" aria-label="Close">' + ICON.close + '</button>') +
+      '</div>' +
+      '<div class="loupe"><div class="loupe-stage" style="width:' + dispW + 'px">' + this.figure(dispW, 'full', { active: n }) + '</div></div>' +
+      this.bankHtml(true) +
+    '</div>';
+  };
+
+  Instance.prototype.fullHtml = function () {
+    var size = this.size();
+    var st = this.state;
+    if (size.w < size.h) {
+      return '<div class="full full--portrait" role="dialog" aria-label="Question 1"><div class="turn-card">' + ICON.turn +
+        '<p>Turn your phone sideways to answer.</p><button class="btn btn--outline" data-action="done">Back to the lesson</button></div></div>';
+    }
+    var dispW = Math.floor(Math.min(size.w - 12 - 84, (size.h - 24) * this.q.iw / this.q.ih));
+    var pop = '';
+    if (st.pop) {
+      var removeChip = st.placed[st.pop] ? '<button class="chip chip--remove" data-remove="' + st.pop + '">' + ICON.close + 'Remove</button>' : '';
+      pop = '<div class="pop' + (this.enterPop ? ' is-entering' : '') + '" data-for="' + st.pop + '" role="dialog" aria-label="Labels for place ' + st.pop + '">' +
+        this.bankHtml().replace('<div class="bank" aria-label="Answer options">', '<div class="bank" aria-label="Answer options">' + removeChip) + '</div>';
+    }
+    return '<div class="full" role="dialog" aria-label="Question 1">' +
+      '<div class="full-stage"><div class="full-fig" style="width:' + dispW + 'px">' + this.figure(dispW, 'full', { px: 16, active: st.pop }) + '</div></div>' +
+      '<button class="btn full-done" data-action="done">Done</button>' + pop +
+    '</div>';
+  };
+
+  Instance.prototype.viewerHtml = function () {
+    var v = this.state.viewer;
+    var size = this.size();
+    var z = this.state.zoom;
+    var ratio = v.kind === 'rationale' ? this.q.rw / this.q.rh : this.q.iw / this.q.ih;
+    var side = size.w > size.h;
+    var paneW = side ? size.w - 56 : size.w;
+    var paneH = side ? size.h : size.h - 52 - 52;
+    var fitW = Math.min(paneW, paneH * ratio);
+    var w = Math.round(fitW * z);
+    var content;
+    if (v.kind === 'rationale') content = '<img src="' + this.q.rationale + '" alt="Correct answer">';
+    else content = this.figure(w, 'full', {});
+    var zoom = '<div class="zoom">' +
+        '<button class="icon-btn" data-zoom="-1" aria-label="Zoom out"' + (z <= 1 ? ' disabled' : '') + '>' + ICON.minus + '</button>' +
+        '<output>' + Math.round(z * 100) + '%</output>' +
+        '<button class="icon-btn" data-zoom="1" aria-label="Zoom in"' + (z >= 3 ? ' disabled' : '') + '>' + ICON.plus + '</button>' +
+      '</div>';
+    var close = '<button class="icon-btn" data-action="close-viewer" aria-label="Close">' + ICON.close + '</button>';
+    var pan = '<div class="viewer-pan"><div class="viewer-canvas" style="width:' + w + 'px">' + content + '</div></div>';
+    if (side) return '<div class="viewer viewer--side" role="dialog" aria-label="Image">' + pan + '<div class="viewer-bar">' + zoom + close + '</div></div>';
+    return '<div class="viewer" role="dialog" aria-label="Image"><div class="viewer-bar"><span></span>' + close + '</div>' + pan +
+      '<div class="viewer-bar" style="justify-content:center">' + zoom + '</div></div>';
+  };
+
+  Instance.prototype.lightboxHtml = function () {
+    return '<div class="lightbox" role="dialog" aria-label="Answer image" data-action="close-viewer">' +
+      '<div class="lightbox-panel"><button class="icon-btn" data-action="close-viewer" aria-label="Close">' + ICON.close + '</button>' +
+      '<img src="' + this.q.rationale + '" alt="Correct answer"></div></div>';
+  };
+
+  Instance.prototype.afterRender = function () {
+    var st = this.state;
+    var sheetOpened = this.enterSheet;
+    this.enterSheet = false;
+    st.pulse = false;
+    // Magnifier: the page gets room under it for the sheet, and on opening the whole image moves above the sheet
+    var sheetEl = this.overlay.querySelector('.sheet');
+    this.scroller.style.paddingBottom = sheetEl ? sheetEl.offsetHeight + 'px' : '';
+    if (sheetOpened && sheetEl) {
+      var figEl = this.scroller.querySelector('.fig');
+      if (figEl) this.scroller.scrollTo({ top: this.scroller.scrollTop + figEl.getBoundingClientRect().top - this.scroller.getBoundingClientRect().top - 12, behavior: this.rendered ? 'smooth' : 'auto' });
+    }
+    this.rendered = true;
+    // Magnifier: center the chosen place, clamped to the image, and slide there from the previous place
+    var loupe = this.overlay.querySelector('.loupe');
+    if (loupe) {
+      var stageEl = loupe.querySelector('.loupe-stage');
+      var slot = this.q.slots[st.loupe - 1];
+      var dispW = stageEl.offsetWidth;
+      var dispH = dispW * this.q.ih / this.q.iw;
+      var vw = loupe.clientWidth, vh = loupe.clientHeight;
+      // Leader lines run from a cell toward the middle of the picture, so the frame leans that way to show the part
+      var ccx = slot.x + slot.w / 2, ccy = slot.y + slot.h / 2;
+      var cx = (ccx + (50 - ccx) * 0.15) / 100 * dispW;
+      var cy = (ccy + (50 - ccy) * 0.1) / 100 * dispH - 6;
+      var tx = Math.min(12, Math.max(vw - dispW - 12, vw / 2 - cx));
+      var ty = Math.min(14, Math.max(vh - dispH - 14, vh / 2 - cy));
+      var target = 'translate(' + Math.round(tx) + 'px,' + Math.round(ty) + 'px)';
+      if (this.loupeFrom) {
+        stageEl.style.transition = 'none';
+        stageEl.style.transform = this.loupeFrom;
+        stageEl.getBoundingClientRect();
+        stageEl.style.transition = '';
+      }
+      stageEl.style.transform = target;
+      this.loupeFrom = target;
+    } else {
+      this.loupeFrom = null;
+    }
+    this.enterPop = false;
+    var popEl = this.overlay.querySelector('.pop');
+    if (popEl) {
+      var fullEl = this.overlay.querySelector('.full');
+      var cellEl = fullEl.querySelector('.cell[data-slot="' + popEl.dataset.for + '"]');
+      var fr = fullEl.getBoundingClientRect(), cr = cellEl.getBoundingClientRect();
+      var pw = popEl.offsetWidth, ph = popEl.offsetHeight;
+      var left = Math.min(fr.width - pw - 8, Math.max(8, cr.left - fr.left + cr.width / 2 - pw / 2));
+      var below = cr.bottom - fr.top + 8;
+      var top = below + ph <= fr.height - 8 ? below : Math.max(8, cr.top - fr.top - ph - 8);
+      popEl.style.left = Math.round(left) + 'px';
+      popEl.style.top = Math.round(top) + 'px';
+    }
+    var pan = this.overlay.querySelector('.viewer-pan');
+    if (pan && this.viewerScroll) { pan.scrollLeft = this.viewerScroll.left; pan.scrollTop = this.viewerScroll.top; }
+    if (pan) this.bindPan(pan);
+  };
+
+  Instance.prototype.bindPan = function (pan) {
+    var self = this, drag = null;
+    pan.addEventListener('pointerdown', function (e) { drag = { x: e.clientX, y: e.clientY, l: pan.scrollLeft, t: pan.scrollTop }; pan.style.cursor = 'grabbing'; });
+    window.addEventListener('pointerup', function () { drag = null; pan.style.cursor = ''; }, { once: false });
+    pan.addEventListener('pointermove', function (e) { if (!drag) return; pan.scrollLeft = drag.l - (e.clientX - drag.x); pan.scrollTop = drag.t - (e.clientY - drag.y); });
+    pan.addEventListener('scroll', function () { self.viewerScroll = { left: pan.scrollLeft, top: pan.scrollTop }; });
+    pan.addEventListener('dblclick', function () { self.state.zoom = self.state.zoom >= 2 ? 1 : 2; self.render(); });
+  };
+
+  // ---------- Interaction ----------
+
+  Instance.prototype.place = function (n, label) {
+    var placed = this.state.placed;
+    Object.keys(placed).forEach(function (k) { if (placed[k] === label) delete placed[k]; });
+    placed[n] = label;
+    this.state.picked = null;
+  };
+
+  Instance.prototype.nextEmpty = function (from) {
+    var slots = this.q.slots, placed = this.state.placed;
+    for (var i = 0; i < slots.length; i++) {
+      var n = ((from + i) % slots.length) + 1;
+      if (!placed[n]) return n;
+    }
+    return null;
+  };
+
+  Instance.prototype.onClick = function (e) {
+    var st = this.state;
+    var t = e.target.closest('button, [data-action]');
+    if (t && !this.el.contains(t)) return;
+    if (!t) { this.onBackgroundClick(e); return; }
+    if (t.dataset.action === 'close-viewer') {
+      if (t.classList.contains('lightbox') && e.target !== t) return;
+      st.viewer = null; this.viewerScroll = null;
+      if (this.viewerTurned) { this.viewerTurned = false; this.landscape = st.full; this.turn(); }
+      this.render(); return;
+    }
+    if (t.dataset.zoom) { st.zoom = Math.min(3, Math.max(1, st.zoom + Number(t.dataset.zoom))); this.render(); return; }
+    if (t.dataset.open) {
+      st.viewer = { kind: t.dataset.open }; st.zoom = 1; this.viewerScroll = null;
+      if (this.device === 'phone' && !this.solo && !this.landscape) { this.landscape = true; this.viewerTurned = true; this.turn(); }
+      this.render(); return;
+    }
+    if (t.dataset.action === 'check') { st.checked = true; st.active = null; st.picked = null; st.loupe = null; this.render(); this.scroller.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    if (t.dataset.action === 'full') { st.full = true; st.pop = null; this.landscape = true; this.turn(); this.render(); return; }
+    if (t.dataset.action === 'done') { st.full = false; st.pop = null; st.picked = null; this.landscape = false; this.turn(); this.render(); return; }
+    if (t.dataset.action === 'close') { st.loupe = null; this.render(); return; }
+    if (t.dataset.step) {
+      var total = this.q.slots.length;
+      st.loupe = Math.min(total, Math.max(1, st.loupe + Number(t.dataset.step)));
+      this.render(); return;
+    }
+    if (st.checked) return;
+    if (t.dataset.remove) {
+      delete st.placed[Number(t.dataset.remove)];
+      if (st.full) st.pop = null;
+      this.render(); return;
+    }
+    if (t.dataset.placed) {
+      // In the magnifier sheet a placed label moves to the shown place; on the page it opens the magnifier on its place
+      if (st.loupe && t.closest('.sheet')) { this.place(st.loupe, t.dataset.label); this.render(); return; }
+      this.enterSheet = !st.loupe; st.loupe = Number(t.dataset.placed); this.render(); return;
+    }
+    if (t.dataset.chip) {
+      var label = t.dataset.chip;
+      if (st.full && st.pop) { this.place(st.pop, label); st.pop = null; this.render(); return; }
+      if (this.variant === 'loupe' && st.loupe && this.device === 'phone') {
+        this.place(st.loupe, label);
+        var next = this.nextEmpty(st.loupe);
+        if (next) st.loupe = next;
+        this.render(); return;
+      }
+      if (this.variant === 'list' && st.active && this.device === 'phone') {
+        this.place(st.active, label);
+        st.active = null;
+        this.render(); return;
+      }
+      st.picked = st.picked === label ? null : label;
+      this.render(); return;
+    }
+    if (t.dataset.slot) this.tapSlot(Number(t.dataset.slot), !!t.closest('.fig'));
+  };
+
+  Instance.prototype.tapSlot = function (n, fromImage) {
+    var st = this.state;
+    if (st.full) { this.enterPop = st.pop !== n; st.pop = st.pop === n ? null : n; this.render(); return; }
+    if (st.picked) { this.place(n, st.picked); st.active = null; this.render(); return; }
+    if (this.device === 'phone' && this.variant === 'loupe') {
+      this.enterSheet = !st.loupe; st.loupe = n; this.render(); return;
+    }
+    if (this.device === 'phone' && this.variant === 'list') {
+      st.active = st.active === n ? null : n; st.pulse = true;
+      this.render();
+      if (fromImage && st.active) this.revealRow(n);
+      return;
+    }
+    // Tap a filled place without a picked label: return the label to the bank (as dragging it out does)
+    if (st.placed[n]) { delete st.placed[n]; this.render(); }
+  };
+
+  // Cells on the small phone picture are tiny, so a tap anywhere on the picture takes the nearest cell
+  Instance.prototype.onBackgroundClick = function (e) {
+    var st = this.state;
+    if (st.pop && e.target.closest('.full')) { st.pop = null; this.render(); return; }
+    var fig = e.target.closest('.scroller .fig');
+    if (!fig || st.checked || this.device !== 'phone') return;
+    if (this.variant === 'full') { st.full = true; st.pop = null; this.landscape = true; this.turn(); this.render(); return; }
+    var r = fig.getBoundingClientRect();
+    var px = (e.clientX - r.left) / r.width * 100, py = (e.clientY - r.top) / r.height * 100;
+    var aspect = r.height / r.width;
+    var best = null, bestD = Infinity;
+    this.q.slots.forEach(function (slot) {
+      var dx = Math.max(slot.x - px, 0, px - (slot.x + slot.w));
+      var dy = (Math.max(slot.y - py, 0, py - (slot.y + slot.h))) * aspect;
+      var d = dx * dx + dy * dy;
+      if (d < bestD) { bestD = d; best = slot.n; }
+    });
+    if (best) this.tapSlot(best, true);
+  };
+
+  Instance.prototype.revealRow = function (n) {
+    var row = this.scroller.querySelector('.row[data-slot="' + n + '"]');
+    if (!row) return;
+    var sr = this.scroller.getBoundingClientRect(), rr = row.getBoundingClientRect();
+    if (rr.top >= sr.top + 8 && rr.bottom <= sr.bottom - 8) return;
+    this.scroller.scrollTo({ top: this.scroller.scrollTop + rr.top - sr.top - sr.height / 2 + rr.height / 2, behavior: 'smooth' });
+  };
+
+  Instance.prototype.turn = function () {
+    if (this.solo) return;
+    var el = this.el;
+    el.classList.remove('is-turning');
+    void el.offsetWidth;
+    el.classList.add('is-turning');
+    setTimeout(function () { el.classList.remove('is-turning'); }, 320);
+  };
+
+  // ---------- Mockup state ----------
+
+  function readHash() {
+    var out = {};
+    location.hash.replace(/^#/, '').split('&').forEach(function (pair) {
+      var kv = pair.split('=');
+      if (kv[0]) out[kv[0]] = decodeURIComponent(kv[1] || '');
+    });
+    return out;
+  }
+
+  var instances = [];
+  function mount() {
+    var h = readHash();
+    ['screen', 'q', 'state'].forEach(function (k) { if (h[k]) body.dataset[k] = h[k]; });
+    body.dataset.bare = h.bare === '1' ? '1' : '0';
+    var solo = h.solo === '1' || window.innerWidth < 720;
+    body.dataset.solo = solo ? '1' : '0';
+    if (solo) body.dataset.screen = 'phone';
+    document.querySelectorAll('.mock-seg').forEach(function (seg) {
+      seg.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.value === body.dataset[seg.dataset.key])); });
+    });
+    stage.innerHTML = '';
+    instances = [];
+    var common = { q: body.dataset.q, state: body.dataset.state, variant: body.dataset.variant };
+    var list;
+    if (solo) {
+      var barH = body.dataset.bare === '1' ? 0 : document.querySelector('.mock-bar').offsetHeight;
+      list = [Object.assign({ device: 'phone', width: window.innerWidth, height: window.innerHeight - barH, solo: true }, common)];
+    } else if (body.dataset.screen === 'laptop') {
+      list = [Object.assign({ device: 'laptop' }, common)];
+    } else {
+      list = [Object.assign({ device: 'phone', width: 390, height: PHONE_H }, common), Object.assign({ device: 'phone', width: 446, height: PHONE_H }, common)];
+    }
+    list.forEach(function (opts) {
+      var inst = new Instance(opts);
+      instances.push(inst);
+      stage.appendChild(inst.el);
+    });
+    instances.forEach(function (inst) { if (inst.device === 'laptop') inst.scaleLaptop(); inst.render(); });
+  }
+
+  function go(key, value) {
+    var h = readHash();
+    ['screen', 'q', 'state'].forEach(function (k) { if (!h[k]) h[k] = body.dataset[k]; });
+    h[key] = value;
+    history.replaceState(null, '', '#' + KEYS.filter(function (k) { return h[k]; }).map(function (k) { return k + '=' + h[k]; }).join('&'));
+    mount();
+  }
+
+  document.querySelectorAll('.mock-seg button').forEach(function (b) {
+    b.addEventListener('click', function () { go(b.parentElement.dataset.key, b.dataset.value); });
+  });
+  window.addEventListener('hashchange', mount);
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      var soloNow = window.innerWidth < 720 || readHash().solo === '1';
+      if (soloNow !== (body.dataset.solo === '1')) { mount(); return; }
+      if (soloNow && instances[0]) {
+        var barH = body.dataset.bare === '1' ? 0 : document.querySelector('.mock-bar').offsetHeight;
+        instances[0].width = window.innerWidth;
+        instances[0].height = window.innerHeight - barH;
+        instances[0].render();
+        return;
+      }
+      instances.forEach(function (inst) { if (inst.device === 'laptop') inst.scaleLaptop(); });
+    }, 150);
+  });
+
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(mount);
+})();
+</script>
+</body>
+</html>

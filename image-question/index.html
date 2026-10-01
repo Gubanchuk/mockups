@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Your Best Grade mockups</title>
+  <title>Image labeling question mockups</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
   <style>
     :root { --ink: #183261; --link: #1E5290; --ground: #E6EDF6; }
@@ -20,26 +20,16 @@
     .mk-card-body { display: block; }
     .mk-card-body b { display: block; font-size: 16px; margin-bottom: 5px; }
     .mk-card-body span { display: block; font-size: 13px; line-height: 1.55; color: #5a6f92; }
-    .mk-center { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; max-width: 900px; margin: 0 auto; padding: 48px 20px; }
-    .mk-center h1 { text-align: center; }
-    .mk-center .mk-sub { text-align: center; }
-    .mk-choice { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-    .mk-choice .mk-card { flex-direction: column; gap: 10px; min-height: 180px; margin: 0; padding: 28px 28px; }
-    .mk-choice .mk-card-body b { font-size: 22px; margin-bottom: 8px; }
-    .mk-choice .mk-card-body span { font-size: 14px; }
-    .mk-go { margin-top: auto; color: var(--link); font-size: 14px; font-weight: 600; }
-    @media (max-width: 860px) { .mk-choice { grid-template-columns: minmax(0, 1fr); } }
   </style>
 </head>
 <body>
-<main class="mk-center">
-  <h1>Your Best Grade mockups</h1>
-  <p class="mk-sub">Pick a set of mockups.</p>
-  <div class="mk-choice">
-    <a class="mk-card" href="/a2"><span class="mk-card-body"><b>A2 inside the admin panel</b><span>Five ways the A2 course can live in the current admin panel.</span></span><span class="mk-go">Open &rarr;</span></a>
-    <a class="mk-card" href="/affiliate"><span class="mk-card-body"><b>Affiliate program</b><span>The landing page, login and signup, the affiliate dashboard and affiliates in the admin panel.</span></span><span class="mk-go">Open &rarr;</span></a>
-    <a class="mk-card" href="/image-question"><span class="mk-card-body"><b>A2 image labeling question</b><span>How a student labels an image on a phone without sideways scroll.</span></span><span class="mk-go">Open &rarr;</span></a>
-  </div>
-</main>
+<div class="mk-wrap">
+  <p class="mk-back"><a href="/">&larr; All mockups</a></p>
+  <h1>Image labeling question</h1>
+  <p class="mk-sub">Three versions for the phone. On a laptop all three look the same.</p>
+  <a class="mk-card" href="/image-question/1"><span class="mk-num">1</span><span class="mk-card-body"><b>Version 1 &middot; Image + list</b><span>The image fits the screen. Under it, one numbered row per cell: tap a row or a cell, then a label.</span></span></a>
+  <a class="mk-card" href="/image-question/2"><span class="mk-num">2</span><span class="mk-card-body"><b>Version 2 &middot; Magnifier</b><span>Tap a cell: a sheet opens with that part of the image enlarged and the labels under it. Arrows go to the next cell.</span></span></a>
+  <a class="mk-card" href="/image-question/3"><span class="mk-num">3</span><span class="mk-card-body"><b>Version 3 &middot; Full screen</b><span>Turn the phone: the image fills the screen with the cells at their real size. Tap a cell and pick a label.</span></span></a>
+</div>
 </body>
 </html>

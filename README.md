@@ -29,4 +29,13 @@ Live: https://mockups-seven-ashen.vercel.app
 | `/affiliate/dashboard-2` | YBG-1803 affiliate dashboard - version 2, Commissions as its own section |
 | `/affiliate/admin-1` | YBG-1804 affiliates in the admin panel - version 1, Money view |
 
-Static site, nothing to build on deploy. build-site.py writes the A2 pages, build-affiliate-site.js writes the index, /affiliate and the affiliate pages; both live outside this repo.
+## A2 image labeling question
+
+| Path | Version |
+|---|---|
+| `/image-question` | the phone versions |
+| `/image-question/1` | YBG-1763 version 1, Image + list |
+| `/image-question/2` | YBG-1763 version 2, Magnifier |
+| `/image-question/3` | YBG-1763 version 3, Full screen |
+
+Static site, nothing to build on deploy. build-site.py writes the A2 pages, build-affiliate-site.js writes the index, /affiliate and the affiliate pages, build-image-question-site.js writes /image-question; all live outside this repo.
