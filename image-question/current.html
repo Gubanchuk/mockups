@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Image Labeling Question</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #183261;
+    --blue: #1E5290;
+    --page: #EDF6FF;
+    --slot-line: #CEDFF1;
+    --card-line: #E5E5E5;
+    --ok: #1CBB3F;
+    --bad: #F25222;
+    --row-alt: #F6FBFF;
+    --stage: #E6EAF0;
+    --stage-ink: #4E5D72;
+    --bezel: #141B26;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--stage); color: var(--ink); font: 400 16px/1.4 "Inter", sans-serif; -webkit-font-smoothing: antialiased; }
+  ::selection { background: #CFE2F7; color: var(--ink); }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  img { display: block; }
+
+  /* Mockup toolbar (same as the other YBG mockups) */
+  .mock-bar { position: sticky; top: 0; z-index: 50; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 10px 20px; background: #16202e; color: #c7d2e1; font: 500 12px/1 "Poppins", Arial, sans-serif; }
+  .mock-group { display: flex; align-items: center; gap: 8px; }
+  .mock-group span { color: #8d9bb0; }
+  .mock-seg { display: flex; background: #243142; border-radius: 6px; padding: 2px; }
+  .mock-seg button { color: #c7d2e1; padding: 7px 10px; border-radius: 4px; }
+  .mock-seg button:hover { color: #fff; }
+  .mock-seg button[aria-pressed="true"] { background: #f3f6fb; color: #16202e; }
+  body[data-bare="1"] .mock-bar { display: none; }
+  body[data-screen="laptop"] .mock-group--answer { opacity: .45; }
+
+  /* Stage with device frames */
+  .stage { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 36px 48px; padding: 32px 24px 64px; }
+  .device { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .device figcaption { font: 500 12px/1 "Poppins", Arial, sans-serif; color: var(--stage-ink); letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+  .bezel { background: var(--bezel); box-shadow: 0 24px 48px -24px rgba(20, 27, 38, .55); }
+  .device--phone .bezel { padding: 10px; border-radius: 38px; }
+  .device--phone .screen { border-radius: 28px; }
+  .device--laptop .bezel { padding: 14px 14px 18px; border-radius: 16px 16px 4px 4px; }
+  .device--laptop .base { height: 14px; background: #2A3342; border-radius: 0 0 14px 14px; margin: 0 -40px; }
+  .laptop-fit { transform-origin: top left; }
+  .screen { position: relative; overflow: hidden; background: var(--page); }
+  .scroller { position: absolute; inset: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+  .device--phone .scroller { scrollbar-width: none; }
+  .device--phone .scroller::-webkit-scrollbar { display: none; }
+  .device--laptop .scroller { scrollbar-width: thin; scrollbar-color: #B9CBE2 transparent; }
+  body[data-solo="1"] .stage { padding: 0; gap: 0; }
+  body[data-solo="1"] .device { gap: 0; }
+  body[data-solo="1"] .device figcaption { display: none; }
+  body[data-solo="1"] .bezel { padding: 0; border-radius: 0; background: none; box-shadow: none; }
+  body[data-solo="1"] .screen { border-radius: 0; }
+
+  /* Lesson page inside the device */
+  .pg { padding: 12px; min-height: 100%; }
+  .pg-box { background: #fff; border-radius: 16px; padding: 16px; }
+  .lp { display: grid; grid-template-columns: 350px minmax(0, 1fr); gap: 24px; padding: 20px; min-height: 100%; align-items: start; }
+  .side { position: sticky; top: 20px; background: #fff; border-radius: 20px; padding: 20px 16px 24px; font: 500 14px/1.3 "Poppins", Arial, sans-serif; color: var(--blue); }
+  .side-toggle { display: flex; justify-content: flex-end; padding: 0 10px 14px; color: var(--blue); }
+  .side-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; }
+  .side-item svg { width: 18px; height: 18px; flex: none; }
+  .side-item img { width: 20px; height: 20px; flex: none; }
+  .side-item--top { font-size: 16px; font-weight: 600; }
+  .side-item--top .side-count { font-size: 14px; font-weight: 500; white-space: nowrap; }
+  .side-item--open { background: #EEEFF5; }
+  .side-count { margin-left: auto; font-weight: 600; color: var(--ok); }
+  .side-count--todo { color: var(--blue); }
+  .side-sections { padding-left: 20px; }
+  .side-lessons { padding: 4px 0 6px 20px; font-weight: 400; font-size: 14px; }
+  .side-lesson { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 10px; }
+  .side-lesson svg { width: 14px; height: 14px; flex: none; color: var(--ok); }
+  .side-lesson[aria-current] { background: #EEEFF5; font-weight: 600; }
+  .main { background: #fff; border-radius: 20px; padding: 24px; }
+
+  .card { border: 1px solid var(--card-line); border-radius: 10px; padding: 12px; background: #fff; }
+  .device--laptop .card { padding: 16px; }
+  .q-title { font: 400 16px/20px "Poppins", Arial, sans-serif; color: var(--ink); margin: 4px 0 14px; }
+  .q-instr { font: 400 16px/20px "Inter", sans-serif; color: var(--ink); margin: 0; }
+  .q-head { font: 700 20px/28px "Poppins", Arial, sans-serif; color: var(--blue); margin: 18px 0 14px; }
+  .q-text { font: 400 16px/24px "Inter", sans-serif; color: var(--blue); margin: 0 0 18px; }
+  .q-text p { margin: 0; }
+
+  /* The picture keeps its natural 920 px and scrolls sideways inside the card, as on the live site */
+  .hscroll { overflow-x: auto; overflow-y: hidden; padding: 10px 0 8px; }
+  .hscroll::-webkit-scrollbar { height: 6px; }
+  .hscroll::-webkit-scrollbar-track { background: transparent; }
+  .hscroll::-webkit-scrollbar-thumb { background: #A9BCD6; border-radius: 999px; }
+  @supports not selector(::-webkit-scrollbar) { .hscroll { scrollbar-width: thin; scrollbar-color: #A9BCD6 transparent; } }
+  .device--phone .card > .hscroll { margin: 0 -12px; padding-left: 12px; padding-right: 12px; }
+  /* The live site's hint for a question wider than the screen (as over drag-and-drop columns): red, centred, the number bold */
+  .scroll-hint { margin: 0 0 2px; font: 400 15px/1.4 "Poppins", Arial, sans-serif; color: #DC3545; text-align: center; }
+  .scroll-hint b { font-weight: 700; }
+  .hscroll > .fig, .hscroll > .answer-img { flex: none; }
+
+  /* Question image and cells */
+  .fig { position: relative; margin: 0; user-select: none; }
+  .fig > img { width: 100%; height: 100%; }
+  .cell { position: absolute; display: grid; place-items: center; border: 2px solid var(--slot-line); background: #fff; color: var(--ink); text-align: center; cursor: pointer; outline: 0 solid transparent; transition: outline-color .2s var(--ease), border-color .2s var(--ease); }
+  .cell:not(.cell--icon) { padding: 0 4px 0 11px; }
+  .cell-text { display: block; max-width: 100%; overflow: hidden; font-family: "Inter", sans-serif; line-height: 1.05; }
+  .cell-text > span { display: block; white-space: nowrap; }
+  .cell-eye { display: inline-block; vertical-align: -0.12em; margin-left: 3px; color: var(--ink); }
+  .cell-eye svg { display: block; width: 100%; height: 100%; }
+  .cell .badge { position: absolute; left: -9px; top: -9px; }
+  .cell-icon { width: 24px; height: 24px; }
+  .cell.is-picked-target { border-color: var(--blue); }
+  .cell.is-active { border-color: var(--blue); outline: 3px solid rgba(30, 82, 144, .22); z-index: 2; }
+  .cell.is-ok { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .cell.is-bad { background: var(--bad); border-color: var(--bad); color: #fff; }
+  .cell.is-ok .cell-eye, .cell.is-bad .cell-eye { color: #fff; }
+  .fig.is-locked .cell { cursor: default; }
+
+  /* Cells for the cross and the circle: see-through so the part under them shows; a picture keeps them see-through,
+     a text label gets the white ground of every other cell. Their number sits centred above the cell. */
+  .cell--icon { padding: 0 4px; background: transparent; border: 2px dashed rgba(30, 82, 144, .6); }
+  .cell--icon .badge { left: 50%; top: -24px; transform: translateX(-50%); }
+  .cell--icon.is-filled:not(.has-text) { border-color: transparent; }
+  .cell--icon.has-text { background: #fff; border: 2px solid var(--slot-line); }
+  .cell--icon.is-active { border-style: solid; border-color: var(--blue); }
+  .cell--icon.is-ok, .cell--icon.is-bad { background: transparent; }
+  .cell.cell--icon.is-ok { border: 2px solid var(--ok); }
+  .cell.cell--icon.is-bad { border: 2px solid var(--bad); }
+  .cell--icon.has-text.is-bad { background: var(--bad); }
+
+  .badge { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 10px; background: var(--blue); color: #fff; font: 600 13px/1 "Inter", sans-serif; font-variant-numeric: tabular-nums; flex: none; }
+
+  /* Answer bank */
+  .bank { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; padding: 12px; background: var(--page); border-radius: 10px; min-height: 64px; }
+  .chip { display: inline-flex; align-items: center; min-height: 38px; padding: 8px; background: #fff; border: 1px solid var(--blue); border-radius: 10px; font: 400 16px/20px "Inter", sans-serif; color: var(--ink); transition: background-color .15s, color .15s; }
+  .chip .cell-icon { width: 24px; height: 24px; }
+  .chip:hover { background: #F4F9FF; }
+  .chip[aria-pressed="true"] { background: var(--blue); color: #fff; }
+  .chip[aria-pressed="true"] .cell-icon { background: #fff; border-radius: 6px; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; margin-top: 16px; border-radius: 10px; background: var(--blue); color: #fff; font: 600 14px/1 "Poppins", Arial, sans-serif; border: 1px solid transparent; }
+  .btn:hover { background: #18467D; }
+
+  /* Labels next to the tapped cell (phone) */
+  .pop { position: absolute; z-index: 6; width: 300px; padding: 10px; background: #fff; border: 1px solid var(--slot-line); border-radius: 12px; box-shadow: 0 12px 28px -10px rgba(14, 23, 38, .35); }
+  .pop.is-entering { animation: pop-in .2s var(--ease); }
+  @keyframes pop-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .pop-head { display: flex; align-items: center; gap: 8px; min-height: 36px; }
+  .pop-head .badge { width: 24px; height: 24px; border-radius: 12px; font-size: 14px; }
+  .pop .bank { margin: 8px 0 0; padding: 0; background: none; min-height: 0; }
+  .pop--remove { width: auto; }
+  .pop-remove { display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 10px; border: 1px solid var(--blue); border-radius: 10px; background: #fff; font: 500 14px/1 "Poppins", Arial, sans-serif; color: var(--blue); }
+  .pop-remove:hover { background: #F4F9FF; }
+  .pop-remove svg { width: 16px; height: 16px; }
+
+  /* Results */
+  .result { margin-top: 20px; padding: 16px; background: var(--page); border-radius: 10px; }
+  .result-head { display: flex; align-items: center; gap: 12px; font: 400 16px/1.35 "Poppins", Arial, sans-serif; color: var(--ink); }
+  .device--phone .result-head { font-size: 20px; }
+  .result-head svg { width: 24px; height: 24px; flex: none; }
+  .answer-img { padding: 12px; background: #fff; border-radius: 6px; }
+  .answer-img img { width: 100%; height: auto; }
+  .result > .answer-img { margin-top: 14px; }
+  .result > .hscroll { margin-top: 6px; }
+  .answers { width: 100%; margin-top: 18px; border-collapse: separate; border-spacing: 0; border: 1px solid var(--slot-line); border-radius: 10px; overflow: hidden; font: 600 16px/1.3 "Poppins", Arial, sans-serif; color: var(--ink); }
+  .answers td { padding: 12px 14px; border-top: 1px solid var(--slot-line); vertical-align: middle; }
+  .answers tr:first-child td { border-top: 0; }
+  .answers tr:nth-child(odd) td { background: var(--row-alt); }
+  .answers td:first-child { width: 64px; text-align: center; font-weight: 400; border-right: 1px solid var(--slot-line); font-variant-numeric: tabular-nums; }
+  .answers .cell-icon { width: 22px; height: 22px; }
+  .answers-cell { display: flex; align-items: center; }
+  .answers tr.is-bad td { background: #FEEBE4; }
+  .row-mark { margin-left: auto; padding-left: 10px; display: grid; }
+  .row-mark svg { width: 20px; height: 20px; }
+  .fig-tools { display: flex; justify-content: flex-end; margin-top: 2px; }
+  .link-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 4px; font: 500 14px/1 "Poppins", Arial, sans-serif; color: var(--blue); border-radius: 10px; }
+  .link-btn svg { width: 18px; height: 18px; }
+  .link-btn:hover { text-decoration: underline; text-underline-offset: 3px; }
+  button.answer-img { display: block; cursor: zoom-in; }
+
+  /* The answer picture opened over the whole phone screen: whole picture first, zoom with the buttons, move with a finger */
+  .viewer { position: absolute; inset: 0; z-index: 8; display: flex; flex-direction: column; background: #0E1726; color: #fff; }
+  .viewer.is-entering { animation: viewer-in .2s var(--ease); }
+  @keyframes viewer-in { from { opacity: 0; } to { opacity: 1; } }
+  .viewer-bar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px; }
+  .viewer-bar--bottom { justify-content: center; }
+  .icon-btn { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; flex: none; color: #fff; }
+  .icon-btn:hover { background: rgba(255, 255, 255, .1); }
+  .icon-btn:disabled { color: rgba(255, 255, 255, .35); cursor: default; background: none; }
+  .viewer button:focus-visible { outline-color: #fff; }
+  .icon-btn svg { width: 22px; height: 22px; }
+  .viewer-pan { flex: 1; display: flex; overflow: auto; scrollbar-width: none; cursor: grab; }
+  .viewer-pan::-webkit-scrollbar { display: none; }
+  .viewer-canvas { flex: none; background: #fff; margin: auto; }
+  .viewer-canvas img { width: 100%; height: auto; }
+  .zoom { display: inline-flex; align-items: center; gap: 2px; padding: 3px; background: rgba(255, 255, 255, .12); border-radius: 12px; font: 500 14px/1 "Poppins", Arial, sans-serif; font-variant-numeric: tabular-nums; }
+  .zoom output { min-width: 56px; text-align: center; }
+
+  @media (max-width: 719px) {
+    .mock-bar { padding: 10px 12px; gap: 8px 12px; }
+    .mock-group, .mock-seg { flex-wrap: wrap; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+<style>
+  .mock-version { color: #c7d2e1; text-decoration: none; white-space: nowrap; }
+  .mock-version:hover { color: #ffffff; }
+  .mock-version-name { color: #ffffff; font-weight: 600; white-space: nowrap; margin-right: 8px; }
+  @media (max-width: 767px) { .mock-version-name { white-space: normal; } }
+</style>
+</head>
+<body data-answer="bank" data-screen="phone" data-q="microscope" data-state="empty">
+
+<div class="mock-bar" role="toolbar" aria-label="Mockup options">
+  <a class="mock-version" href="/image-question">&larr; Image labeling question</a><span class="mock-version-name">Version 1 &middot; Labels below the picture</span>
+  <div class="mock-group"><span>Screen</span>
+    <div class="mock-seg" data-key="screen">
+      <button data-value="phone">Phone</button>
+      <button data-value="laptop">Laptop 1280</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Question</span>
+    <div class="mock-seg" data-key="q">
+      <button data-value="microscope">Microscope</button>
+      <button data-value="cycle">Cycle</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>State</span>
+    <div class="mock-seg" data-key="state">
+      <button data-value="empty">Empty</button>
+      <button data-value="partial">Partly placed</button>
+      <button data-value="checked">Checked</button>
+      <button data-value="zoom">Answer image</button>
+    </div>
+  </div>
+</div>
+
+<main class="stage" id="stage"></main>
+
+<script>
+(function () {
+  var ICON = {
+    eye: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+    close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    ok: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1CBB3F"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    bad: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#F25222"/><path d="M8.2 8.2l7.6 7.6M15.8 8.2l-7.6 7.6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>',
+    tick: '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="8" fill="currentColor"/><path d="M4.6 8.3l2.2 2.2 4.6-4.8" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    panel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M9.5 3.5v17"/></svg>',
+    chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>',
+    chevronDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+    expand: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-6.5 6.5M4 20l6.5-6.5"/></svg>',
+    minus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>',
+    plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'
+  };
+  var PICT = { cross: '/image-question/assets/cross.png', circle: '/image-question/assets/circle.png' };
+
+  var Q = {
+    microscope: {
+      title: 'Light Microscope',
+      text: ['Place each label at the correct position in the image.', 'Place the cross at the part that adjusts the level of magnification.', 'Place the circle at the part that sharpens the image.'],
+      img: '/image-question/assets/microscope-question.png', iw: 1024, ih: 541,
+      rationale: '/image-question/assets/microscope-rationale.png', rw: 1008, rh: 528,
+      slots: [
+        { n: 1, a: 'Coarse focusing knob', x: 72.9, y: 53.9, w: 11.8, h: 8.2 },
+        { n: 2, a: 'Fine focusing knob', x: 68.0, y: 64.0, w: 13.0, h: 7.8 },
+        { n: 3, a: 'Stage', x: 8.0, y: 46.0, w: 13.1, h: 8.4 },
+        { n: 4, a: 'Diaphragm', x: 11.7, y: 62.1, w: 13.1, h: 8.0 },
+        { n: 5, a: 'Light source', x: 13.2, y: 73.9, w: 15.1, h: 10.0 },
+        { n: 6, a: 'Objective lenses', x: 13.1, y: 33.8, w: 11.1, h: 8.4 },
+        { n: 7, a: 'Eye piece', x: 64.5, y: 10.5, w: 11.1, h: 7.8 },
+        { n: 8, a: 'cross', x: 38.1, y: 38.9, w: 11.1, h: 9.8 },
+        { n: 9, a: 'circle', x: 49.8, y: 59.0, w: 11.1, h: 10.0 }
+      ],
+      bank: ['Diaphragm', 'cross', 'Fine focusing knob', 'Light source', 'Coarse focusing knob', 'Eye piece', 'circle', 'Stage', 'Objective lenses'],
+      partial: { placed: { 7: 'Eye piece', 3: 'Stage', 5: 'Light source', 1: 'Coarse focusing knob', 8: 'cross' }, active: 2, picked: 'Fine focusing knob' },
+      swap: [1, 2],
+      nav: { open: 'Biology', lesson: 'Scientific Method and the Microscope' }
+    },
+    cycle: {
+      title: 'Drag each label to correct position in the image:',
+      text: [],
+      img: '/image-question/assets/cycle-question.png', iw: 880, ih: 723,
+      rationale: '/image-question/assets/cycle-rationale.png', rw: 854, rh: 692,
+      slots: [
+        { n: 1, a: 'LH', x: 6.9, y: 24.0, w: 14.9, h: 4.2 },
+        { n: 2, a: 'FSH', x: 7.1, y: 29.8, w: 14.4, h: 4.4 },
+        { n: 3, a: 'estrogen', x: 7.5, y: 36.2, w: 14.0, h: 4.4 },
+        { n: 4, a: 'progesterone', x: 7.6, y: 42.0, w: 13.7, h: 4.0 },
+        { n: 5, a: 'follicular phase', x: 32.9, y: 5.7, w: 14.2, h: 5.1 },
+        { n: 6, a: 'ovulation', x: 49.9, y: 4.3, w: 13.8, h: 5.1 },
+        { n: 7, a: 'luteal phase', x: 67.8, y: 4.7, w: 14.8, h: 5.1 },
+        { n: 8, a: 'menstruation', x: 20.5, y: 95.0, w: 13.4, h: 5.1 },
+        { n: 9, a: 'proliferation', x: 38.8, y: 94.6, w: 13.7, h: 5.1 },
+        { n: 10, a: 'secretory phase', x: 70.3, y: 94.8, w: 13.7, h: 5.1 }
+      ],
+      bank: ['FSH', 'ovulation', 'estrogen', 'luteal phase', 'secretory phase', 'LH', 'follicular phase', 'menstruation', 'progesterone', 'proliferation'],
+      partial: { placed: { 1: 'LH', 2: 'FSH', 5: 'follicular phase', 6: 'ovulation', 8: 'menstruation' }, active: 3, picked: 'estrogen' },
+      swap: [3, 4],
+      nav: { open: 'Anatomy and Physiology', lesson: 'Female Reproductive System' }
+    }
+  };
+
+  var NAV = [
+    { name: 'Introduction', icon: 'introduction', count: '0/4', todo: true },
+    { name: 'Biology', icon: 'biology', count: '13/13', lessons: ['Introduction to Biology', 'Ecology', 'Scientific Method and the Microscope', 'The Cell', 'Cellular organelles', 'Passive Transport', 'Active Transport', 'Energy', 'DNA', 'Cellular Reproduction I: Mitosis', 'Cellular Reproduction II: Meiosis', 'Genetics', 'Nutrition'] },
+    { name: 'Chemistry', icon: 'chemistry', count: '10/10' },
+    { name: 'Anatomy and Physiology', icon: 'anatomy', count: '15/15', lessons: ['Introduction to A&P (General Terminology)', 'Histology and Skin', 'Musculoskeletal I: Bones and Joints', 'Musculoskeletal II: Muscle', 'Nervous System', 'Senses (Vision and Hearing)', 'Endocrine System (Hormones)', 'Male Reproductive System', 'Female Reproductive System', 'Urinary System', 'Cardiovascular System I: The Heart', 'Cardiovascular System II: Vasculature and Blood', 'Respiratory System', 'Gastrointestinal Tract', 'Immune System'] },
+    { name: 'Math', icon: 'math', count: '12/12' },
+    { name: 'Reading Comprehension', icon: 'reading', count: '10/10' }
+  ];
+
+  var INSTRUCTION = {
+    bank: '❗ Drag and drop or click and drop the correct option to the image.',
+    tap: '❗ Tap a position in the image and choose the correct option.',
+    hybrid: '❗ Tap a position in the image and choose the correct option, or click and drop it from the list below.'
+  };
+
+  var IMG_W = 920;              // the live site draws the picture at 920 px; phone and laptop use the same size here
+  var CELL_PX = 16;             // label size in a cell, as on the site
+  var PHONE_H = 705;
+  var body = document.body;
+  var stage = document.getElementById('stage');
+  var KEYS = ['screen', 'q', 'state', 'bare', 'solo'];
+
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function isIcon(label) { return label === 'cross' || label === 'circle'; }
+  function pict(label, size) { return '<img class="cell-icon" src="' + PICT[label] + '" alt="' + label + '"' + (size ? ' style="width:' + size + 'px;height:' + size + 'px"' : '') + '>'; }
+  function labelHtml(label) { return isIcon(label) ? pict(label) : esc(label); }
+
+  // Text in a cell, as the live site does it: words wrap inside the cell, what does not fit is cut
+  // mid-word on the last line that fits, and the eye after it shows the full label.
+  var measureCtx = document.createElement('canvas').getContext('2d');
+  function textWidth(text, px) { measureCtx.font = '400 ' + px + 'px Inter, sans-serif'; return measureCtx.measureText(text).width; }
+  function fitLabel(label, boxW, boxH, px) {
+    var inner = boxH - 4;
+    var maxLines = Math.max(1, Math.floor(inner / (px * 1.05)));
+    var avail = boxW - 23;
+    var words = label.split(' ');
+    var lines = [], rest = words.slice();
+    while (rest.length) {
+      var line = rest[0];
+      if (textWidth(line, px) > avail) break;
+      var i = 1;
+      while (i < rest.length && textWidth(line + ' ' + rest[i], px) <= avail) { line += ' ' + rest[i]; i++; }
+      if (lines.length === maxLines - 1 && i < rest.length) break;
+      lines.push(line);
+      rest = rest.slice(i);
+      if (lines.length === maxLines) break;
+    }
+    if (!rest.length) return { lines: lines, cut: false };
+    if (lines.length === maxLines) lines.pop();
+    var last = words.slice(lines.join(' ').split(' ').filter(Boolean).length).join(' ');
+    var room = avail - (px + 3);
+    while (last && textWidth(last, px) > room) last = last.slice(0, -1);
+    lines.push(last.replace(/\s+$/, ''));
+    return { lines: lines, cut: true };
+  }
+
+  function presetFor(qKey, stateKey) {
+    var q = Q[qKey];
+    var s = { placed: {}, picked: null, checked: false, pop: null, viewer: false, zoom: 1 };
+    if (stateKey === 'partial') s.placed = Object.assign({}, q.partial.placed);
+    if (stateKey === 'checked' || stateKey === 'zoom') {
+      q.slots.forEach(function (slot) { s.placed[slot.n] = slot.a; });
+      var a = q.swap[0], b = q.swap[1];
+      s.placed[a] = q.slots[b - 1].a;
+      s.placed[b] = q.slots[a - 1].a;
+      s.checked = true;
+    }
+    return s;
+  }
+
+  function Instance(opts) {
+    this.device = opts.device;      // phone | laptop
+    this.width = opts.width;
+    this.height = opts.height;
+    this.q = Q[opts.q];
+    this.solo = !!opts.solo;
+    // How the student answers on the phone: labels below (as on the site), tap the picture, or both. The laptop is the site.
+    this.answer = this.device === 'phone' ? (opts.answer || 'bank') : 'bank';
+    this.state = presetFor(opts.q, opts.state);
+    // Partly placed: with the tap the labels are open next to one cell; with labels below one label is picked
+    if (opts.state === 'partial') {
+      if (this.answer !== 'bank') { this.state.pop = this.q.partial.active; this.enterPop = true; }
+      else this.state.picked = this.q.partial.picked;
+    }
+    // Answer image: the phone shows the answer picture opened over the screen; the laptop stays as on the site
+    if (opts.state === 'zoom' && this.device === 'phone') this.state.viewer = true;
+    // The picture first opens at the open cell (or, with labels below, at the cell the picked label is meant for);
+    // otherwise at its start, as on the live site
+    var focus = this.state.pop || (this.device === 'phone' && opts.state === 'partial' ? this.q.partial.active : null);
+    this.figLeft = focus ? this.leftFor(focus) : 0;
+    this.ansLeft = 0;
+    this.build();
+  }
+
+  Instance.prototype.build = function () {
+    var fig = document.createElement('figure');
+    fig.className = 'device device--' + this.device;
+    this.el = fig;
+    this.bezel = document.createElement('div');
+    this.bezel.className = 'bezel';
+    this.screen = document.createElement('div');
+    this.screen.className = 'screen';
+    this.scroller = document.createElement('div');
+    this.scroller.className = 'scroller';
+    this.overlay = document.createElement('div');
+    this.screen.appendChild(this.scroller);
+    this.screen.appendChild(this.overlay);
+    this.bezel.appendChild(this.screen);
+    if (this.device === 'laptop') {
+      this.fit = document.createElement('div');
+      this.fit.className = 'laptop-fit';
+      this.fit.appendChild(this.bezel);
+      var base = document.createElement('div');
+      base.className = 'base';
+      this.fit.appendChild(base);
+      this.fitWrap = document.createElement('div');
+      this.fitWrap.appendChild(this.fit);
+      fig.appendChild(this.fitWrap);
+    } else {
+      fig.appendChild(this.bezel);
+    }
+    this.caption = document.createElement('figcaption');
+    fig.appendChild(this.caption);
+    var self = this;
+    fig.addEventListener('click', function (e) { self.onClick(e); });
+    // Scrolling the page or the picture closes the labels, the way a native popover does
+    this.scroller.addEventListener('scroll', function () { self.onScroll(); });
+    // Escape closes the opened answer picture
+    fig.addEventListener('keydown', function (e) { if (e.key === 'Escape' && self.state.viewer) self.closeViewer(); });
+    this.userAt = -Infinity;
+    ['wheel', 'touchstart', 'pointerdown', 'keydown'].forEach(function (type) {
+      self.screen.addEventListener(type, function () { self.userAt = performance.now(); }, { passive: true, capture: true });
+    });
+  };
+
+  Instance.prototype.size = function () {
+    if (this.device === 'laptop') return { w: 1280, h: 800 };
+    return { w: this.width, h: this.height };
+  };
+
+  // Visible width of the picture strip inside the card
+  Instance.prototype.viewWidth = function () {
+    if (this.device === 'laptop') return 1280 - 20 - 350 - 24 - 20 - 48 - 34;
+    return this.width - 24 - 32 - 2;
+  };
+
+  // Scroll offset that puts a cell in the middle of the strip
+  Instance.prototype.leftFor = function (n) {
+    var slot = this.q.slots[n - 1];
+    var center = (slot.x + slot.w / 2) / 100 * IMG_W;
+    return Math.max(0, Math.min(IMG_W - this.viewWidth(), Math.round(center - this.viewWidth() / 2)));
+  };
+
+  Instance.prototype.render = function () {
+    var size = this.size();
+    this.screen.style.width = size.w + 'px';
+    this.screen.style.height = size.h + 'px';
+    this.caption.textContent = size.w + ' × ' + size.h;
+    if (this.device === 'laptop') this.scaleLaptop();
+    var top = this.scroller.scrollTop;
+    this.scroller.innerHTML = this.device === 'laptop' ? this.laptopPage() : this.phonePage();
+    this.scroller.scrollTop = top;
+    this.overlay.innerHTML = this.state.viewer && this.device === 'phone' ? this.viewerHtml() : this.popHtml();
+    this.afterRender();
+  };
+
+  Instance.prototype.scaleLaptop = function () {
+    var full = 1280 + 28;
+    var room = Math.min(stage.clientWidth - 48, window.innerWidth - 48);
+    var k = Math.min(1, room / full);
+    this.fit.style.transform = 'scale(' + k + ')';
+    this.fitWrap.style.width = Math.round(full * k) + 'px';
+    this.fitWrap.style.height = Math.round((800 + 32 + 14) * k) + 'px';
+  };
+
+  // ---------- Page markup ----------
+
+  Instance.prototype.header = function () {
+    var q = this.q;
+    var html = '<div class="q-title">' + esc(q.title) + '</div>' +
+      '<p class="q-instr">' + INSTRUCTION[this.answer] + '</p>' +
+      '<div class="q-head">Question 1</div>';
+    if (q.text.length) html += '<div class="q-text">' + q.text.map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('') + '</div>';
+    return html;
+  };
+
+  Instance.prototype.remaining = function () {
+    var used = {};
+    var placed = this.state.placed;
+    Object.keys(placed).forEach(function (n) { used[placed[n]] = true; });
+    return this.q.bank.filter(function (label) { return !used[label]; });
+  };
+
+  Instance.prototype.bankHtml = function () {
+    var picked = this.state.picked;
+    return '<div class="bank" aria-label="Answer options">' + this.remaining().map(function (label) {
+      return '<button class="chip" data-chip="' + esc(label) + '" aria-pressed="' + (picked === label) + '">' + labelHtml(label) + '</button>';
+    }).join('') + '</div>';
+  };
+
+  // After Show Results a cell left empty counts as a mistake, like a wrong label
+  Instance.prototype.slotStatus = function (slot) {
+    if (!this.state.checked) return '';
+    return this.state.placed[slot.n] === slot.a ? 'is-ok' : 'is-bad';
+  };
+
+  Instance.prototype.cells = function () {
+    var self = this, st = this.state;
+    var dispH = IMG_W * this.q.ih / this.q.iw;
+    return this.q.slots.map(function (slot) {
+      var label = st.placed[slot.n];
+      var w = slot.w / 100 * IMG_W, h = slot.h / 100 * dispH;
+      var icon = isIcon(slot.a);
+      var cls = 'cell' + (icon ? ' cell--icon' : '');
+      if (label) cls += ' is-filled';
+      if (icon && label && !isIcon(label)) cls += ' has-text';
+      var status = self.slotStatus(slot);
+      if (status) cls += ' ' + status;
+      if (st.pop === slot.n) cls += ' is-active';
+      if (st.picked && !label && !st.checked) cls += ' is-picked-target';
+      var inner = '', style = '';
+      if (label && isIcon(label)) {
+        // Cross and circle take the size of their cell, never more than on the live site
+        var iconSize = Math.max(10, Math.floor(Math.min(24, h - 8, w - 8)));
+        inner = pict(label, iconSize);
+      } else if (label) {
+        var fit = fitLabel(label, w, h, CELL_PX);
+        var eyeHtml = fit.cut ? '<span class="cell-eye" title="' + esc(label) + '" style="width:' + (CELL_PX - 1) + 'px;height:' + (CELL_PX - 1) + 'px">' + ICON.eye + '</span>' : '';
+        inner = '<span class="cell-text" style="font-size:' + CELL_PX + 'px">' + fit.lines.map(function (l, i) {
+          return '<span>' + esc(l) + (i === fit.lines.length - 1 ? eyeHtml : '') + '</span>';
+        }).join('') + '</span>';
+      }
+      return '<button class="' + cls + '" data-slot="' + slot.n + '" style="' + style + 'left:' + slot.x + '%;top:' + slot.y + '%;width:' + slot.w + '%;height:' + slot.h + '%;border-radius:10px" aria-label="Place ' + slot.n + (label ? ': ' + esc(label) : '') + '">' +
+        '<span class="badge">' + slot.n + '</span>' + inner + '</button>';
+    }).join('');
+  };
+
+  Instance.prototype.figure = function () {
+    var locked = this.state.checked ? ' is-locked' : '';
+    // Shown only when some cells lie beyond the visible strip, as the live hint over columns
+    var reach = Math.max.apply(null, this.q.slots.map(function (slot) { return (slot.x + slot.w) / 100 * IMG_W; }));
+    var hint = reach > this.viewWidth() ? '<p class="scroll-hint">← There are <b>' + this.q.slots.length + '</b> positions in the image. Scroll left or right to see them all. →</p>' : '';
+    // The ratio is set up front so the cells are in place before the picture loads
+    return hint + '<div class="hscroll" data-scroll="fig"><figure class="fig' + locked + '" style="width:' + IMG_W + 'px;aspect-ratio:' + this.q.iw + ' / ' + this.q.ih + '"><img src="' + this.q.img + '" alt="" draggable="false">' + this.cells() + '</figure></div>';
+  };
+
+  Instance.prototype.resultHtml = function () {
+    var q = this.q, st = this.state;
+    var correct = q.slots.every(function (slot) { return st.placed[slot.n] === slot.a; });
+    var img = '<div class="answer-img"><img src="' + q.rationale + '" alt="Correct answer"></div>';
+    // Phone: the answer picture at the size of the question picture, scrolled sideways like it, and opened whole on a tap
+    if (this.device === 'phone') {
+      img = '<div class="hscroll" data-scroll="answer"><button class="answer-img" data-open="rationale" style="width:' + IMG_W + 'px" aria-label="Open the answer image"><img src="' + q.rationale + '" alt="Correct answer"></button></div>' +
+        '<div class="fig-tools"><button class="link-btn" data-open="rationale">' + ICON.expand + 'Enlarge image</button></div>';
+    }
+    return '<section class="result">' +
+      '<div class="result-head">' + (correct ? ICON.ok : ICON.bad) + '<span>Your answer was ' + (correct ? 'correct' : 'incorrect') + '</span></div>' +
+      img + '</section>';
+  };
+
+  // As on the live phone: each place with its correct answer; a place the student got wrong is highlighted (new)
+  Instance.prototype.answersTable = function () {
+    var self = this;
+    return '<table class="answers"><tbody>' + this.q.slots.map(function (slot) {
+      var bad = self.slotStatus(slot) === 'is-bad';
+      return '<tr' + (bad ? ' class="is-bad"' : '') + '><td>' + slot.n + '</td><td><span class="answers-cell">' + labelHtml(slot.a) +
+        (bad ? '<span class="row-mark" role="img" aria-label="Your answer here was wrong">' + ICON.bad + '</span>' : '') + '</span></td></tr>';
+    }).join('') + '</tbody></table>';
+  };
+
+  Instance.prototype.phonePage = function () {
+    var st = this.state;
+    var html = '<div class="pg"><div class="pg-box"><article class="card">' + this.header() + this.figure();
+    if (!st.checked) html += (this.answer === 'tap' ? '' : this.bankHtml()) + '<button class="btn" data-action="check">Show Results</button>';
+    else html += this.answersTable() + this.resultHtml();
+    return html + '</article></div></div>';
+  };
+
+  Instance.prototype.sidebar = function () {
+    var open = this.q.nav.open, lesson = this.q.nav.lesson;
+    var sections = NAV.map(function (sec) {
+      var isOpen = sec.name === open;
+      var row = '<div class="side-item' + (isOpen ? ' side-item--open' : '') + '"><img src="/image-question/assets/nav/' + sec.icon + '.svg" alt="">' + '<span>' + esc(sec.name) + '</span><span class="side-count' + (sec.todo ? ' side-count--todo' : '') + '">(' + sec.count + ')</span>' + (isOpen ? ICON.chevronDown : ICON.chevron) + '</div>';
+      if (!isOpen || !sec.lessons) return row;
+      return row + '<div class="side-lessons">' + sec.lessons.map(function (name) {
+        return '<div class="side-lesson"' + (name === lesson ? ' aria-current="page"' : '') + '>' + ICON.tick + '<span>' + esc(name) + '</span></div>';
+      }).join('') + '</div>';
+    }).join('');
+    return '<nav class="side" aria-label="Lessons">' +
+      '<div class="side-toggle">' + ICON.panel.replace('<svg', '<svg width="22" height="22"') + '</div>' +
+      '<div class="side-item side-item--top"><img src="/image-question/assets/nav/dashboard.svg" alt=""><span>Dashboard</span></div>' +
+      '<div class="side-item side-item--top side-item--open"><img src="/image-question/assets/nav/book.svg" alt=""><span>Lessons</span><span class="side-count side-count--todo">(13/105 completed)</span>' + ICON.chevronDown + '</div>' +
+      '<div class="side-sections">' + sections + '</div></nav>';
+  };
+
+  Instance.prototype.laptopPage = function () {
+    var st = this.state;
+    var html = '<div class="lp">' + this.sidebar() + '<div class="main"><article class="card">' + this.header() + this.figure();
+    if (!st.checked) html += this.bankHtml() + '<button class="btn" data-action="check">Show Results</button>';
+    else html += this.resultHtml();
+    return html + '</article></div></div>';
+  };
+
+  // ---------- Labels next to a cell ----------
+
+  Instance.prototype.popHtml = function () {
+    var st = this.state, n = st.pop;
+    if (!n || this.answer === 'bank') return '';
+    var label = st.placed[n];
+    var head = '<div class="pop-head"><span class="badge">' + n + '</span>' +
+      (label ? '<button class="pop-remove" data-remove="' + n + '">' + ICON.close + 'Remove</button>' : '') + '</div>';
+    var chips = label ? '' : '<div class="bank" aria-label="Labels">' + this.remaining().map(function (l) {
+      return '<button class="chip" data-pick="' + esc(l) + '">' + labelHtml(l) + '</button>';
+    }).join('') + '</div>';
+    return '<div class="pop' + (label ? ' pop--remove' : '') + (this.enterPop ? ' is-entering' : '') + '" role="dialog" aria-label="Place ' + n + '">' + head + chips + '</div>';
+  };
+
+  Instance.prototype.viewerHtml = function () {
+    var size = this.size(), z = this.state.zoom;
+    var ratio = this.q.rw / this.q.rh;
+    var paneW = size.w, paneH = size.h - 52 - 52;
+    var w = Math.round(Math.min(paneW, paneH * ratio) * z);
+    var zoom = '<div class="zoom">' +
+        '<button class="icon-btn" data-zoom="-1" aria-label="Zoom out"' + (z <= 1 ? ' disabled' : '') + '>' + ICON.minus + '</button>' +
+        '<output>' + Math.round(z * 100) + '%</output>' +
+        '<button class="icon-btn" data-zoom="1" aria-label="Zoom in"' + (z >= 3 ? ' disabled' : '') + '>' + ICON.plus + '</button>' +
+      '</div>';
+    return '<div class="viewer' + (this.enterViewer ? ' is-entering' : '') + '" role="dialog" aria-modal="true" aria-label="Answer image">' +
+      '<div class="viewer-bar"><span></span><button class="icon-btn" data-action="close-viewer" aria-label="Close">' + ICON.close + '</button></div>' +
+      '<div class="viewer-pan"><div class="viewer-canvas" style="width:' + w + 'px"><img src="' + this.q.rationale + '" alt="Correct answer"></div></div>' +
+      '<div class="viewer-bar viewer-bar--bottom">' + zoom + '</div></div>';
+  };
+
+  // Drag to move the zoomed picture (a finger does this natively; the mouse needs it in the mockup)
+  Instance.prototype.bindPan = function (pan) {
+    var self = this, drag = null;
+    pan.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') return; drag = { x: e.clientX, y: e.clientY, l: pan.scrollLeft, t: pan.scrollTop }; pan.style.cursor = 'grabbing'; });
+    pan.addEventListener('pointermove', function (e) { if (!drag) return; pan.scrollLeft = drag.l - (e.clientX - drag.x); pan.scrollTop = drag.t - (e.clientY - drag.y); });
+    pan.addEventListener('pointerup', function () { drag = null; pan.style.cursor = ''; });
+    pan.addEventListener('pointerleave', function () { drag = null; pan.style.cursor = ''; });
+    pan.addEventListener('scroll', function () { self.viewerScroll = { left: pan.scrollLeft, top: pan.scrollTop }; });
+  };
+
+  Instance.prototype.placePop = function () {
+    var popEl = this.overlay.querySelector('.pop');
+    if (!popEl) return;
+    var cellEl = this.scroller.querySelector('.fig .cell[data-slot="' + this.state.pop + '"]');
+    var sr = this.screen.getBoundingClientRect(), cr = cellEl.getBoundingClientRect();
+    var k = sr.width / this.screen.offsetWidth;
+    var cx = (cr.left - sr.left) / k, cy = (cr.top - sr.top) / k, cw = cr.width / k, ch = cr.height / k;
+    var w = this.screen.offsetWidth, hgt = this.screen.offsetHeight;
+    var card = this.scroller.querySelector('.card').getBoundingClientRect();
+    var minL = (card.left - sr.left) / k + 4, maxR = (card.right - sr.left) / k - 4;
+    var removeOnly = popEl.classList.contains('pop--remove');
+    if (!removeOnly) popEl.style.width = Math.min(300, maxR - minL) + 'px';
+    var pw = popEl.offsetWidth, ph = popEl.offsetHeight;
+    var left, top;
+    // Remove alone is small: it sits right on the tapped cell, so it never half-covers a neighbour
+    if (removeOnly) {
+      left = Math.min(maxR - pw, Math.max(minL, cx + cw / 2 - pw / 2));
+      top = cy + ch / 2 - ph / 2;
+    } else {
+      // The labels stay over the picture: below the cell, or above it when below would run onto the bank
+      var fr = this.scroller.querySelector('[data-scroll="fig"]').getBoundingClientRect();
+      var figTop = (fr.top - sr.top) / k, figBottom = (fr.bottom - sr.top) / k;
+      var below = cy + ch + 8, above = cy - ph - 8;
+      if (below + ph <= Math.min(figBottom, hgt - 8)) top = below;
+      else if (above >= Math.max(figTop, 8)) top = above;
+      else top = below + ph <= hgt - 8 ? below : Math.max(8, above);
+      left = Math.min(maxR - pw, Math.max(minL, cx + cw / 2 - pw / 2));
+    }
+    popEl.style.left = Math.round(left) + 'px';
+    popEl.style.top = Math.round(top) + 'px';
+  };
+
+  // Where the page and the picture stand once a render has placed them
+  Instance.prototype.settle = function () {
+    var fig = this.scroller.querySelector('[data-scroll="fig"]');
+    this.rest = { top: this.scroller.scrollTop, left: fig ? fig.scrollLeft : 0 };
+  };
+
+  // Only a scroll the student makes (finger, wheel, keys) closes the labels; a scroll the page makes
+  // by itself (a render restoring its place, a late font moving the text) keeps them next to their cell
+  Instance.prototype.onScroll = function () {
+    if (!this.state.pop || !this.rest) return;
+    var fig = this.scroller.querySelector('[data-scroll="fig"]');
+    var moved = Math.abs(this.scroller.scrollTop - this.rest.top) > 1 || (fig && Math.abs(fig.scrollLeft - this.rest.left) > 1);
+    if (!moved) return;
+    if (performance.now() - this.userAt < 800) { this.closePop(); return; }
+    this.placePop();
+    this.settle();
+  };
+
+  Instance.prototype.closePop = function () {
+    this.state.pop = null;
+    this.overlay.innerHTML = '';
+    var active = this.scroller.querySelector('.cell.is-active');
+    if (active) active.classList.remove('is-active');
+  };
+
+  Instance.prototype.afterRender = function () {
+    var self = this;
+    var fig = this.scroller.querySelector('[data-scroll="fig"]');
+    if (fig) {
+      fig.scrollLeft = this.figLeft;
+      fig.addEventListener('scroll', function () { self.figLeft = fig.scrollLeft; self.onScroll(); });
+    }
+    var ans = this.scroller.querySelector('[data-scroll="answer"]');
+    if (ans) {
+      ans.scrollLeft = this.ansLeft;
+      ans.addEventListener('scroll', function () { self.ansLeft = ans.scrollLeft; });
+    }
+    this.placePop();
+    this.settle();
+    this.enterPop = false;
+    this.enterViewer = false;
+    var pan = this.overlay.querySelector('.viewer-pan');
+    if (pan) {
+      if (this.viewerScroll) { pan.scrollLeft = this.viewerScroll.left; pan.scrollTop = this.viewerScroll.top; }
+      this.bindPan(pan);
+      if (this.focusViewer) this.overlay.querySelector('[data-action="close-viewer"]').focus({ preventScroll: true });
+    } else if (this.focusEnlarge) {
+      var enlarge = this.scroller.querySelector('.link-btn[data-open]');
+      if (enlarge) enlarge.focus({ preventScroll: true });
+    }
+    this.focusViewer = false;
+    this.focusEnlarge = false;
+  };
+
+  Instance.prototype.closeViewer = function () {
+    this.state.viewer = false; this.viewerScroll = null; this.focusEnlarge = true; this.render();
+  };
+
+  // ---------- Interaction ----------
+
+  Instance.prototype.place = function (n, label) {
+    var placed = this.state.placed;
+    Object.keys(placed).forEach(function (k) { if (placed[k] === label) delete placed[k]; });
+    placed[n] = label;
+    this.state.picked = null;
+  };
+
+  Instance.prototype.onClick = function (e) {
+    var st = this.state;
+    var t = e.target.closest('button');
+    if (t && !this.el.contains(t)) return;
+    if (!t) {
+      // A tap anywhere but the labels closes them
+      if (st.pop && !e.target.closest('.pop')) this.closePop();
+      return;
+    }
+    if (t.dataset.open) { st.viewer = true; st.zoom = 1; st.pop = null; this.viewerScroll = null; this.enterViewer = true; this.focusViewer = true; this.render(); return; }
+    if (t.dataset.action === 'close-viewer') { this.closeViewer(); return; }
+    if (t.dataset.zoom) {
+      // Zooming keeps the middle of what was in view in the middle
+      var pan = this.overlay.querySelector('.viewer-pan');
+      var nz = Math.min(3, Math.max(1, st.zoom + Number(t.dataset.zoom)));
+      if (pan && nz !== st.zoom) {
+        var f = nz / st.zoom;
+        var mx = pan.scrollLeft + pan.clientWidth / 2, my = pan.scrollTop + pan.clientHeight / 2;
+        this.viewerScroll = { left: mx * f - pan.clientWidth / 2, top: my * f - pan.clientHeight / 2 };
+      }
+      st.zoom = nz; this.render(); return;
+    }
+    if (t.dataset.action === 'check') { st.checked = true; st.picked = null; st.pop = null; this.figLeft = 0; this.render(); this.scroller.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    if (st.checked) return;
+    if (t.dataset.remove) { delete st.placed[Number(t.dataset.remove)]; st.pop = null; this.render(); return; }
+    if (t.dataset.pick) { this.place(st.pop, t.dataset.pick); st.pop = null; this.render(); return; }
+    if (t.dataset.chip) {
+      st.pop = null;
+      st.picked = st.picked === t.dataset.chip ? null : t.dataset.chip;
+      this.render(); return;
+    }
+    if (t.dataset.slot) this.tapSlot(Number(t.dataset.slot));
+  };
+
+  Instance.prototype.tapSlot = function (n) {
+    var st = this.state;
+    // A label picked in the bank goes straight to the tapped cell, as on the live site
+    if (st.picked) { this.place(n, st.picked); this.render(); return; }
+    if (this.answer !== 'bank') {
+      if (st.pop === n) { this.closePop(); return; }
+      this.enterPop = true; st.pop = n; this.render(); return;
+    }
+    // Labels below (and the laptop), as on the live site: tapping a filled cell returns its label to the bank
+    if (st.placed[n]) { delete st.placed[n]; this.render(); }
+  };
+
+  // ---------- Mockup state ----------
+
+  function readHash() {
+    var out = {};
+    location.hash.replace(/^#/, '').split('&').forEach(function (pair) {
+      var kv = pair.split('=');
+      if (kv[0]) out[kv[0]] = decodeURIComponent(kv[1] || '');
+    });
+    return out;
+  }
+
+  var instances = [];
+  function mount() {
+    var h = readHash();
+    ['screen', 'q', 'state'].forEach(function (k) { if (h[k]) body.dataset[k] = h[k]; });
+    body.dataset.bare = h.bare === '1' ? '1' : '0';
+    var solo = h.solo === '1' || window.innerWidth < 720;
+    body.dataset.solo = solo ? '1' : '0';
+    if (solo) body.dataset.screen = 'phone';
+    document.querySelectorAll('.mock-seg').forEach(function (seg) {
+      seg.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.value === body.dataset[seg.dataset.key])); });
+    });
+    stage.innerHTML = '';
+    instances = [];
+    var common = { q: body.dataset.q, state: body.dataset.state, answer: body.dataset.answer };
+    var list;
+    if (solo) {
+      var barH = body.dataset.bare === '1' ? 0 : document.querySelector('.mock-bar').offsetHeight;
+      list = [Object.assign({ device: 'phone', width: window.innerWidth, height: window.innerHeight - barH, solo: true }, common)];
+    } else if (body.dataset.screen === 'laptop') {
+      list = [Object.assign({ device: 'laptop' }, common)];
+    } else {
+      list = [Object.assign({ device: 'phone', width: 390, height: PHONE_H }, common), Object.assign({ device: 'phone', width: 446, height: PHONE_H }, common)];
+    }
+    list.forEach(function (opts) {
+      var inst = new Instance(opts);
+      instances.push(inst);
+      stage.appendChild(inst.el);
+    });
+    instances.forEach(function (inst) { if (inst.device === 'laptop') inst.scaleLaptop(); inst.render(); });
+    // Partly placed with labels below: bring the picked label in the bank and the target cells above it into view
+    instances.forEach(function (inst) {
+      if (inst.device !== 'phone' || inst.answer !== 'bank' || body.dataset.state !== 'partial') return;
+      var bank = inst.scroller.querySelector('.card > .bank');
+      var sr = inst.scroller.getBoundingClientRect(), br = bank.getBoundingClientRect();
+      var k = sr.height / inst.scroller.offsetHeight;
+      inst.scroller.scrollTop += (br.bottom - sr.top) / k - inst.scroller.clientHeight + 16;
+      inst.settle();
+    });
+    // Partly placed opens the labels under a cell further down the card: bring that cell into view
+    instances.forEach(function (inst) {
+      var cell = inst.state.pop && inst.scroller.querySelector('.fig .cell[data-slot="' + inst.state.pop + '"]');
+      if (!cell) return;
+      var sr = inst.scroller.getBoundingClientRect(), cr = cell.getBoundingClientRect();
+      var k = sr.height / inst.scroller.offsetHeight;
+      inst.scroller.scrollTop += (cr.top - sr.top) / k - 120;
+      inst.placePop();
+      inst.settle();
+    });
+  }
+
+  function go(key, value) {
+    var h = readHash();
+    ['screen', 'q', 'state'].forEach(function (k) { if (!h[k]) h[k] = body.dataset[k]; });
+    h[key] = value;
+    history.replaceState(null, '', '#' + KEYS.filter(function (k) { return h[k]; }).map(function (k) { return k + '=' + h[k]; }).join('&'));
+    mount();
+  }
+
+  document.querySelectorAll('.mock-seg button').forEach(function (b) {
+    b.addEventListener('click', function () { go(b.parentElement.dataset.key, b.dataset.value); });
+  });
+  window.addEventListener('hashchange', mount);
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      var soloNow = window.innerWidth < 720 || readHash().solo === '1';
+      if (soloNow !== (body.dataset.solo === '1')) { mount(); return; }
+      if (soloNow && instances[0]) {
+        var barH = body.dataset.bare === '1' ? 0 : document.querySelector('.mock-bar').offsetHeight;
+        instances[0].width = window.innerWidth;
+        instances[0].height = window.innerHeight - barH;
+        instances[0].render();
+        return;
+      }
+      instances.forEach(function (inst) { if (inst.device === 'laptop') inst.scaleLaptop(); });
+    }, 150);
+  });
+
+  // Poppins loads on first use; wait for the weights the page uses so the text does not move after the first render
+  var fontsReady = document.fonts && document.fonts.load
+    ? Promise.all(['400 16px Poppins', '500 14px Poppins', '600 14px Poppins', '700 20px Poppins'].map(function (f) { return document.fonts.load(f); })).catch(function () {})
+    : Promise.resolve();
+  fontsReady.then(mount);
+  if (document.fonts) document.fonts.addEventListener('loadingdone', function () { instances.forEach(function (inst) { inst.placePop(); }); });
+})();
+</script>
+</body>
+</html>

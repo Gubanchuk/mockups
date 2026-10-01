@@ -33,6 +33,9 @@ Live: https://mockups-seven-ashen.vercel.app
 
 | Path | Version |
 |---|---|
-| `/image-question` | YBG-1763: the question on a phone and a laptop (the earlier `/1`, `/2`, `/3` redirect here) |
+| `/image-question` | YBG-1763: three phone versions (the earlier `/1`, `/2`, `/3` redirect here) |
+| `/image-question/current` | version 1, labels below the picture (as on the site) |
+| `/image-question/tap` | version 2, tap the picture |
+| `/image-question/hybrid` | version 3, both |
 
 Static site, nothing to build on deploy. build-site.py writes the A2 pages, build-affiliate-site.js writes the index, /affiliate and the affiliate pages, build-image-question-site.js writes /image-question; all live outside this repo.
