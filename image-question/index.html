@@ -97,6 +97,9 @@
   .hscroll::-webkit-scrollbar-thumb { background: #A9BCD6; border-radius: 999px; }
   @supports not selector(::-webkit-scrollbar) { .hscroll { scrollbar-width: thin; scrollbar-color: #A9BCD6 transparent; } }
   .device--phone .card > .hscroll { margin: 0 -12px; padding-left: 12px; padding-right: 12px; }
+  /* The live site's hint for a question wider than the screen (as over drag-and-drop columns): red, centred, the number bold */
+  .scroll-hint { margin: 0 0 2px; font: 400 15px/1.4 "Poppins", Arial, sans-serif; color: #DC3545; text-align: center; }
+  .scroll-hint b { font-weight: 700; }
   .hscroll > .fig, .hscroll > .answer-img { flex: none; }
 
   /* Question image and cells */
@@ -532,8 +535,11 @@
 
   Instance.prototype.figure = function () {
     var locked = this.state.checked ? ' is-locked' : '';
+    // Shown only when some cells lie beyond the visible strip, as the live hint over columns
+    var reach = Math.max.apply(null, this.q.slots.map(function (slot) { return (slot.x + slot.w) / 100 * IMG_W; }));
+    var hint = reach > this.viewWidth() ? '<p class="scroll-hint">← There are <b>' + this.q.slots.length + '</b> positions in the image. Scroll left or right to see them all. →</p>' : '';
     // The ratio is set up front so the cells are in place before the picture loads
-    return '<div class="hscroll" data-scroll="fig"><figure class="fig' + locked + '" style="width:' + IMG_W + 'px;aspect-ratio:' + this.q.iw + ' / ' + this.q.ih + '"><img src="' + this.q.img + '" alt="" draggable="false">' + this.cells() + '</figure></div>';
+    return hint + '<div class="hscroll" data-scroll="fig"><figure class="fig' + locked + '" style="width:' + IMG_W + 'px;aspect-ratio:' + this.q.iw + ' / ' + this.q.ih + '"><img src="' + this.q.img + '" alt="" draggable="false">' + this.cells() + '</figure></div>';
   };
 
   Instance.prototype.resultHtml = function () {
