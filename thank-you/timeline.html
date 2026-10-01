@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thank You Page</title>
+<style>
+  @font-face { font-family: "Gotham Narrow"; src: url("/thank-you/assets/fonts/GothamNarrow-Black.d8117813.woff2") format("woff2"); font-weight: 900; font-style: normal; font-display: swap; }
+  @font-face { font-family: "Gotham Narrow"; src: url("/thank-you/assets/fonts/GothamNarrow-Bold.4384608e.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+  @font-face { font-family: "Poppins"; src: url("/thank-you/assets/fonts/Poppins-Regular.581964a0.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: "Poppins"; src: url("/thank-you/assets/fonts/Poppins-Medium.0a448ffa.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: "Poppins"; src: url("/thank-you/assets/fonts/Poppins-Bold.31674544.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+
+  :root {
+    --ink: #183261;
+    --blue: #1E5290;
+    --blue-hover: #18467D;
+    --muted: #4A5E80;
+    --tint: #EDF6FF;
+    --line: #D7E3F1;
+    --footer: #0E2C56;
+    --ground: #EFF8FF;
+    --stage: #E6EAF0;
+    --stage-ink: #4E5D72;
+    --bezel: #141B26;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--stage); color: var(--ink); font: 400 16px/1.6 "Poppins", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  ::selection { background: #CFE2F7; color: var(--ink); }
+  img { display: block; max-width: 100%; }
+  a { color: var(--blue); text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+
+  /* Mockup toolbar (same as the other YBG mockups) */
+  .mock-bar { position: sticky; top: 0; z-index: 50; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 10px 20px; background: #16202e; color: #c7d2e1; font: 500 12px/1 "Poppins", Arial, sans-serif; }
+  .mock-group { display: flex; align-items: center; gap: 8px; }
+  .mock-group span { color: #8d9bb0; }
+  .mock-seg { display: flex; background: #243142; border-radius: 6px; padding: 2px; }
+  .mock-seg button { color: #c7d2e1; padding: 7px 10px; border-radius: 4px; }
+  .mock-seg button:hover { color: #fff; }
+  .mock-seg button[aria-pressed="true"] { background: #f3f6fb; color: #16202e; }
+
+  /* Desktop: the page at the window width, as in a browser */
+  body[data-screen="laptop"] .stage { display: block; padding: 0; }
+  .device.device--page { display: block; width: 100%; margin: 0; }
+  .page-root { background: #fff; }
+
+  /* Stage with device frames */
+  .stage { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 36px 48px; padding: 32px 24px 64px; }
+  .device { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .device figcaption { font: 500 12px/1 "Poppins", Arial, sans-serif; color: var(--stage-ink); font-variant-numeric: tabular-nums; }
+  .bezel { background: var(--bezel); box-shadow: 0 24px 48px -24px rgba(20, 27, 38, .55); }
+  .device--phone .bezel { padding: 10px; border-radius: 38px; }
+  .device--phone .screen { border-radius: 28px; }
+  .device--laptop .bezel { padding: 14px 14px 18px; border-radius: 16px 16px 4px 4px; }
+  .device--laptop .base { height: 14px; background: #2A3342; border-radius: 0 0 14px 14px; margin: 0 -40px; }
+  .laptop-fit { transform-origin: top left; }
+  .screen { position: relative; overflow: hidden; background: #fff; }
+  .scroller { position: absolute; inset: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+  .device--phone .scroller { scrollbar-width: none; }
+  .device--phone .scroller::-webkit-scrollbar { display: none; }
+  .device--laptop .scroller { scrollbar-width: thin; scrollbar-color: #B9CBE2 transparent; }
+  body[data-solo="1"] .stage { padding: 0; gap: 0; }
+  body[data-solo="1"] .device { gap: 0; }
+  body[data-solo="1"] .device figcaption { display: none; }
+  body[data-solo="1"] .bezel { padding: 0; border-radius: 0; background: none; box-shadow: none; }
+  body[data-solo="1"] .screen { border-radius: 0; }
+
+  /* Site header, as on the live program pages: a centred container, logo, menu, and for HESI the logged-out button */
+  .site-head { background: #fff; border-bottom: 1px solid #DCE6F1; }
+  .site-head-in { display: flex; align-items: center; gap: 56px; max-width: 980px; height: 80px; margin: 0 auto; padding: 0 12px; }
+  .site-logo { height: 62px; width: auto; }
+  .site-nav { display: flex; gap: 30px; font: 500 13px/1 "Poppins", Arial, sans-serif; color: #000; letter-spacing: .01em; }
+  .site-btn { display: inline-flex; align-items: center; gap: 10px; height: 35px; margin-left: auto; padding: 0 14px; border-radius: 3px; background: var(--blue); color: #fff; font: 400 12px/1 "Poppins", Arial, sans-serif; text-decoration: none; white-space: nowrap; }
+  .site-btn svg { width: 15px; height: 15px; }
+  .burger { display: none; margin-left: auto; width: 32px; height: 32px; color: var(--blue); }
+  .is-phone .site-head-in { height: 64px; padding: 0 16px; gap: 12px; }
+  .is-phone .site-logo { height: 42px; }
+  .is-phone .site-nav, .is-phone .site-btn { display: none; }
+  .is-phone .burger { display: block; }
+
+  /* Page: the site's pale ground with the content on one white sheet */
+  .ground { background: var(--ground); padding: 40px 20px 56px; }
+  .is-phone .ground { padding: 14px 10px 28px; }
+  .ty { max-width: 860px; margin: 0 auto; padding: 48px 56px 52px; background: #fff; border-radius: 12px; box-shadow: 0 14px 34px -18px rgba(0, 0, 0, .28), 0 1px 3px rgba(0, 0, 0, .06); }
+  .is-phone .ty { padding: 26px 18px 30px; border-radius: 10px; }
+  .ty-title { margin: 0; font: italic 900 44px/1 "Gotham Narrow", Arial, sans-serif; color: var(--blue); letter-spacing: -.005em; }
+  .is-phone .ty-title { font-size: 36px; }
+  .ty-lead { margin: 14px 0 0; font-size: 18px; line-height: 1.55; color: var(--ink); max-width: 34em; }
+  .is-phone .ty-lead { font-size: 16px; }
+  .ty-status { margin: 18px 0 0; font-weight: 500; color: var(--ink); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 6px; background: var(--blue); color: #fff; font: 700 16px/1.2 "Poppins", Arial, sans-serif; text-decoration: none; transition: background-color .15s; }
+  .btn:hover { background: var(--blue-hover); }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+  .is-phone .btn { width: 100%; padding: 0 14px; gap: 8px; font-size: 15px; }
+  .btn-note { margin: 10px 0 0; font-size: 14px; color: var(--muted); }
+  .h3 { margin: 0; font: 700 18px/1.35 "Poppins", Arial, sans-serif; color: var(--ink); }
+  p { margin: 0; }
+  .card-img { width: 100%; max-width: 360px; height: auto; }
+
+  /* Version 1: card first, then what to do with the email and where help is */
+  .v-card .hero { display: grid; justify-items: center; text-align: center; }
+  .v-card .hero .card-img { max-width: 400px; margin-bottom: 12px; }
+  .v-card .hero .ty-lead { margin-left: auto; margin-right: auto; }
+  .v-card .hero .btn { margin-top: 24px; }
+  .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px; margin-top: 44px; padding-top: 32px; border-top: 1px solid var(--line); }
+  .is-phone .facts { grid-template-columns: minmax(0, 1fr); gap: 24px; margin-top: 32px; padding-top: 24px; }
+  .facts p { margin-top: 6px; font-size: 15px; line-height: 1.6; color: var(--muted); }
+  .facts p + p { margin-top: 8px; }
+
+  /* Claire's note closes the sheet */
+  .note { margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--line); }
+  .is-phone .note { margin-top: 30px; padding-top: 24px; }
+  .note p { font-size: 16px; line-height: 1.65; }
+  .note p + p { margin-top: 12px; }
+  .note .sign { margin-top: 18px; font: italic 900 26px/1.15 "Gotham Narrow", Arial, sans-serif; color: var(--blue); }
+  .note .ps { font-size: 14px; color: var(--muted); }
+
+  /* Version 2: the login email as it looks in the inbox */
+  .v-mail .top { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 40px; align-items: center; }
+  .is-phone .v-mail .top { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .is-phone .v-mail .top .card-img { display: none; }
+  .card-img--after { display: none; }
+  .is-phone .card-img--after { display: block; max-width: 240px; margin: 24px auto 0; }
+  .mail-intro { margin-top: 32px; }
+  .is-phone .mail-intro { margin-top: 22px; }
+  .mail-intro .h3 { margin-bottom: 4px; }
+  .mail-intro p { color: var(--muted); font-size: 15px; }
+  .mail-intro p b { color: var(--ink); font-weight: 500; }
+  .inbox { margin-top: 14px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+  .mail { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px; align-items: start; padding: 16px 18px; }
+  .is-phone .mail { padding: 14px; gap: 12px; }
+  .mail + .mail { border-top: 1px solid var(--line); }
+  .mail-from { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 20px; background: var(--blue); color: #fff; font: 700 13px/1 "Poppins", Arial, sans-serif; letter-spacing: .02em; }
+  .mail-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; font-size: 13px; color: var(--muted); }
+  .mail-subject { margin-top: 2px; font: 700 16px/1.35 "Poppins", Arial, sans-serif; color: var(--ink); }
+  .mail-what { margin-top: 4px; font-size: 14px; line-height: 1.5; color: var(--muted); }
+  .mail-tag { font-weight: 500; color: var(--blue); }
+  .mail-note { margin-top: 10px; font-size: 14px; color: var(--muted); }
+  .after { margin-top: 26px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px; align-items: center; }
+  .is-phone .after { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .after p { font-size: 15px; color: var(--muted); }
+  .help { margin-top: 22px; padding: 18px 20px; border-radius: 10px; background: var(--tint); font-size: 15px; line-height: 1.55; }
+  .help b { font-weight: 700; }
+
+  /* Version 3: what happens and when */
+  .v-line .top { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 40px; align-items: center; }
+  .is-phone .v-line .top { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .is-phone .v-line .top .card-img { max-width: 240px; margin: 20px auto 0; }
+  .line { list-style: none; margin: 36px 0 0; padding: 0; }
+  .stop { position: relative; padding: 0 0 28px 38px; }
+  .stop::before { content: ""; position: absolute; left: 7px; top: 24px; bottom: 0; width: 2px; background: var(--line); }
+  .stop:last-child { padding-bottom: 0; }
+  .stop:last-child::before { display: none; }
+  .stop-dot { position: absolute; left: 0; top: 5px; width: 16px; height: 16px; border-radius: 8px; border: 3px solid var(--blue); background: #fff; }
+  .stop.is-done .stop-dot { background: var(--blue); }
+  .stop .h3 { margin-bottom: 4px; color: var(--blue); }
+  .stop p { font-size: 15px; line-height: 1.55; color: var(--muted); }
+  .stop p + p { margin-top: 6px; }
+  .stop .btn { margin-top: 14px; }
+
+  /* Footers, as on the live program pages */
+  .foot-light { padding: 30px 24px 40px; background: #fff; text-align: center; font: 400 12px/1.6 Arial, sans-serif; color: #000; }
+  .foot-light nav { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 0; margin-bottom: 14px; font: 700 14px/1 Arial, sans-serif; }
+  .foot-light nav a { color: #0B5CB5; padding: 0 16px; }
+  .foot-light nav a + a { border-left: 1px solid #D3D9E2; }
+  .is-phone .foot-light nav { gap: 12px 0; }
+  .is-phone .foot-light nav a:nth-child(3) { flex-basis: 100%; border-left: 0; }
+  .foot-dark { padding: 34px 20px 40px; background: var(--footer); color: #fff; font: 400 13px/1.6 "Poppins", Arial, sans-serif; }
+  .foot-dark-in { display: grid; grid-template-columns: auto 1fr auto; gap: 28px 40px; align-items: start; max-width: 980px; margin: 0 auto; padding: 0 12px; }
+  .is-phone .foot-dark-in { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; }
+  .foot-dark .seal { height: 62px; width: auto; }
+  .foot-dark nav { display: grid; grid-template-columns: repeat(3, auto); justify-content: center; gap: 12px 44px; font-weight: 600; }
+  .is-phone .foot-dark nav { gap: 12px 22px; }
+  .foot-dark nav a { color: #fff; text-decoration: none; }
+  .social { display: flex; gap: 10px; }
+  .social a { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 20px; color: #fff; }
+  .social a svg { width: 20px; height: 20px; }
+  .social .fb { background: #3B5998; }
+  .social .tw { background: #1DA1F2; }
+  .foot-dark .copy .ln { display: block; }
+  .is-phone .foot-dark .copy .ln { display: inline; }
+  .foot-dark .copy { grid-column: 1 / -1; margin-top: 18px; text-align: center; color: #7E9AC1; font-size: 12px; line-height: 1.6; }
+  .is-phone .foot-dark .copy p + p { margin-top: 8px; }
+  .is-phone .foot-dark .copy .copy-main { font-size: 14px; }
+
+  @media (max-width: 719px) {
+    .mock-bar { padding: 10px 12px; gap: 8px 12px; }
+    .mock-group, .mock-seg { flex-wrap: wrap; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+<style>
+  .mock-version { color: #c7d2e1; text-decoration: none; white-space: nowrap; }
+  .mock-version:hover { color: #ffffff; }
+  .mock-version-name { color: #ffffff; font-weight: 600; white-space: nowrap; margin-right: 8px; }
+  @media (max-width: 767px) { .mock-version-name { white-space: normal; } }
+</style>
+</head>
+<body data-version="line" data-program="a2" data-screen="laptop">
+
+<div class="mock-bar" role="toolbar" aria-label="Mockup options">
+  <a class="mock-version" href="/thank-you">&larr; Thank You page</a><span class="mock-version-name">Version 3 &middot; Timeline</span>
+  <div class="mock-group"><span>Program</span>
+    <div class="mock-seg" data-key="program">
+      <button data-value="a2">HESI A2 Masterclass</button>
+      <button data-value="hesi">HESI Exam Study</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Screen</span>
+    <div class="mock-seg" data-key="screen">
+      <button data-value="laptop">Desktop</button>
+      <button data-value="phone">Phone</button>
+    </div>
+  </div>
+</div>
+
+<main class="stage" id="stage"></main>
+
+<script>
+(function () {
+  var ICON = {
+    arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+    burger: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 9h22M5 16h22M5 23h22"/></svg>',
+    fb: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.3H8v3h2.5V21h3z"/></svg>',
+    tw: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 6.8c-.7.3-1.4.5-2.1.6.8-.5 1.3-1.2 1.6-2-.7.4-1.5.7-2.3.9a3.6 3.6 0 0 0-6.2 3.3A10.3 10.3 0 0 1 4.5 5.8a3.6 3.6 0 0 0 1.1 4.8c-.6 0-1.2-.2-1.6-.4 0 1.8 1.2 3.3 2.9 3.6-.5.1-1.1.2-1.6.1.5 1.4 1.8 2.5 3.4 2.5A7.3 7.3 0 0 1 3 17.9a10.3 10.3 0 0 0 5.6 1.6c6.7 0 10.4-5.6 10.4-10.4v-.5c.8-.5 1.4-1.2 2-1.8z"/></svg>'
+  };
+  // The login email exactly as it arrives after a test purchase on beta; no receipt email arrived there, so none is named
+  var RECEIPT = 'A receipt for your purchase may come separately.';
+
+  // Facts of each program, from the live pages (reference/texts.md)
+  var P = {
+    a2: {
+      logo: '/thank-you/assets/a2-logo.png', logoAlt: 'Your Best Grade, HESI A2 Masterclass',
+      nav: ['PRICING', 'FAQ', 'PREVIEW'], member: null,
+      name: 'A2 Masterclass', the: 'the A2 Masterclass', exam: 'HESI A2 Exam', we: 'I',
+      card: '/thank-you/assets/a2_masterclass_member_card.jpeg',
+      login: '/a2/login', mail: { from: 'Your Best Grade Support', subject: '[HESI A2 MasterClass] Portal Login Credentials' },
+      within: 'within 24 hours', usually: 'usually much sooner',
+      foot: 'light'
+    },
+    hesi: {
+      logo: '/thank-you/assets/header__logo.webp', logoAlt: 'Your Best Grade, HESI Exam Study',
+      nav: ['PRICING', 'FAQ', 'ABOUT US'], member: "Member's Login",
+      name: 'HESI Exam Study', the: 'HESI Exam Study', exam: 'HESI Exit Exam', we: 'we',
+      card: '/thank-you/assets/hesi_exam_study_member_card.jpeg',
+      login: '/hesi/login', mail: { from: 'info@yourbestgrade.com', subject: '[HESI Insider] Portal Login Credentials' },
+      within: 'within 60 minutes', usually: 'usually sooner',
+      foot: 'dark'
+    }
+  };
+  // Sample buyer from the page address (the site passes email and first_name to this page)
+  var BUYER = { email: 'jordan.lee@example.com' };
+
+  var body = document.body;
+  var stage = document.getElementById('stage');
+  var KEYS = ['program', 'screen', 'solo'];
+  var PHONE_H = 705;
+
+  function header(p) {
+    return '<header class="site-head"><div class="site-head-in"><img class="site-logo" src="' + p.logo + '" alt="' + p.logoAlt + '">' +
+      '<nav class="site-nav" aria-label="Site">' + p.nav.map(function (n) { return '<span>' + n + '</span>'; }).join('') + '</nav>' +
+      (p.member ? '<a class="site-btn" href="#">' + p.member + ICON.arrow + '</a>' : '') +
+      '<button class="burger" aria-label="Menu">' + ICON.burger + '</button></div></header>';
+  }
+
+  function footer(p) {
+    if (p.foot === 'dark') {
+      return '<footer class="foot-dark"><div class="foot-dark-in"><img class="seal" src="/thank-you/assets/footerlogo1.webp" alt="Norton Secured, powered by DigiCert">' +
+        '<nav aria-label="Footer"><a href="#">About</a><a href="#">Register</a><a href="#">Terms and Conditions</a><a href="#">FAQs</a><a href="#">Login</a><a href="#">Privacy Policy</a></nav>' +
+        '<div class="social"><a class="fb" href="#" aria-label="Facebook">' + ICON.fb + '</a><a class="tw" href="#" aria-label="Twitter">' + ICON.tw + '</a></div>' +
+        '<div class="copy"><p class="copy-main"><span class="ln">Copyright © 2026 Your Best Grade, Inc. All Rights Reserved. </span></p><p><span class="ln">*We utilize surveys to measure the effectiveness of our program. Our latest results show that over 90% of customers </span><span class="ln">who responded to our surveys and reported to have taken the HESI Exit since joining, passed their exam. </span></p><p><span class="ln">**Please see the full terms and conditions of the success guarantee on our Pricing page. </span></p><p><span class="ln">HESI is a registered trademark of Elsevier, Inc., creator and owner of the official HESI Examinations and Review Materials. </span><span class="ln">Elsevier is not involved in the production of, and does not endorse, this website or its content. </span></p></div></div></footer>';
+    }
+    return '<footer class="foot-light"><nav aria-label="Footer"><a href="#">Terms and Conditions</a><a href="#">Privacy Policy</a><a href="#">support@yourbestgrade.com</a></nav>' +
+      '<p>© 2026 Your Best Grade, Inc. All Rights Reserved.</p>' +
+      '<p>HESI ® is a registered trademark of Elsevier Inc. NCLEX ® is a registered trademark of the NCSBN, Inc.</p></footer>';
+  }
+
+  function lead(p) {
+    return "I'm so glad you're as confident as I am that " + p.we + ' can help you succeed on the ' + p.exam + '!';
+  }
+  function loginBtn(p) {
+    return '<a class="btn" href="#">Log in to ' + p.the + ICON.arrow + '</a>';
+  }
+  var SUPPORT = '<a href="#">support@yourbestgrade.com</a>';
+  function note(p) {
+    return '<section class="note" aria-label="A note from Claire">' +
+      '<p>The training begins as soon as you log in: go through the materials and the practice questions at your own pace. I want you to have the best experience possible.</p>' +
+      '<p>Thank you again for choosing ' + p.the + '. I look forward to helping you prepare for your exam!</p>' +
+      '<p class="sign">See you inside! Claire</p>' +
+      '<p class="ps">P.S. The practice starts whenever you want, so make time to read the materials and get started.</p></section>';
+  }
+
+  // Version 1: the member card leads, then the email and help facts, Claire's note
+  function vCard(p) {
+    return '<div class="ty v-card"><section class="hero">' +
+      '<img class="card-img" src="' + p.card + '" alt="' + p.name + ' member card">' +
+      '<h1 class="ty-title">THANK YOU!</h1>' +
+      '<p class="ty-lead">' + lead(p) + '</p>' +
+      '<p class="ty-status">Your login details are on their way to your inbox.</p>' +
+      loginBtn(p) + '<p class="btn-note">Use the login and password from the email.</p></section>' +
+      '<section class="facts">' +
+        '<div><h2 class="h3">Check your email</h2><p>' + cap(p.within) + ' (' + p.usually + ') you will get your login details from ' + p.mail.from + ': “' + p.mail.subject + '”.</p><p>' + RECEIPT + '</p></div>' +
+        '<div><h2 class="h3">Need help?</h2><p>No email? Check your spam folder and add yourbestgrade.com to your safe senders.</p><p>Still nothing, or any other question: ' + SUPPORT + '</p></div>' +
+      '</section>' + note(p) + '</div>';
+  }
+
+  // Version 2: the login email shown as it will look in the inbox
+  function vMail(p) {
+    var card = function (cls) { return '<img class="card-img' + (cls ? ' ' + cls : '') + '" src="' + p.card + '" alt="' + p.name + ' member card">'; };
+    return '<div class="ty v-mail"><section class="top"><div>' +
+      '<h1 class="ty-title">THANK YOU!</h1><p class="ty-lead">' + lead(p) + '</p></div>' + card() + '</section>' +
+      '<section class="mail-intro"><h2 class="h3">Look for this email</h2>' +
+        '<p>It is on its way to <b>' + BUYER.email + '</b> and arrives ' + p.within + ', ' + p.usually + '.</p>' +
+        '<div class="inbox">' +
+          '<div class="mail"><span class="mail-from" aria-hidden="true">YBG</span><div><div class="mail-meta"><span>' + p.mail.from + '</span><span class="mail-tag">Login details</span></div>' +
+            '<p class="mail-subject">' + p.mail.subject + '</p><p class="mail-what">The login page, your login (your email) and your password.</p></div></div>' +
+        '</div><p class="mail-note">' + RECEIPT + '</p></section>' +
+      '<section class="after">' + loginBtn(p) + '<p>Got the email? Log in with the details from it.</p></section>' +
+      '<p class="help"><b>Not there?</b> Check your spam folder and add yourbestgrade.com to your safe senders. Still nothing, or any other question: ' + SUPPORT + '</p>' +
+      card('card-img--after') + note(p) + '</div>';
+  }
+
+  // Version 3: what happens and when
+  function vLine(p) {
+    return '<div class="ty v-line"><section class="top"><div>' +
+      '<h1 class="ty-title">THANK YOU!</h1><p class="ty-lead">' + lead(p) + '</p></div>' +
+      '<img class="card-img" src="' + p.card + '" alt="' + p.name + ' member card"></section>' +
+      '<ol class="line">' +
+        '<li class="stop is-done"><span class="stop-dot" aria-hidden="true"></span><h2 class="h3">Now</h2><p>Your payment went through.</p></li>' +
+        '<li class="stop"><span class="stop-dot" aria-hidden="true"></span><h2 class="h3">' + cap(p.within) + '</h2><p>Your login details arrive, ' + p.usually + ': “' + p.mail.subject + '” from ' + p.mail.from + '. ' + RECEIPT + '</p><p>Not there? Check your spam folder and add yourbestgrade.com to your safe senders.</p></li>' +
+        '<li class="stop"><span class="stop-dot" aria-hidden="true"></span><h2 class="h3">Then</h2><p>Log in with the details from the login email and finish setting up your account.</p>' + loginBtn(p) + '</li>' +
+        '<li class="stop"><span class="stop-dot" aria-hidden="true"></span><h2 class="h3">Any time</h2><p>Study at your own pace: the materials and the practice questions are waiting whenever you are.</p></li>' +
+      '</ol>' +
+      '<p class="help"><b>Need help?</b> If the email doesn’t come, or for any other question: ' + SUPPORT + '</p>' +
+      note(p) + '</div>';
+  }
+
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  function page(version, program) {
+    var p = P[program];
+    var main = version === 'mail' ? vMail(p) : version === 'line' ? vLine(p) : vCard(p);
+    return header(p) + '<main class="ground">' + main + '</main>' + footer(p);
+  }
+
+  function Device(opts) {
+    this.kind = opts.kind;
+    if (this.kind === 'page') {
+      this.el = document.createElement('div');
+      this.el.className = 'device device--page';
+      this.scroller = document.createElement('div');
+      this.scroller.className = 'page-root';
+      this.el.appendChild(this.scroller);
+      this.el.addEventListener('click', function (e) { if (e.target.closest('a, button')) e.preventDefault(); });
+      return;
+    }
+    this.width = opts.width;
+    this.height = opts.height;
+    this.solo = !!opts.solo;
+    var fig = document.createElement('figure');
+    fig.className = 'device device--' + this.kind;
+    this.el = fig;
+    var bezel = document.createElement('div');
+    bezel.className = 'bezel';
+    var screen = document.createElement('div');
+    screen.className = 'screen';
+    this.scroller = document.createElement('div');
+    this.scroller.className = 'scroller' + (this.kind === 'phone' ? ' is-phone' : '');
+    screen.appendChild(this.scroller);
+    bezel.appendChild(screen);
+    var w = this.kind === 'laptop' ? 1280 : this.width, h = this.kind === 'laptop' ? 800 : this.height;
+    screen.style.width = w + 'px';
+    screen.style.height = h + 'px';
+    if (this.kind === 'laptop') {
+      this.fit = document.createElement('div');
+      this.fit.className = 'laptop-fit';
+      this.fit.appendChild(bezel);
+      var base = document.createElement('div');
+      base.className = 'base';
+      this.fit.appendChild(base);
+      this.fitWrap = document.createElement('div');
+      this.fitWrap.appendChild(this.fit);
+      fig.appendChild(this.fitWrap);
+    } else {
+      fig.appendChild(bezel);
+    }
+    var cap = document.createElement('figcaption');
+    cap.textContent = w + ' × ' + h;
+    fig.appendChild(cap);
+    // The mockup does not leave the page: links and buttons inside the screens stay put
+    fig.addEventListener('click', function (e) { if (e.target.closest('a, button')) e.preventDefault(); });
+  }
+  Device.prototype.render = function (version, program) { this.scroller.innerHTML = page(version, program); };
+  Device.prototype.scale = function () {
+    if (this.kind !== 'laptop') return;
+    var full = 1280 + 28;
+    var room = Math.min(stage.clientWidth - 48, window.innerWidth - 48);
+    var k = Math.min(1, room / full);
+    this.fit.style.transform = 'scale(' + k + ')';
+    this.fitWrap.style.width = Math.round(full * k) + 'px';
+    this.fitWrap.style.height = Math.round((800 + 32 + 14) * k) + 'px';
+  };
+
+  function readHash() {
+    var out = {};
+    location.hash.replace(/^#/, '').split('&').forEach(function (pair) {
+      var kv = pair.split('=');
+      if (kv[0]) out[kv[0]] = decodeURIComponent(kv[1] || '');
+    });
+    return out;
+  }
+
+  var devices = [];
+  function mount() {
+    var h = readHash();
+    ['program', 'screen'].forEach(function (k) { if (h[k]) body.dataset[k] = h[k]; });
+    var solo = h.solo === '1' || window.innerWidth < 720;
+    body.dataset.solo = solo ? '1' : '0';
+    if (solo) body.dataset.screen = 'phone';
+    document.querySelectorAll('.mock-seg').forEach(function (seg) {
+      seg.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.value === body.dataset[seg.dataset.key])); });
+    });
+    stage.innerHTML = '';
+    devices = [];
+    if (solo) {
+      var barH = document.querySelector('.mock-bar').offsetHeight;
+      devices.push(new Device({ kind: 'phone', width: window.innerWidth, height: window.innerHeight - barH, solo: true }));
+    } else if (body.dataset.screen === 'laptop') {
+      devices.push(new Device({ kind: 'page' }));
+    } else {
+      devices.push(new Device({ kind: 'phone', width: 390, height: PHONE_H }), new Device({ kind: 'phone', width: 446, height: PHONE_H }));
+    }
+    devices.forEach(function (d) { stage.appendChild(d.el); d.scale(); d.render(body.dataset.version, body.dataset.program); });
+  }
+
+  function go(key, value) {
+    var h = readHash();
+    ['program', 'screen'].forEach(function (k) { if (!h[k]) h[k] = body.dataset[k]; });
+    h[key] = value;
+    history.replaceState(null, '', '#' + KEYS.filter(function (k) { return h[k]; }).map(function (k) { return k + '=' + h[k]; }).join('&'));
+    mount();
+  }
+
+  document.querySelectorAll('.mock-seg button').forEach(function (b) {
+    b.addEventListener('click', function () { go(b.parentElement.dataset.key, b.dataset.value); });
+  });
+  window.addEventListener('hashchange', mount);
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      var soloNow = window.innerWidth < 720 || readHash().solo === '1';
+      if (soloNow !== (body.dataset.solo === '1')) { mount(); return; }
+      devices.forEach(function (d) { d.scale(); });
+    }, 150);
+  });
+
+  var fontsReady = document.fonts && document.fonts.load
+    ? Promise.all(['italic 900 44px "Gotham Narrow"', '400 16px Poppins', '500 16px Poppins', '700 16px Poppins'].map(function (f) { return document.fonts.load(f); })).catch(function () {})
+    : Promise.resolve();
+  fontsReady.then(mount);
+})();
+</script>
+</body>
+</html>
