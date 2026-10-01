@@ -1,4 +1,11 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/image-question/:n(1|2|3)",
+      "destination": "/image-question",
+      "permanent": false
+    }
+  ]
 }
