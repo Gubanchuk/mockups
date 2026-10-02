@@ -138,7 +138,6 @@
   .mail-subject { margin-top: 2px; font: 700 16px/1.35 "Poppins", Arial, sans-serif; color: var(--ink); }
   .mail-what { margin-top: 4px; font-size: 14px; line-height: 1.5; color: var(--muted); }
   .mail-tag { font-weight: 500; color: var(--blue); }
-  .mail-note { margin-top: 10px; font-size: 14px; color: var(--muted); }
   .after { margin-top: 26px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px; align-items: center; }
   .is-phone .after { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .after p { font-size: 15px; color: var(--muted); }
@@ -229,9 +228,6 @@
     fb: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.3H8v3h2.5V21h3z"/></svg>',
     tw: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 6.8c-.7.3-1.4.5-2.1.6.8-.5 1.3-1.2 1.6-2-.7.4-1.5.7-2.3.9a3.6 3.6 0 0 0-6.2 3.3A10.3 10.3 0 0 1 4.5 5.8a3.6 3.6 0 0 0 1.1 4.8c-.6 0-1.2-.2-1.6-.4 0 1.8 1.2 3.3 2.9 3.6-.5.1-1.1.2-1.6.1.5 1.4 1.8 2.5 3.4 2.5A7.3 7.3 0 0 1 3 17.9a10.3 10.3 0 0 0 5.6 1.6c6.7 0 10.4-5.6 10.4-10.4v-.5c.8-.5 1.4-1.2 2-1.8z"/></svg>'
   };
-  // The login email exactly as it arrives after a test purchase on beta; no receipt email arrived there, so none is named
-  var RECEIPT = 'A receipt for your purchase may come separately.';
-
   // Facts of each program, from the live pages (reference/texts.md)
   var P = {
     a2: {
@@ -304,7 +300,7 @@
       '<p class="ty-status">Your login details are on their way to your inbox.</p>' +
       loginBtn(p) + '<p class="btn-note">Use the login and password from the email.</p></section>' +
       '<section class="facts">' +
-        '<div><h2 class="h3">Check your email</h2><p>' + cap(p.within) + ' (' + p.usually + ') you will get your login details from ' + p.mail.from + ': “' + p.mail.subject + '”.</p><p>' + RECEIPT + '</p></div>' +
+        '<div><h2 class="h3">Check your email</h2><p>' + cap(p.within) + ' (' + p.usually + ') you will get your login details from ' + p.mail.from + ': “' + p.mail.subject + '”.</p></div>' +
         '<div><h2 class="h3">Need help?</h2><p>No email? Check your spam folder and add yourbestgrade.com to your safe senders.</p><p>Still nothing, or any other question: ' + SUPPORT + '</p></div>' +
       '</section>' + note(p) + '</div>';
   }
@@ -319,7 +315,7 @@
         '<div class="inbox">' +
           '<div class="mail"><span class="mail-from" aria-hidden="true">YBG</span><div><div class="mail-meta"><span>' + p.mail.from + '</span><span class="mail-tag">Login details</span></div>' +
             '<p class="mail-subject">' + p.mail.subject + '</p><p class="mail-what">The login page, your login (your email) and your password.</p></div></div>' +
-        '</div><p class="mail-note">' + RECEIPT + '</p></section>' +
+        '</div></section>' +
       '<section class="after">' + loginBtn(p) + '<p>Got the email? Log in with the details from it.</p></section>' +
       '<p class="help"><b>Not there?</b> Check your spam folder and add yourbestgrade.com to your safe senders. Still nothing, or any other question: ' + SUPPORT + '</p>' +
       card('card-img--after') + note(p) + '</div>';
@@ -332,7 +328,7 @@
       '<img class="card-img" src="' + p.card + '" alt="' + p.name + ' member card"></section>' +
       '<ol class="line">' +
         '<li class="stop is-done"><span class="stop-dot" aria-hidden="true"></span><h2 class="h3">Now</h2><p>Your payment went through.</p></li>' +
-        '<li class="stop"><span class="stop-dot" aria-hidden="true"></span><h2 class="h3">' + cap(p.within) + '</h2><p>Your login details arrive, ' + p.usually + ': “' + p.mail.subject + '” from ' + p.mail.from + '. ' + RECEIPT + '</p><p>Not there? Check your spam folder and add yourbestgrade.com to your safe senders.</p></li>' +
+        '<li class="stop"><span class="stop-dot" aria-hidden="true"></span><h2 class="h3">' + cap(p.within) + '</h2><p>Your login details arrive, ' + p.usually + ': “' + p.mail.subject + '” from ' + p.mail.from + '.</p><p>Not there? Check your spam folder and add yourbestgrade.com to your safe senders.</p></li>' +
         '<li class="stop"><span class="stop-dot" aria-hidden="true"></span><h2 class="h3">Then</h2><p>Log in with the details from the login email and finish setting up your account.</p>' + loginBtn(p) + '</li>' +
         '<li class="stop"><span class="stop-dot" aria-hidden="true"></span><h2 class="h3">Any time</h2><p>Study at your own pace: the materials and the practice questions are waiting whenever you are.</p></li>' +
       '</ol>' +
