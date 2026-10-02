@@ -56,8 +56,6 @@
   .mock-seg button:hover { color: #fff; }
   .mock-seg button[aria-pressed="true"] { background: #f3f6fb; color: #16202e; }
   .mock-sample { margin-left: auto; padding: 6px 10px; border: 1px dashed #8d9bb0; border-radius: 4px; color: #e6edf6; }
-  .mock-sample--terms { display: none; margin-left: 0; }
-  body[data-section="terms"] .mock-sample--terms { display: block; }
   body[data-bare="1"] .mock-bar { display: none; }
 
   /* ---------- Site header (same as the login pages) ---------- */
@@ -166,7 +164,7 @@
   .ledger { overflow: hidden; }
   .tab__bar { width: 100%; max-width: 140px; height: 4px; margin: 4px 0 6px; background: var(--surface); border-radius: 2px; overflow: hidden; }
   .tab__bar i { display: block; height: 100%; width: 100%; background: var(--avail-bar); border-radius: 2px; transform-origin: left center; transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1); }
-  body[data-state="below"] .tab__bar i { transform: scaleX(0.59); }
+  body[data-state="below"] .tab__bar i { transform: scaleX(0.85); }
   body[data-state="new"] .tab__bar i { transform: scaleX(0); }
 
   /* Ledger: the balances come first; a balance opens the orders behind it */
@@ -256,7 +254,7 @@
   .st-paid { background: var(--paid-bg); color: var(--paid-ink); }
   .st-refund { background: var(--refund-bg); color: var(--refund-ink); }
 
-  /* States: below the $50 minimum hides one available order; a new affiliate has no orders or payouts */
+  /* States: below the $100 minimum hides one available order; a new affiliate has no orders or payouts */
   body[data-state="below"] [data-hide-below] { display: none; }
   body[data-state="new"] tr[data-status],
   body[data-state="new"] .payout-row,
@@ -303,7 +301,6 @@
   .terms__rates tbody td { padding: 11px 16px; }
   .terms__rates tbody tr:last-child td { border-bottom: 0; }
   .terms__rates tbody tr:not(.rates__group):hover td { background: none; }
-  .terms__tbd { margin: 10px 0 0 28px; max-width: 640px; padding: 10px 14px; border: 1px dashed var(--field); border-radius: 6px; color: var(--muted); font-size: 13px; font-weight: 500; }
   .terms__foot { margin: 20px 0 0; padding: 18px 0 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; line-height: 1.6; }
 
   /* ---------- Footers (same as the login pages) ---------- */
@@ -457,7 +454,7 @@
 
     .form-panel { padding: 20px 18px 22px; }
     .terms { padding: 20px 18px 22px; }
-    .terms__item p, .terms__rates, .terms__tbd { margin-left: 0; }
+    .terms__item p, .terms__rates { margin-left: 0; }
     .footer-hesi__inner, .footer-light__inner { padding: 30px 20px 26px; }
     .footer-hesi__row, .footer-light__row { flex-direction: column; text-align: center; gap: 22px; }
     .footer-hesi__menu { gap: 28px; }
@@ -517,13 +514,12 @@
   <div class="mock-group"><span>State</span>
     <div class="mock-seg" data-key="state">
       <button data-value="active">Active</button>
-      <button data-value="below">Below $50</button>
+      <button data-value="below">Below $100</button>
       <button data-value="new">New affiliate</button>
       <button data-value="many">Hundreds of orders</button>
     </div>
   </div>
   <div class="mock-sample">Sample data</div>
-  <div class="mock-sample mock-sample--terms">Terms: draft for review</div>
 </div>
 
 <header class="site-header chrome chrome--program">
@@ -584,9 +580,9 @@
       <h1 class="page-title">Links</h1>
       <p class="page-lead">Share these links. A purchase counts for you if the buyer clicked your link within the last 30 days, and your link was the last one they clicked.</p>
       <div class="stats stats--links">
-        <span>Revenue<b class="num" data-stat="revenue" data-below="$2,292.00" data-new="$0.00">$2,489.00</b></span>
+        <span>Revenue<b class="num" data-stat="revenue" data-below="$2,773.00" data-new="$0.00">$2,970.00</b></span>
         <span>Clicks<b class="num" data-stat="clicks" data-new="0">960</b></span>
-        <span>Earnings per click<b class="num" data-stat="epc" data-below="$0.21" data-new="$0.00">$0.23</b></span>
+        <span>Earnings per click<b class="num" data-stat="epc" data-below="$0.25" data-new="$0.00">$0.27</b></span>
       </div>
       <div class="panel links">
         <div class="link-row link-head"><span>Link</span><span>Your link</span><span>Clicks</span><span>Unique visitors</span><span>Purchases</span></div>
@@ -595,21 +591,21 @@
           <div class="copy"><span class="link-url">https://www.yourbestgrade.com/<wbr>?aff=Jx7Kq2MvR9tLp4Wn</span><button type="button"><svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg><span>Copy</span></button></div>
           <div class="count num" data-count="clicks" data-new="0">318<small>clicks</small></div>
           <div class="count num" data-count="unique" data-new="0">254<small>unique visitors</small></div>
-          <div class="count num" data-count="purchases" data-below="5" data-new="0">6<small>purchases</small></div>
+          <div class="count num" data-count="purchases" data-below="6" data-new="0">7<small>purchases</small></div>
         </div>
         <div class="link-row" data-link="hesi">
           <div class="link-name"><strong>HESI Exam Study</strong><span>yourbestgrade.com/<wbr>hesi</span></div>
           <div class="copy"><span class="link-url">https://www.yourbestgrade.com/<wbr>hesi<wbr>?aff=Jx7Kq2MvR9tLp4Wn</span><button type="button"><svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg><span>Copy</span></button></div>
           <div class="count num" data-count="clicks" data-new="0">214<small>clicks</small></div>
           <div class="count num" data-count="unique" data-new="0">176<small>unique visitors</small></div>
-          <div class="count num" data-count="purchases" data-new="0">4<small>purchases</small></div>
+          <div class="count num" data-count="purchases" data-new="0">5<small>purchases</small></div>
         </div>
         <div class="link-row" data-link="start">
           <div class="link-name"><strong>HESI Exam Study start page</strong><span>yourbestgrade.com/<wbr>hesi/<wbr>start</span></div>
           <div class="copy"><span class="link-url">https://www.yourbestgrade.com/<wbr>hesi/<wbr>start<wbr>?aff=Jx7Kq2MvR9tLp4Wn</span><button type="button"><svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg><span>Copy</span></button></div>
           <div class="count num" data-count="clicks" data-new="0">262<small>clicks</small></div>
           <div class="count num" data-count="unique" data-new="0">205<small>unique visitors</small></div>
-          <div class="count num" data-count="purchases" data-new="0">4<small>purchases</small></div>
+          <div class="count num" data-count="purchases" data-new="0">5<small>purchases</small></div>
         </div>
         <div class="link-row" data-link="pricing">
           <div class="link-name"><strong>HESI Exam Study pricing</strong><span>yourbestgrade.com/<wbr>hesi/<wbr>pricing</span></div>
@@ -633,7 +629,7 @@
       <div class="panel rates"><div class="rates__body"></div></div>
       <p class="hold-note">
         <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        <span>A commission stays on hold for 30 days after the purchase, then it becomes available. Available commissions are paid out to your PayPal once they add up to $50. If an order is refunded, its commission is cancelled.</span>
+        <span>A commission stays on hold for 30 days after the purchase, then it becomes available. Available commissions are paid out to your PayPal once they add up to $100. If an order is refunded, its commission is cancelled.</span>
       </p>
     </section>
 
@@ -649,39 +645,39 @@
           <button class="balance" type="button" data-filter="hold" aria-pressed="false" aria-controls="orders">
             <svg class="icon balance__more" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             <span class="balance__label"><i class="dot dot-hold"></i>On hold</span>
-            <span class="balance__sum num" data-sum="hold">$111.60</span>
+            <span class="balance__sum num" data-sum="hold">$50.00</span>
             <span class="balance__meta" data-order-count="hold">4 orders</span>
           </button>
           <button class="balance" type="button" data-filter="avail" aria-pressed="false" aria-controls="orders">
             <svg class="icon balance__more" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             <span class="balance__label"><i class="dot dot-avail"></i>Available</span>
-            <span class="balance__sum num" data-sum="avail">$58.80</span>
+            <span class="balance__sum num" data-sum="avail">$105.00</span>
             <span class="tab__bar" aria-hidden="true"><i></i></span>
-            <span class="balance__meta" data-minimum>$50 payout minimum reached</span>
+            <span class="balance__meta" data-minimum>$100 payout minimum reached</span>
           </button>
           <button class="balance" type="button" data-filter="paid" aria-pressed="false" aria-controls="orders">
             <svg class="icon balance__more" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             <span class="balance__label"><i class="dot dot-paid"></i>Paid out</span>
-            <span class="balance__sum num" data-sum="paid">$159.00</span>
-            <span class="balance__meta" data-order-count="paid">5 orders</span>
+            <span class="balance__sum num" data-sum="paid">$108.00</span>
+            <span class="balance__meta" data-order-count="paid">8 orders</span>
           </button>
           <button class="balance" type="button" data-filter="refund" aria-pressed="false" aria-controls="orders">
             <svg class="icon balance__more" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             <span class="balance__label"><i class="dot dot-refund"></i>Refunded</span>
-            <span class="balance__sum num" data-sum="refund">$39.40</span>
+            <span class="balance__sum num" data-sum="refund">$20.00</span>
             <span class="balance__meta" data-order-count="refund">1 order</span>
           </button>
         </div>
         <p class="hold-note">
           <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-          <span>A commission stays on hold for 30 days after the purchase, then it becomes available. Available commissions are paid out to your PayPal once they add up to $50. If an order is refunded, its commission is cancelled.</span>
+          <span>A commission stays on hold for 30 days after the purchase, then it becomes available. Available commissions are paid out to your PayPal once they add up to $100. If an order is refunded, its commission is cancelled.</span>
         </p>
         <button class="more-details" type="button" data-filter="all" aria-expanded="false" aria-controls="orders">More details<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
         <div class="panel orders-empty"><strong>No orders yet</strong>Purchases made through your links will show up here.</div>
 
         <div class="panel ledger orders" id="orders" hidden>
           <div class="orders__head">
-            <h2 class="orders__title"><span class="orders__name">All orders</span><span class="orders__count num">12 orders</span></h2>
+            <h2 class="orders__title"><span class="orders__name">All orders</span><span class="orders__count num">21 orders</span></h2>
             <button class="orders__close" type="button"><svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>Hide orders</button>
           </div>
           <div class="orders__filters" role="group" aria-label="Filter orders by status">
@@ -720,18 +716,17 @@
       <div class="panel next-payout">
         <svg class="icon icon-done" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
         <svg class="icon icon-wait" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        <span class="when-reached">Your available balance of <b class="num" data-sum="avail">$58.80</b> has reached the $50 minimum and will be included in the next payout.</span>
-        <span class="when-below">Your available balance is <b class="num" data-sum="avail">$29.40</b>. It will be paid out once it reaches $50.</span>
+        <span class="when-reached">Your available balance of <b class="num" data-sum="avail">$105.00</b> has reached the $100 minimum and will be included in the next payout.</span>
+        <span class="when-below">Your available balance is <b class="num" data-sum="avail">$85.00</b>. It will be paid out once it reaches $100.</span>
       </div>
-      <p class="payout-start">Payouts start once your available balance reaches $50.</p>
+      <p class="payout-start">Payouts start once your available balance reaches $100.</p>
       <div class="panel ledger">
         <table>
           <thead>
             <tr><th>Date paid</th><th class="r">Amount</th><th class="r">Commissions</th><th>PayPal account</th></tr>
           </thead>
           <tbody class="payouts-body">
-            <tr class="payout-row"><td data-label="Date paid" class="num">Aug 20, 2026</td><td data-label="Amount" class="r num">$96.20</td><td data-label="Commissions" class="r num">3</td><td data-label="PayPal account">jordan.lee@example.com</td></tr>
-            <tr class="payout-row"><td data-label="Date paid" class="num">Jun 19, 2026</td><td data-label="Amount" class="r num">$62.80</td><td data-label="Commissions" class="r num">2</td><td data-label="PayPal account">jordan.lee@example.com</td></tr>
+            <tr class="payout-row"><td data-label="Date paid" class="num">Aug 20, 2026</td><td data-label="Amount" class="r num">$108.00</td><td data-label="Commissions" class="r num">8</td><td data-label="PayPal account">jordan.lee@example.com</td></tr>
             <tr class="empty-row"><td colspan="4"><strong>No payouts yet</strong></td></tr>
           </tbody>
         </table>
@@ -753,48 +748,36 @@
     <!-- Terms -->
     <section class="section section--terms">
       <h1 class="page-title">Program terms</h1>
-      <p class="page-lead">The rules of the YourBestGrade Affiliate Program.</p>
+      <p class="page-lead">The main rules of the program. For the complete rules, read the <a href="https://www.beta.yourbestgrade.com/affiliate/terms_of_use" target="_blank" rel="noopener">Terms of Use</a>.</p>
       <div class="panel terms">
         <ol class="terms__list">
           <li class="terms__item">
             <h2>Commission</h2>
-            <p>You earn a fixed amount for each HESI Exam Study purchase made through your links. The amount is set at the time of purchase and stays the same if the student pays with a payment plan.</p>
+            <p>You earn a fixed amount for each HESI Exam Study purchase made through your links.</p>
             <div class="rates terms__rates"><div class="rates__body"></div></div>
           </li>
           <li class="terms__item">
             <h2>What counts</h2>
-            <p>A purchase counts for you if the buyer clicked your link within the last 30 days and your link was the last affiliate link they clicked. Card, Afterpay, Affirm, Klarna and PayPal payments all count. HESI A2 MasterClass purchases don't earn a commission.</p>
+            <p>A purchase counts if the buyer clicked your link within the last 30 days and yours was the last affiliate link they clicked.</p>
           </li>
           <li class="terms__item">
             <h2>Hold</h2>
-            <p>Each commission is on hold for 30 days after the purchase. Then it becomes available.</p>
+            <p>Each commission is on hold for 30 days after the purchase, then it becomes available.</p>
           </li>
           <li class="terms__item">
             <h2>Payouts</h2>
-            <p>We pay your available commissions to your PayPal account once they add up to $50. You can change your PayPal email in <a href="#" data-go="settings">Settings</a>.</p>
+            <p>We pay your available commissions to your PayPal once they add up to $100.</p>
           </li>
           <li class="terms__item">
             <h2>Refunds</h2>
-            <p>If an order is refunded, its commission is cancelled. If the commission was already paid out, it's deducted from your next payout.</p>
+            <p>If an order is refunded, its commission is cancelled. If it was already paid out, it's deducted from your future payouts.</p>
           </li>
           <li class="terms__item">
-            <h2>Who can join</h2>
-            <p>Anyone can apply. We review every application and email you once it's approved.</p>
-          </li>
-          <li class="terms__item">
-            <h2>How you can promote your links</h2>
-            <div class="terms__tbd">TBD</div>
-          </li>
-          <li class="terms__item">
-            <h2>Purchases through your own link</h2>
-            <div class="terms__tbd">TBD</div>
-          </li>
-          <li class="terms__item">
-            <h2>Changes to these terms</h2>
-            <div class="terms__tbd">TBD</div>
+            <h2>Not allowed</h2>
+            <p>Don't spam your links, buy through your own link or fake clicks. If you break the rules, we may suspend or close your account.</p>
           </li>
         </ol>
-        <p class="terms__foot">Questions about these terms? Email <a href="mailto:support@yourbestgrade.com">support@yourbestgrade.com</a>.</p>
+        <p class="terms__foot">Questions about the program? Email <a href="mailto:support@yourbestgrade.com">support@yourbestgrade.com</a>.</p>
       </div>
     </section>
   </main>
@@ -848,7 +831,7 @@
     var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var PAGE_SIZE = 20;
     var HOLD_DAYS = 30;
-    var MINIMUM = 50;
+    var MINIMUM = 100;
     var DAY = 86400000;
     var TODAY = Date.UTC(2026, 8, 15);
 
@@ -884,9 +867,12 @@
       ['2026-08-28', '30 Days', 97, 'a***@gmail.com', 'hold'],
       ['2026-08-14', '36 Months Access', 197, 'w***@gmail.com', 'avail', true],
       ['2026-08-11', '12 Months Access', 147, 't***@gmail.com', 'avail'],
+      ['2026-08-09', '180 Days', 137, 'f***@gmail.com', 'avail'],
       ['2026-08-06', '12 Months Access', 147, 's***@icloud.com', 'avail'],
+      ['2026-08-02', '36 Months Access', 197, 'y***@yahoo.com', 'avail'],
       ['2026-07-31', '90 Days', 117, 'p***@gmail.com', 'avail'],
       ['2026-07-30', '36 Months Access', 197, 'r***@gmail.com', 'refund'],
+      ['2026-07-27', '12 Months Access', 147, 'u***@outlook.com', 'avail'],
       ['2026-07-24', '30 Days', 97, 'h***@yahoo.com', 'avail'],
       ['2026-07-19', '180 Days', 137, 'b***@gmail.com', 'paid'],
       ['2026-07-12', '12 Months Access', 147, 'v***@outlook.com', 'paid'],
@@ -898,11 +884,10 @@
       ['2026-04-29', '180 Days', 137, 'e***@icloud.com', 'paid']
     ].map(function (r) { return order(utc(r[0]), r[1], r[2], r[3], r[4], r[5]); });
     var BASE_PAYOUTS = [
-      { date: utc('2026-08-20'), amount: 55, count: 4 },
-      { date: utc('2026-06-19'), amount: 53, count: 4 }
+      { date: utc('2026-08-20'), amount: 108, count: 8 }
     ];
 
-    // A busy affiliate: a year of orders, payouts on the 20th once the available balance reaches $50
+    // A busy affiliate: a year of orders, payouts on the 20th once the available balance reaches $100
     var MANY = (function () {
       var seed = 20260915;
       function rand() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
@@ -1028,9 +1013,9 @@
       document.querySelectorAll('[data-sum]').forEach(function (el) { el.textContent = money(t[el.dataset.sum]); });
       document.querySelectorAll('[data-order-count]').forEach(function (el) { el.textContent = plural(t.count[el.dataset.orderCount], 'order'); });
       var minimum = document.querySelector('[data-minimum]');
-      if (t.avail >= MINIMUM) minimum.textContent = '$50 payout minimum reached';
-      else if (t.avail === 0) minimum.textContent = '$50 to the payout minimum';
-      else minimum.textContent = money(round2(MINIMUM - t.avail)) + ' to the $50 minimum';
+      if (t.avail >= MINIMUM) minimum.textContent = '$100 payout minimum reached';
+      else if (t.avail === 0) minimum.textContent = '$100 to the payout minimum';
+      else minimum.textContent = money(round2(MINIMUM - t.avail)) + ' to the $100 minimum';
       document.querySelector('.balance .tab__bar i').style.transform = 'scaleX(' + Math.min(t.avail / MINIMUM, 1) + ')';
 
       var open = Object.prototype.hasOwnProperty.call(FILTERS, filter);
