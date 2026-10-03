@@ -6,6 +6,11 @@
       "source": "/image-question/:n(1|2|3)",
       "destination": "/image-question",
       "permanent": false
+    },
+    {
+      "source": "/thank-you/:old(card|timeline)",
+      "destination": "/thank-you",
+      "permanent": false
     }
   ]
 }

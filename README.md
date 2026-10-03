@@ -42,9 +42,8 @@ Live: https://mockups-seven-ashen.vercel.app
 
 | Path | Version |
 |---|---|
-| `/thank-you` | YBG-1870: three versions, A2 and HESI in each |
-| `/thank-you/card` | version 1, card first |
-| `/thank-you/email` | version 2, the login email |
-| `/thank-you/timeline` | version 3, timeline |
+| `/thank-you` | YBG-1870: two versions, A2 and HESI in each |
+| `/thank-you/email` | version 1, the email |
+| `/thank-you/checklist` | version 2, checklist |
 
 Static site, nothing to build on deploy. build-site.py writes the A2 pages, build-affiliate-site.js writes the index, /affiliate and the affiliate pages, build-image-question-site.js writes /image-question, build-thank-you-site.js writes /thank-you; all live outside this repo.
