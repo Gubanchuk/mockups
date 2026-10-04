@@ -8,7 +8,7 @@
       "permanent": false
     },
     {
-      "source": "/thank-you/:old(card|timeline)",
+      "source": "/thank-you/:old(card|timeline|checklist)",
       "destination": "/thank-you",
       "permanent": false
     }

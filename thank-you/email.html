@@ -19,6 +19,10 @@
     --tint: #EDF6FF;
     --line: #D7E3F1;
     --footer: #0E2C56;
+    --ok: #1F7A4D;
+    --ok-tint: #EAF6EF;
+    --bad: #B3261E;
+    --bad-tint: #FCEEEE;
     --ground: #EFF8FF;
     --stage: #E6EAF0;
     --stage-ink: #4E5D72;
@@ -119,6 +123,9 @@
   .is-phone .when { margin-top: 20px; font-size: 19px; }
   .when-sub { margin: 6px 0 0; font-size: 16px; line-height: 1.55; color: var(--muted); max-width: 34em; }
   .is-phone .when-sub { font-size: 15px; }
+  /* Claire's line from the live page, in her voice (The email only) */
+  .when-claire { margin: 8px 0 0; font-size: 17px; line-height: 1.5; font-style: italic; color: var(--ink); }
+  .is-phone .when-claire { font-size: 16px; }
 
   /* The login email as an envelope: a picture of what is coming, not a piece of mail software */
   .env { position: relative; width: 100%; max-width: 340px; aspect-ratio: 340 / 250; margin: 0; transform: rotate(-2.5deg); cursor: default; }
@@ -135,28 +142,69 @@
   .is-phone .env-letter { padding: 10px 12px; }
   .is-phone .env-subject { font-size: 13px; }
 
-  /* Step marks: done is a filled check, next is a ring with its number; they show the steps, they are not buttons */
-  .mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--blue); background: #fff; color: var(--blue); font: 700 15px/1 "Poppins", Arial, sans-serif; }
-  .mark svg { width: 18px; height: 18px; }
-  .is-done .mark { background: var(--blue); color: #fff; }
+  /* Step marks: a ring with the step number; they show the steps, they are not buttons.
+     Poppins sits high in its line box, so the line is trimmed to the cap height and the glyph itself is centred */
+  .mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--blue); background: #fff; color: var(--blue); font: 700 15px/1 "Poppins", Arial, sans-serif; font-variant-numeric: tabular-nums; }
+  .mark > span, .qz-letter > span { text-box: trim-both cap alphabetic; }
+  /* Poppins figures sit a touch above the cap line centre */
+  .mark > span { translate: 0 .06em; }
   .step-title { margin: 4px 0 0; font: 700 20px/1.3 "Poppins", Arial, sans-serif; color: var(--ink); }
   .is-phone .step-title { font-size: 18px; }
   .step-text { margin-top: 6px; font-size: 15px; line-height: 1.6; color: var(--muted); }
-  .step-help { margin-top: 12px; font-size: 14px; line-height: 1.55; color: var(--muted); }
-  .step-help b { color: var(--ink); font-weight: 700; }
 
-  /* Version Checklist */
-  .todo { list-style: none; margin: 34px 0 0; padding: 0; border-top: 1px solid var(--line); }
-  .todo-item { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 18px; padding: 26px 0; border-bottom: 1px solid var(--line); }
-  .is-phone .todo-item { gap: 14px; padding: 22px 0; }
-  .todo-item.is-done { padding: 18px 0; align-items: center; }
-  .todo-item:last-child { border-bottom: 0; padding-bottom: 4px; }
-  .todo-item.is-done .step-title { margin: 0; font-size: 17px; }
-  .todo-mail { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 32px; align-items: start; }
-  .todo-mail .env { margin-top: 10px; }
-  .is-phone .todo-mail { grid-template-columns: minmax(0, 1fr); gap: 18px; }
-  .is-phone .todo-mail .env { grid-row: 2; }
-  .todo .btn { margin-top: 16px; }
+  /* Version Try a question: one real course question to answer while the login email is on its way; the two steps sit beside it */
+  .ground:has(.v-quiz) { padding-top: 28px; }
+  .is-phone .ground:has(.v-quiz) { padding-top: 14px; }
+  .v-quiz { padding-top: 36px; }
+  .is-phone .v-quiz { padding-top: 26px; }
+  .v-quiz .ty-lead { max-width: none; margin-top: 10px; text-wrap: balance; }
+  .v-quiz .when { margin-top: 16px; }
+  .v-quiz .when-sub { text-wrap: balance; }
+  .is-phone .v-quiz .ty-lead, .is-phone .v-quiz .when-sub { text-wrap: wrap; }
+  .v-quiz .when-sub { max-width: none; }
+  .split { display: grid; grid-template-columns: minmax(0, 1fr) 236px; gap: 0 28px; align-items: start; margin-top: 16px; }
+  .is-phone .split { grid-template-columns: minmax(0, 1fr); margin-top: 18px; }
+  .quiz { padding: 20px 24px 24px; border-radius: 12px; background: var(--tint); }
+  .is-phone .quiz { padding: 20px 16px 22px; }
+  .qz-q { margin-top: 0; font-size: 15.5px; line-height: 1.55; color: var(--ink); }
+  .qz-q u { text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+  .qz-opts { list-style: none; display: grid; gap: 6px; margin: 14px 0 0; padding: 0; }
+  .qz-opt { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: center; width: 100%; padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); font: 400 15px/1.45 "Poppins", Arial, sans-serif; text-align: left; transition: border-color .15s, background-color .15s; }
+  .qz-opt:hover:not(:disabled) { border-color: var(--blue); }
+  .qz-opt:disabled { cursor: default; }
+  .qz-letter { display: grid; place-items: center; width: 28px; height: 28px; border: 1.5px solid var(--blue); border-radius: 50%; color: var(--blue); font: 700 13px/1 "Poppins", Arial, sans-serif; }
+  .qz-opt.is-correct { border-color: var(--ok); background: var(--ok-tint); }
+  .qz-opt.is-correct .qz-letter { border-color: var(--ok); background: var(--ok); color: #fff; }
+  .qz-opt.is-wrong { border-color: var(--bad); background: var(--bad-tint); }
+  .qz-opt.is-wrong .qz-letter { border-color: var(--bad); background: var(--bad); color: #fff; }
+  /* the course's own explanation, opened after the answer */
+  .qz-feedback { margin-top: 16px; font-size: 15px; line-height: 1.6; color: var(--ink); animation: qz-open .35s cubic-bezier(.22, 1, .36, 1) both; }
+  .qz-feedback[hidden] { display: none; }
+  .qz-feedback p + p { margin-top: 10px; }
+  .qz-verdict { font: 700 17px/1.3 "Poppins", Arial, sans-serif; }
+  .qz-verdict.is-right { color: var(--ok); }
+  /* a wrong pick right after paying should not sting: the option shows red, the words stay calm */
+  .qz-verdict.is-off { color: var(--ink); }
+  .qz-feedback .qz-more { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 15px; font-weight: 500; color: var(--ink); text-wrap: balance; }
+  @keyframes qz-open { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  /* the two steps in a narrow column beside the question */
+  .rail { list-style: none; display: grid; gap: 24px; margin: 0; padding: 0; }
+  .is-phone .rail-col { margin-top: 26px; padding-top: 24px; border-top: 1px solid var(--line); }
+  .step { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; align-content: start; }
+  .rail .mark { width: 30px; height: 30px; font-size: 14px; }
+  .rail .step-title { margin-top: 3px; font-size: 16px; }
+  .rail .step-text { font-size: 14px; line-height: 1.55; }
+  .page-root .rail .btn { width: 100%; min-height: 46px; margin-top: 12px; padding: 0 16px; font-size: 15px; }
+  /* the email described in words: who sends it and its exact subject */
+  .mail-id { margin: 8px 0 0; font-size: 13px; line-height: 1.45; }
+  .mail-id dt { color: var(--muted); }
+  .mail-id dd { margin: 0 0 6px; color: var(--ink); font-weight: 500; }
+  /* if the email is not there: right after "Got your email? Log in" */
+  .rail-help { margin: 18px 0 0 42px; font-size: 13px; line-height: 1.5; color: var(--muted); }
+  .rail-help b { color: var(--ink); font-weight: 700; }
+  /* Claire's real signature under "See you inside!" */
+  .note .sign-img { display: block; height: 40px; width: auto; margin-top: 8px; }
+  .note .sign-img + .ps { margin-top: 16px; }
   .plan { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 32px; margin: 18px 0 0; padding: 0; }
   .is-phone .plan { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .plan li { padding-top: 12px; border-top: 2px solid var(--line); }
@@ -243,7 +291,6 @@
 (function () {
   var ICON = {
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
-    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
     burger: '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 9h22M5 16h22M5 23h22"/></svg>',
     fb: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5h2.6l.4-3h-3V8.6c0-.9.3-1.5 1.5-1.5h1.6V4.4c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.3H8v3h2.5V21h3z"/></svg>',
     tw: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 6.8c-.7.3-1.4.5-2.1.6.8-.5 1.3-1.2 1.6-2-.7.4-1.5.7-2.3.9a3.6 3.6 0 0 0-6.2 3.3A10.3 10.3 0 0 1 4.5 5.8a3.6 3.6 0 0 0 1.1 4.8c-.6 0-1.2-.2-1.6-.4 0 1.8 1.2 3.3 2.9 3.6-.5.1-1.1.2-1.6.1.5 1.4 1.8 2.5 3.4 2.5A7.3 7.3 0 0 1 3 17.9a10.3 10.3 0 0 0 5.6 1.6c6.7 0 10.4-5.6 10.4-10.4v-.5c.8-.5 1.4-1.2 2-1.8z"/></svg>'
@@ -267,6 +314,20 @@
         ['Finish with a final test', "Score over 90%, and you're more than ready for the real exam."]
       ],
       also: 'practice tests and forums.',
+      // One real question from the A2 vocabulary practice test (beta admin, question 2612; reference/course/sample-questions.md)
+      quiz: {
+        src: 'the A2 Vocabulary and General Knowledge practice test',
+        q: 'Choose the correct meaning of the underlined word.<br>The client was admitted with a <u>perforated</u> bowel.',
+        options: ['Obstructed.', 'Leaking.', 'Misaligned.', 'Vital.'],
+        correct: 1,
+        why: [
+          'Choice A means that the bowel lumen is blocked.',
+          '‘Perforated’ means the wall of the bowel has small holes, resulting in the leakage of bowel content.',
+          'Choice C means that the bowel is in malposition or even twisted, causing obstruction.',
+          'Choice D means the bowel is healthy.'
+        ],
+        more: 'This question is from the A2 practice tests inside.'
+      },
       foot: 'light'
     },
     hesi: {
@@ -286,6 +347,22 @@
         ['Work on your weak spots', 'See where your weaknesses are, then practice with Test Creator and the specialty practice exams.']
       ],
       also: '2 CAT Self-Assessments and a member-only forum where you can connect with other students.',
+      // One real question from the free HESI RN Exit practice test (beta admin, question 3; reference/course/sample-questions.md)
+      quiz: {
+        src: 'our free HESI RN Exit practice test',
+        q: 'The dialysis nurse is caring for a client with end-stage renal disease who is completing a peritoneal dialysis session. The nurse assesses that 2L of fluids have been removed during the session. What action should the nurse prioritize?',
+        options: ['Assess for signs and symptoms of infection.', 'Inspect the dialysate fluid.', 'Palpate for a thrill and auscultate for a bruit.', 'Assess vital signs.'],
+        correct: 3,
+        why: [
+          'Monitoring for infection is important in clients undergoing PD, especially since the peritoneal cavity is at risk for peritonitis. However, it is not the first action to be taken immediately following the completion of the PD session. Signs of infection may not present immediately and typically develop over hours to days. Regular monitoring for signs of infection should be part of ongoing care rather than the immediate first step after fluid removal.',
+          'While inspecting the dialysate fluid is important to identify potential complications, the nurse should first ensure the client’s stability through direct client assessment. Once the client’s clinical condition has been assessed, the nurse should observe the drained fluid for clarity, color, and the presence of fibrin or blood. Cloudy or discolored fluid may indicate infection (peritonitis) or internal bleeding. Straw-colored clear fluid is expected when no complications are present.',
+          'Palpating for a thrill and auscultating for a bruit describe techniques used to assess vascular access sites in hemodialysis, particularly in arteriovenous fistulas or grafts, not in peritoneal dialysis. Therefore, these actions are not relevant to the care of this client.',
+          'The first nursing action following PD should be to assess vital signs as this action provides critical information about the client’s current condition and stability. Removing a significant volume of fluid (2 liters) from the body can affect blood pressure and heart rate, potentially leading to hypotension or shock. Monitoring vital signs immediately after fluid removal helps identify any acute changes in the client’s hemodynamic status, allowing for timely intervention.'
+        ],
+        more: 'Inside, every question comes with a detailed rationale like this one.'
+      },
+      // Claire's story, verbatim sentences from /hesi/our-story
+      story: 'Back in 2008, I failed my HESI Exit Exam. I saw a gap between what was being taught and what was actually tested, and I decided to change that. I went from failing my first Exit to passing with a top 1% score of 1046.',
       foot: 'dark'
     }
   };
@@ -324,29 +401,28 @@
   }
   var SUPPORT = '<a href="#">support@yourbestgrade.com</a>';
   // ---- New versions (03.10): anticipation, the email as an envelope, log in only after the email ----
-  function topV4(p, sub) {
+  function topV4(p, sub, claire) {
     return '<section class="top"><div><h1 class="ty-title">THANK YOU!</h1><p class="ty-lead">' + lead(p) + '</p></div>' +
       '<img class="card-img" src="' + p.card + '" alt="' + p.name + ' member card">' +
-      '<div><h2 class="when">When do we start? <span>Right away!</span></h2><p class="when-sub">' + sub + '</p></div></section>';
+      '<div><h2 class="when">When do we start? <span>Right away!</span></h2>' +
+      (claire ? '<p class="when-claire">' + claire + '</p>' : '') +
+      '<p class="when-sub">' + sub + '</p></div></section>';
   }
   function envelope(p) {
     return '<figure class="env" role="img" aria-label="An email from ' + p.mail.from + ' with the subject ' + p.mail.subject + '">' +
       '<span class="env-back"></span><span class="env-flap"></span><span class="env-letter"><span class="env-from">From: ' + p.mail.from + '</span>' +
       '<span class="env-subject">' + p.mail.subject + '</span></span><span class="env-front"></span></figure>';
   }
-  function mailFacts(p) {
-    return '<p class="step-text">It arrives ' + p.within + ', ' + p.usually + ', with your login and password.</p>' +
-      '<p class="step-help"><b>Not there?</b> Check your spam folder and add yourbestgrade.com to your safe senders. Still nothing? ' + SUPPORT + '</p>';
-  }
-  function noteV4(p) {
+  // warmTop: Claire's "best experience" line is already at the top, so the note does not repeat it
+  function noteV4(p, warmTop) {
     return '<section class="note" aria-label="A note from Claire">' +
-      '<p>The training begins the moment you log in, and you can go at your own pace. I want you to have the best experience possible, so make time for your first session today.</p>' +
+      '<p>The training begins the moment you log in, and you can go at your own pace' +
+        (warmTop ? ', so' : '. I want you to have the best experience possible, so') + ' make time for your first session today.</p>' +
       '<p>Thank you again for choosing ' + p.the + '. I look forward to helping you prepare for your exam!</p>' +
-      '<p class="sign">See you inside! Claire</p>' +
+      '<p class="sign">See you inside!</p><img class="sign-img" src="/thank-you/assets/course/claire-signature.png" alt="Claire">' +
       '<p class="ps">P.S. Bookmark your login page: <a href="#">' + p.loginUrl + '</a></p></section>';
   }
-  var MARK_DONE = '<span class="mark" aria-hidden="true">' + ICON.check + '</span>';
-  function mark(n) { return '<span class="mark" aria-hidden="true">' + n + '</span>'; }
+  function mark(n) { return '<span class="mark" aria-hidden="true"><span>' + n + '</span></span>'; }
   function planBlock(p) {
     return '<ol class="plan">' + p.plan.map(function (s) { return '<li><b>' + s[0] + '</b><span>' + s[1] + '</span></li>'; }).join('') + '</ol>' +
       '<p class="also"><b>Also inside:</b> ' + p.also + '</p>';
@@ -354,7 +430,7 @@
 
   // Version The email (Patrick's pick of the first round): the email as an envelope, then logging in, then the first session
   function vMail(p) {
-    return '<div class="ty v4 v-mail">' + topV4(p, 'Your login details are on their way to your inbox.') +
+    return '<div class="ty v4 v-mail">' + topV4(p, 'Your login details are on their way to your inbox.', 'I want you to have the BEST experience possible.&nbsp;:)') +
       '<section class="mail-step"><div class="mail-step-text"><h2 class="step-title">Look for this email</h2>' +
         // The site passes the buyer's email in the page address; without it the line falls back to "your inbox"
         '<p class="step-text">It\'s on its way to ' + (BUYER.email ? '<b>' + BUYER.email + '</b>' : 'your inbox') + ' and arrives ' + p.within + ', ' + p.usually + ', with your login and password.</p></div>' +
@@ -362,25 +438,68 @@
         '<p class="help"><b>Not there?</b> Check your spam folder and add yourbestgrade.com to your safe senders. Still nothing, or any other question: ' + SUPPORT + '</p></section>' +
       '<section class="next-step"><h2 class="step-title">Got your email? Log in</h2><p class="step-text">Use the login and password from the email.</p>' + loginBtn(p) + '</section>' +
       '<section class="next-step"><h2 class="step-title">' + p.planTitle + '</h2><p class="step-text">' + p.planIntro + '</p>' + planBlock(p) + '</section>' +
-      noteV4(p) + '</div>';
+      noteV4(p, true) + '</div>';
   }
 
-  // Version Checklist: payment done, then the email, logging in and the first session
-  function vChecklist(p) {
-    return '<div class="ty v4 v-check">' + topV4(p, 'Your login details are on their way. Two quick steps to get in, then ' + p.planTitle.toLowerCase() + '.') +
-      '<ol class="todo">' +
-        '<li class="todo-item is-done">' + MARK_DONE + '<div><h2 class="step-title">Payment done</h2></div></li>' +
-        '<li class="todo-item">' + mark(1) + '<div class="todo-mail"><div><h2 class="step-title">Find your login email</h2>' + mailFacts(p) + '</div>' + envelope(p) + '</div></li>' +
-        '<li class="todo-item">' + mark(2) + '<div><h2 class="step-title">Got your email? Log in</h2><p class="step-text">Use the login and password from the email.</p>' + loginBtn(p) + '</div></li>' +
-        '<li class="todo-item">' + mark(3) + '<div><h2 class="step-title">' + p.planTitle + '</h2><p class="step-text">' + p.planIntro + '</p>' + planBlock(p) + '</div></li>' +
-      '</ol>' + noteV4(p) + '</div>';
+  // Version Try a question: one real course question to answer while the login email is on its way; the two steps beside it
+  function vQuiz(p, program) {
+    var Q = p.quiz;
+    return '<div class="ty v4 v-quiz">' +
+      '<section class="top-quiz"><h1 class="ty-title">THANK YOU!</h1><p class="ty-lead">' + lead(p) + '</p>' +
+        '<h2 class="when">When do we start? <span>Right away!</span></h2><p class="when-sub">Your login details are on their way. While you wait, try a real question from ' + Q.src + ':</p></section>' +
+      '<div class="split">' +
+        '<section class="quiz" data-program="' + program + '" aria-label="A practice question">' +
+                    '<p class="qz-q">' + Q.q + '</p>' +
+          '<ol class="qz-opts">' + Q.options.map(function (o, i) {
+            return '<li><button class="qz-opt" type="button" data-i="' + i + '"><span class="qz-letter" aria-hidden="true"><span>' + 'ABCD'.charAt(i) + '</span></span><span>' + o + '</span></button></li>';
+          }).join('') + '</ol>' +
+          '<div class="qz-feedback" aria-live="polite" hidden></div>' +
+        '</section>' +
+        railCol(p) +
+      '</div>' + noteQuiz(p) + '</div>';
+  }
+  // The answer opens the course's own explanation: for the chosen option and, when it is wrong, for the right one
+  function answer(quiz, i) {
+    var Q = P[quiz.getAttribute('data-program')].quiz, c = Q.correct, L = 'ABCD';
+    quiz.querySelectorAll('.qz-opt').forEach(function (o, k) {
+      o.disabled = true;
+      if (k === c) o.classList.add('is-correct');
+      if (k === i && i !== c) o.classList.add('is-wrong');
+      if (k === i) o.setAttribute('aria-pressed', 'true');
+    });
+    var fb = quiz.querySelector('.qz-feedback');
+    fb.innerHTML = (i === c
+      ? '<p class="qz-verdict is-right">Correct!</p><p>' + Q.why[i] + '</p>'
+      : '<p class="qz-verdict is-off">Good try!</p><p>' + Q.why[i] + '</p><p><b>The answer is ' + L.charAt(c) + '.</b> ' + Q.why[c] + '</p>') +
+      '<p class="qz-more">' + Q.more + '</p>';
+    fb.hidden = false;
+  }
+  // The two steps to get in, in a narrow column
+  function railCol(p) {
+    return '<div class="rail-col"><ol class="rail">' +
+        '<li class="step">' + mark(1) + '<div><h2 class="step-title">Look for this email</h2>' +
+          '<p class="step-text">It arrives ' + p.within + ', ' + p.usually + ', with your login and password.</p>' +
+          '<dl class="mail-id"><dt>From:</dt><dd>' + p.mail.from + '</dd><dt>Subject:</dt><dd>' + p.mail.subject + '</dd></dl></div></li>' +
+        '<li class="step">' + mark(2) + '<div><h2 class="step-title">Got your email? Log in</h2><p class="step-text">Use the login and password from the email.</p>' +
+          '<a class="btn" href="#">Log in' + ICON.arrow + '</a></div></li>' +
+      '</ol>' +
+      '<p class="rail-help"><b>Not there?</b> Check your spam folder and add yourbestgrade.com to your safe senders. Still nothing, or any other question: ' + SUPPORT + '</p></div>';
+  }
+  // Claire's note for Try a question: her story on HESI, her real signature under "See you inside!"
+  function noteQuiz(p) {
+    return '<section class="note" aria-label="A note from Claire">' +
+      (p.story ? '<p>' + p.story + '</p>' : '') +
+      '<p>The training begins the moment you log in, and you can go at your own pace. I want you to have the best experience possible, so make time for your first session today.</p>' +
+      '<p>Thank you again for choosing ' + p.the + '. I look forward to helping you prepare for your exam!</p>' +
+      '<p class="sign">See you inside!</p><img class="sign-img" src="/thank-you/assets/course/claire-signature.png" alt="Claire">' +
+      '<p class="ps">P.S. Bookmark your login page: <a href="#">' + p.loginUrl + '</a></p></section>';
   }
 
   function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
   function page(version, program) {
     var p = P[program];
-    var main = version === 'checklist' ? vChecklist(p) : vMail(p);
+    var main = version === 'quiz' ? vQuiz(p, program) : vMail(p);
     return header(p) + '<main class="ground">' + main + '</main>' + footer(p);
   }
 
@@ -484,6 +603,12 @@
 
   document.querySelectorAll('.mock-seg button').forEach(function (b) {
     b.addEventListener('click', function () { go(b.parentElement.dataset.key, b.dataset.value); });
+  });
+  // A click on an answer in the practice question (works in every device frame)
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.qz-opt');
+    if (!b || b.disabled) return;
+    answer(b.closest('.quiz'), +b.getAttribute('data-i'));
   });
   window.addEventListener('hashchange', mount);
   var resizeTimer;
