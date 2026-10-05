@@ -132,6 +132,7 @@
     display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px;
     margin: 22px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); max-width: 520px;
   }
+  .hero__rates-label { flex-basis: 100%; color: var(--muted); font-size: 12.5px; font-weight: 500; }
   .hero__rates-list { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 14px; }
   .hero__rates-list li { color: var(--muted); font-size: 13.5px; }
   .hero__rates-list b { color: var(--navy); font-size: 16px; font-weight: 600; margin-left: 4px; }
@@ -214,9 +215,8 @@
   .rates tbody tr:hover td { background: var(--panel); }
   .rates .r { text-align: right; }
   .rates__plan { color: var(--navy); font-weight: 600; }
-  .rates__price { color: var(--ink); }
-  .rates__price small { display: block; margin-top: 2px; color: var(--muted); font-size: 12.5px; }
   .rates__earn { color: var(--navy); font-size: 22px; font-weight: 700; }
+  .rates__earn small { display: block; margin-top: 1px; color: var(--muted); font-size: 12.5px; font-weight: 400; white-space: nowrap; }
   .rates-notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 40px; margin: 18px 0 0; padding: 0; list-style: none; }
   .rates-notes li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; color: var(--muted); font-size: 14px; line-height: 1.55; }
   .rates-notes svg.icon { color: var(--blue); margin-top: 2px; }
@@ -404,16 +404,17 @@
   <section class="hero">
     <div class="hero__inner">
       <div class="hero__pitch">
-        <h1 class="v-a">Earn $8–$20 for every HESI Exam Study plan your followers buy</h1>
+        <h1 class="v-a">Earn $4–$20 for every HESI Exam Study plan your followers buy</h1>
         <h1 class="v-b">Recommend HESI exam prep to nursing students and earn on every plan they buy</h1>
         <p class="hero__lead v-a">For nurses and nursing students whose followers are getting ready for the HESI Exit. Share your link, and every plan bought through it earns you a fixed commission, paid to your PayPal.</p>
         <p class="hero__lead v-b">The YourBestGrade Affiliate Program pays a fixed commission on every HESI Exam Study plan bought through your link.</p>
         <div class="hero__rates v-a">
-          <ul class="hero__rates-list" aria-label="Commission per plan">
-            <li>30 Days<b class="num">$8</b></li>
-            <li>90 Days<b class="num">$10</b></li>
-            <li>180 Days<b class="num">$11</b></li>
-            <li>12 Months<b class="num">$12</b></li>
+          <span class="hero__rates-label">Paid in full</span>
+          <ul class="hero__rates-list" aria-label="Commission per plan paid in full">
+            <li>30 Days<b class="num">$5</b></li>
+            <li>90 Days<b class="num">$8</b></li>
+            <li>180 Days<b class="num">$9</b></li>
+            <li>12 Months<b class="num">$10</b></li>
             <li>36 Months<b class="num">$20</b></li>
           </ul>
           <a href="#rates">See all plans</a>
@@ -446,12 +447,12 @@
           <div class="preview__balances v-a">
             <div class="balance">
               <span class="balance__label"><i class="dot dot-hold"></i>On hold</span>
-              <span class="balance__sum num">$50.00</span>
-              <span class="balance__meta">4 orders</span>
+              <span class="balance__sum num">$47.00</span>
+              <span class="balance__meta">5 orders</span>
             </div>
             <div class="balance">
               <span class="balance__label"><i class="dot dot-avail"></i>Available</span>
-              <span class="balance__sum num">$105.00</span>
+              <span class="balance__sum num">$103.00</span>
               <span class="balance__bar" aria-hidden="true"><i></i></span>
               <span class="balance__meta">$100 payout minimum reached</span>
             </div>
@@ -460,8 +461,8 @@
             <thead><tr><th class="col-date">Date</th><th>Plan</th><th class="r">Commission</th><th>Status</th></tr></thead>
             <tbody>
               <tr><td class="col-date num">Sep 12, 2026</td><td class="plan">36 Months Access</td><td class="r num">$20.00</td><td><span class="status st-hold">On hold</span></td></tr>
-              <tr><td class="col-date num">Sep 3, 2026</td><td class="plan">90 Days</td><td class="r num">$10.00</td><td><span class="status st-hold">On hold</span></td></tr>
-              <tr><td class="col-date num">Aug 11, 2026</td><td class="plan">12 Months Access</td><td class="r num">$12.00</td><td><span class="status st-avail">Available</span></td></tr>
+              <tr><td class="col-date num">Sep 3, 2026</td><td class="plan">90 Days</td><td class="r num">$8.00</td><td><span class="status st-hold">On hold</span></td></tr>
+              <tr><td class="col-date num">Aug 11, 2026</td><td class="plan">12 Months Access</td><td class="r num">$10.00</td><td><span class="status st-avail">Available</span></td></tr>
             </tbody>
           </table>
           <table class="orders v-b">
@@ -485,18 +486,18 @@
     </div>
     <div class="card rates">
       <table>
-        <thead><tr><th>Plan</th><th>Price</th><th class="r">You earn</th></tr></thead>
+        <thead><tr><th>Plan</th><th class="r">Paid in full</th><th class="r">Payment plan</th></tr></thead>
         <tbody>
-          <tr><td class="rates__plan">30 Days</td><td class="rates__price num">$97<small>$107 with a payment plan</small></td><td class="r rates__earn num">$8</td></tr>
-          <tr><td class="rates__plan">90 Days</td><td class="rates__price num">$117<small>$127 with a payment plan</small></td><td class="r rates__earn num">$10</td></tr>
-          <tr><td class="rates__plan">180 Days</td><td class="rates__price num">$137<small>$147 with a payment plan</small></td><td class="r rates__earn num">$11</td></tr>
-          <tr><td class="rates__plan">12 Months Access</td><td class="rates__price num">$147<small>$157 with a payment plan</small></td><td class="r rates__earn num">$12</td></tr>
-          <tr><td class="rates__plan">36 Months Access</td><td class="rates__price num">$197<small>$207 with a payment plan</small></td><td class="r rates__earn num">$20</td></tr>
+          <tr><td class="rates__plan">30 Days</td><td class="r rates__earn num">$5<small>$97 purchase</small></td><td class="r rates__earn num">$4<small>$107 purchase</small></td></tr>
+          <tr><td class="rates__plan">90 Days</td><td class="r rates__earn num">$8<small>$117 purchase</small></td><td class="r rates__earn num">$7<small>$127 purchase</small></td></tr>
+          <tr><td class="rates__plan">180 Days</td><td class="r rates__earn num">$9<small>$137 purchase</small></td><td class="r rates__earn num">$8<small>$147 purchase</small></td></tr>
+          <tr><td class="rates__plan">12 Months Access</td><td class="r rates__earn num">$10<small>$147 purchase</small></td><td class="r rates__earn num">$10<small>$157 purchase</small></td></tr>
+          <tr><td class="rates__plan">36 Months Access</td><td class="r rates__earn num">$20<small>$197 purchase</small></td><td class="r rates__earn num">$20<small>$207 purchase</small></td></tr>
         </tbody>
       </table>
     </div>
     <ul class="rates-notes">
-      <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>A plan paid with Klarna, Afterpay or Affirm earns the same as a one-time payment.</li>
+      <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>A plan paid with Klarna, Afterpay or Affirm counts too, at the payment plan rate.</li>
       <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>The amount is fixed at the moment of purchase. If a rate changes, the new one applies only to later purchases.</li>
     </ul>
   </section>
@@ -644,7 +645,7 @@
           <dt class="v-b">Where can my link lead?</dt>
           <dd class="v-b">To our home page, the HESI Exam Study page or the pricing page.</dd>
           <dt class="v-b">Do payment plans count?</dt>
-          <dd class="v-b">Yes. A plan paid with Klarna, Afterpay or Affirm earns the same as a one-time payment.</dd>
+          <dd class="v-b">Yes. A plan paid with Klarna, Afterpay or Affirm earns a commission too. Your dashboard shows the rate for paying in full and for a payment plan.</dd>
           <dt>Where do I see my results?</dt>
           <dd>Your dashboard shows clicks, unique visitors and purchases for each link, and every order with its status.</dd>
           <dt>Who do I contact with questions?</dt>
@@ -656,7 +657,7 @@
 
   <section class="closing">
     <h2>Join the YourBestGrade Affiliate Program</h2>
-    <p class="v-a">Earn $8–$20 for every plan your followers buy. The form asks where you post, a few words about you and your audience, and your PayPal email for payouts.</p>
+    <p class="v-a">Earn $4–$20 for every plan your followers buy. The form asks where you post, a few words about you and your audience, and your PayPal email for payouts.</p>
     <p class="v-b">The form asks where you post, a few words about you and your audience, and your PayPal email for payouts.</p>
     <div class="actions">
       <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>

@@ -146,11 +146,9 @@
   .rates thead th { padding: 12px 24px 10px; }
   .rates tbody td { padding: 13px 24px; }
   .rates tbody tr:not(.rates__group):hover td { background: #fafcff; }
-  .rates__price small { display: block; margin-top: 2px; font-size: 12.5px; }
   .rates__plan { color: var(--navy); font-weight: 500; }
-  .rates__price { color: var(--muted); }
   .rates__earn { color: var(--navy); font-size: 15px; font-weight: 600; }
-  .rates__earn small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+  .rates__earn small { display: block; margin-top: 1px; color: var(--muted); font-size: 12px; font-weight: 400; }
   body[data-variant="page"] .section--links .rates { display: none; }
   body[data-variant="links"] .nav [data-go="commissions"],
   body[data-variant="links"] .mock-seg button[data-value="commissions"] { display: none; }
@@ -188,6 +186,33 @@
   .balance__sum { color: var(--navy); font-size: 24px; font-weight: 600; line-height: 1.3; }
   .balance__meta { color: var(--muted); font-size: 12.5px; }
   .balance .tab__bar { margin: 5px 0 3px; }
+  /* Available is a card: the balance opens its orders, the payout request sits under it */
+  .balance-card {
+    display: flex; flex-direction: column; min-width: 0; background: #fff; border: 1px solid transparent; border-radius: 10px;
+    box-shadow: 0 4px 18px rgba(24, 50, 97, 0.07), 0 1px 2px rgba(24, 50, 97, 0.06);
+    transition: border-color 160ms ease-out, box-shadow 160ms ease-out;
+  }
+  .balance-card > .balance { flex: 1 0 auto; width: 100%; background: none; border: 0; box-shadow: none; }
+  .balance-card > .balance:hover { border: 0; box-shadow: none; }
+  .balance-card:has(> .balance:hover) { border-color: #b9c9df; box-shadow: 0 6px 22px rgba(24, 50, 97, 0.11), 0 1px 2px rgba(24, 50, 97, 0.06); }
+  .balance-card:has(> .balance[aria-pressed="true"]) { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue), 0 6px 22px rgba(24, 50, 97, 0.11); }
+  .balance-card > .balance[aria-pressed="true"] { border: 0; box-shadow: none; }
+  .payout-cta { display: none; padding: 0 18px 16px; }
+  body[data-payout="ready"]:not([data-state="new"]) .payout-cta,
+  body[data-payout="requested"]:not([data-state="new"]) .payout-cta { display: block; }
+  .btn-request {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 38px; padding: 0 16px; border: 0; border-radius: 6px;
+    background: var(--orange); color: #fff; font: 600 13.5px "Poppins", Arial, sans-serif; white-space: nowrap; cursor: pointer;
+    transition: background-color 160ms ease-out;
+  }
+  .btn-request:hover { background: var(--orange-hover); }
+  .btn-request:active { transform: translateY(1px); }
+  .btn-request svg.icon { width: 16px; height: 16px; stroke-width: 2; }
+  .payout-cta .btn-request { width: 100%; }
+  .payout-requested { display: none; align-items: center; gap: 7px; min-height: 38px; padding: 0 12px; border-radius: 6px; background: var(--hold-bg); color: var(--blue); font-size: 13px; font-weight: 500; }
+  .payout-requested svg.icon { width: 16px; height: 16px; }
+  body[data-payout="requested"] .payout-cta .btn-request { display: none; }
+  body[data-payout="requested"] .payout-requested { display: flex; }
   .balance__more { position: absolute; top: 15px; right: 14px; width: 16px; height: 16px; color: #9fb2cc; transition: transform 200ms ease-out, color 160ms ease-out; }
   .balance:hover .balance__more { color: var(--blue); }
   .balance[aria-pressed="true"] .balance__more { color: var(--blue); transform: rotate(180deg); }
@@ -264,17 +289,21 @@
   body[data-state="new"] .empty-row { display: table-row; }
   .empty-row td { color: var(--muted); text-align: center; padding: 36px 16px; line-height: 1.6; }
   .empty-row strong { display: block; color: var(--navy); font-size: 14.5px; font-weight: 600; }
-  .when-below { display: none; }
-  body[data-state="below"] .when-below { display: inline; }
-  body[data-state="below"] .when-reached { display: none; }
+  /* The payout panel follows the available balance: ready to request, below the minimum, or already requested */
+  .when-below, .when-requested { display: none; }
+  body[data-payout="below"] .when-below, body[data-payout="requested"] .when-requested { display: inline; }
+  body[data-payout="below"] .when-reached, body[data-payout="requested"] .when-reached { display: none; }
 
   /* Payouts */
-  .next-payout { display: flex; align-items: center; gap: 10px; padding: 14px 18px; margin: 0 0 16px; font-size: 14px; color: var(--ink); }
+  .next-payout { display: flex; align-items: center; gap: 10px 14px; padding: 14px 18px; margin: 0 0 16px; font-size: 14px; line-height: 1.55; color: var(--ink); }
+  .next-payout__text { flex: 1 1 auto; min-width: 0; }
   .next-payout svg.icon { color: var(--avail-ink); }
   .next-payout svg.icon-wait { display: none; color: var(--blue); }
-  body[data-state="below"] .next-payout .icon-done { display: none; }
-  body[data-state="below"] .next-payout .icon-wait { display: block; }
+  body[data-payout="below"] .next-payout .icon-done, body[data-payout="requested"] .next-payout .icon-done { display: none; }
+  body[data-payout="below"] .next-payout .icon-wait, body[data-payout="requested"] .next-payout .icon-wait { display: block; }
   .next-payout b { color: var(--navy); }
+  .next-payout .btn-request { flex: none; height: 42px; padding: 0 20px; font-size: 14px; }
+  body:not([data-payout="ready"]) .next-payout .btn-request { display: none; }
   .payout-start { display: none; margin: -6px 0 16px; color: var(--muted); font-size: 13.5px; }
   body[data-state="new"] .payout-start { display: block; }
 
@@ -436,12 +465,17 @@
 
     .rates__title { padding: 16px 16px 2px; font-size: 16px; }
     .rates__lead { padding: 4px 16px 4px; }
-    .rates tbody tr { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "plan earn" "price earn"; gap: 1px 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    .rates tbody tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "plan plan" "full instal"; gap: 6px 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
     .rates tbody tr:last-child { border-bottom: 0; }
-    .rates tbody td { display: block; padding: 0; border: 0; }
+    .rates tbody td, .terms__rates tbody td { display: block; padding: 0; border: 0; text-align: left; }
     .rates tbody td:nth-child(1) { grid-area: plan; }
-    .rates tbody td:nth-child(2) { grid-area: price; text-align: left; font-size: 12.5px; }
-    .rates tbody td:nth-child(3) { grid-area: earn; align-self: center; }
+    .rates tbody td:nth-child(2) { grid-area: full; }
+    .rates tbody td:nth-child(3) { grid-area: instal; }
+    .rates__earn::before { content: attr(data-label); display: block; margin-bottom: 1px; color: var(--muted); font-size: 12px; font-weight: 500; }
+    .next-payout { flex-wrap: wrap; align-items: flex-start; }
+    .next-payout svg.icon { margin-top: 3px; }
+    .next-payout__text { flex-basis: calc(100% - 32px); }
+    .next-payout .btn-request { width: 100%; }
 
 
     .section--payouts tr { display: block; padding: 12px 16px; border-bottom: 1px solid var(--line); }
@@ -515,6 +549,7 @@
     <div class="mock-seg" data-key="state">
       <button data-value="active">Active</button>
       <button data-value="below">Below $100</button>
+      <button data-value="requested">Payout requested</button>
       <button data-value="new">New affiliate</button>
       <button data-value="many">Hundreds of orders</button>
     </div>
@@ -580,7 +615,7 @@
       <h1 class="page-title">Links</h1>
       <p class="page-lead">Share these links. A purchase counts for you if the buyer clicked your link within the last 30 days, and your link was the last one they clicked.</p>
       <div class="stats stats--links">
-        <span>Revenue<b class="num" data-stat="revenue" data-below="$2,773.00" data-new="$0.00">$2,970.00</b></span>
+        <span>Revenue<b class="num" data-stat="revenue" data-below="$3,127.00" data-new="$0.00">$3,324.00</b></span>
         <span>Clicks<b class="num" data-stat="clicks" data-new="0">960</b></span>
         <span>Earnings per click<b class="num" data-stat="epc" data-below="$0.25" data-new="$0.00">$0.27</b></span>
       </div>
@@ -598,14 +633,14 @@
           <div class="copy"><span class="link-url">https://www.yourbestgrade.com/<wbr>hesi<wbr>?aff=Jx7Kq2MvR9tLp4Wn</span><button type="button"><svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg><span>Copy</span></button></div>
           <div class="count num" data-count="clicks" data-new="0">214<small>clicks</small></div>
           <div class="count num" data-count="unique" data-new="0">176<small>unique visitors</small></div>
-          <div class="count num" data-count="purchases" data-new="0">5<small>purchases</small></div>
+          <div class="count num" data-count="purchases" data-new="0">6<small>purchases</small></div>
         </div>
         <div class="link-row" data-link="start">
           <div class="link-name"><strong>HESI Exam Study start page</strong><span>yourbestgrade.com/<wbr>hesi/<wbr>start</span></div>
           <div class="copy"><span class="link-url">https://www.yourbestgrade.com/<wbr>hesi/<wbr>start<wbr>?aff=Jx7Kq2MvR9tLp4Wn</span><button type="button"><svg class="icon" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg><span>Copy</span></button></div>
           <div class="count num" data-count="clicks" data-new="0">262<small>clicks</small></div>
           <div class="count num" data-count="unique" data-new="0">205<small>unique visitors</small></div>
-          <div class="count num" data-count="purchases" data-new="0">5<small>purchases</small></div>
+          <div class="count num" data-count="purchases" data-new="0">6<small>purchases</small></div>
         </div>
         <div class="link-row" data-link="pricing">
           <div class="link-name"><strong>HESI Exam Study pricing</strong><span>yourbestgrade.com/<wbr>hesi/<wbr>pricing</span></div>
@@ -629,7 +664,7 @@
       <div class="panel rates"><div class="rates__body"></div></div>
       <p class="hold-note">
         <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        <span>A commission stays on hold for 30 days after the purchase, then it becomes available. Available commissions are paid out to your PayPal once they add up to $100. If an order is refunded, its commission is cancelled.</span>
+        <span>A commission stays on hold for 30 days after the purchase, then it becomes available. Once your available commissions add up to $100, you can request a payout to your PayPal. If an order is refunded, its commission is cancelled.</span>
       </p>
     </section>
 
@@ -645,16 +680,22 @@
           <button class="balance" type="button" data-filter="hold" aria-pressed="false" aria-controls="orders">
             <svg class="icon balance__more" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             <span class="balance__label"><i class="dot dot-hold"></i>On hold</span>
-            <span class="balance__sum num" data-sum="hold">$50.00</span>
-            <span class="balance__meta" data-order-count="hold">4 orders</span>
+            <span class="balance__sum num" data-sum="hold">$47.00</span>
+            <span class="balance__meta" data-order-count="hold">5 orders</span>
           </button>
-          <button class="balance" type="button" data-filter="avail" aria-pressed="false" aria-controls="orders">
-            <svg class="icon balance__more" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-            <span class="balance__label"><i class="dot dot-avail"></i>Available</span>
-            <span class="balance__sum num" data-sum="avail">$105.00</span>
-            <span class="tab__bar" aria-hidden="true"><i></i></span>
-            <span class="balance__meta" data-minimum>$100 payout minimum reached</span>
-          </button>
+          <div class="balance-card">
+            <button class="balance" type="button" data-filter="avail" aria-pressed="false" aria-controls="orders">
+              <svg class="icon balance__more" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              <span class="balance__label"><i class="dot dot-avail"></i>Available</span>
+              <span class="balance__sum num" data-sum="avail">$103.00</span>
+              <span class="tab__bar" aria-hidden="true"><i></i></span>
+              <span class="balance__meta" data-minimum>$100 payout minimum reached</span>
+            </button>
+            <div class="payout-cta">
+              <button class="btn-request" type="button" data-request>Request payout</button>
+              <span class="payout-requested" role="status"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Requested <span class="num" data-requested-short>Sep 15</span></span></span>
+            </div>
+          </div>
           <button class="balance" type="button" data-filter="paid" aria-pressed="false" aria-controls="orders">
             <svg class="icon balance__more" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             <span class="balance__label"><i class="dot dot-paid"></i>Paid out</span>
@@ -670,14 +711,14 @@
         </div>
         <p class="hold-note">
           <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-          <span>A commission stays on hold for 30 days after the purchase, then it becomes available. Available commissions are paid out to your PayPal once they add up to $100. If an order is refunded, its commission is cancelled.</span>
+          <span>A commission stays on hold for 30 days after the purchase, then it becomes available. Once your available commissions add up to $100, you can request a payout to your PayPal. If an order is refunded, its commission is cancelled.</span>
         </p>
         <button class="more-details" type="button" data-filter="all" aria-expanded="false" aria-controls="orders">More details<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
         <div class="panel orders-empty"><strong>No orders yet</strong>Purchases made through your links will show up here.</div>
 
         <div class="panel ledger orders" id="orders" hidden>
           <div class="orders__head">
-            <h2 class="orders__title"><span class="orders__name">All orders</span><span class="orders__count num">21 orders</span></h2>
+            <h2 class="orders__title"><span class="orders__name">All orders</span><span class="orders__count num">23 orders</span></h2>
             <button class="orders__close" type="button"><svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>Hide orders</button>
           </div>
           <div class="orders__filters" role="group" aria-label="Filter orders by status">
@@ -716,18 +757,22 @@
       <div class="panel next-payout">
         <svg class="icon icon-done" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
         <svg class="icon icon-wait" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        <span class="when-reached">Your available balance of <b class="num" data-sum="avail">$105.00</b> has reached the $100 minimum and will be included in the next payout.</span>
-        <span class="when-below">Your available balance is <b class="num" data-sum="avail">$85.00</b>. It will be paid out once it reaches $100.</span>
+        <span class="next-payout__text">
+          <span class="when-reached">Your available balance of <b class="num" data-sum="avail">$103.00</b> has reached the $100 minimum. Request a payout and we'll send it to your PayPal within a few days.</span>
+          <span class="when-below">Your available balance is <b class="num" data-sum="avail">$83.00</b>. You can request a payout once it reaches $100.</span>
+          <span class="when-requested">You requested a payout of <b class="num" data-requested-amount>$103.00</b> on <span class="num" data-requested-date>Sep 15, 2026</span>. We'll send it to your PayPal within a few days.</span>
+        </span>
+        <button class="btn-request" type="button" data-request>Request payout</button>
       </div>
-      <p class="payout-start">Payouts start once your available balance reaches $100.</p>
+      <p class="payout-start">You can request a payout once your available balance reaches $100.</p>
       <div class="panel ledger">
         <table>
           <thead>
-            <tr><th>Date paid</th><th class="r">Amount</th><th class="r">Commissions</th><th>PayPal account</th></tr>
+            <tr><th>Requested</th><th>Paid</th><th class="r">Amount</th><th class="r">Commissions</th><th>Status</th><th>PayPal account</th></tr>
           </thead>
           <tbody class="payouts-body">
-            <tr class="payout-row"><td data-label="Date paid" class="num">Aug 20, 2026</td><td data-label="Amount" class="r num">$108.00</td><td data-label="Commissions" class="r num">8</td><td data-label="PayPal account">jordan.lee@example.com</td></tr>
-            <tr class="empty-row"><td colspan="4"><strong>No payouts yet</strong></td></tr>
+            <tr class="payout-row"><td data-label="Requested" class="num">Aug 19, 2026</td><td data-label="Paid" class="num">Aug 21, 2026</td><td data-label="Amount" class="r num">$108.00</td><td data-label="Commissions" class="r num">8</td><td data-label="Status"><span class="status st-paid">Paid</span></td><td data-label="PayPal account">jordan.lee@example.com</td></tr>
+            <tr class="empty-row"><td colspan="6"><strong>No payouts yet</strong></td></tr>
           </tbody>
         </table>
       </div>
@@ -766,7 +811,7 @@
           </li>
           <li class="terms__item">
             <h2>Payouts</h2>
-            <p>We pay your available commissions to your PayPal once they add up to $100.</p>
+            <p>Once your available commissions add up to $100, you can request a payout in your dashboard. We send it to your PayPal within a few days.</p>
           </li>
           <li class="terms__item">
             <h2>Refunds</h2>
@@ -841,57 +886,62 @@
     function money(n) { return '$' + group3(n.toFixed(2)); }
     function plural(n, word) { return group3(String(n)) + ' ' + word + (n === 1 ? '' : 's'); }
     function fmtDate(t) { var d = new Date(t); return MONTHS[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear(); }
-    // Commission rates as they are set in the admin panel, Affiliates -> Products: a fixed amount, or "10%" of the price
-    // plan, price, rate, price on a payment plan; the commission is the same either way
+    // Commission rates as they are set in the admin panel, Affiliates -> Products: a fixed amount, or "10%" of the price.
+    // plan, price paid in full, its rate, price on a payment plan, its rate
     var RATES = [
-      ['30 Days', 97, 8, 107],
-      ['90 Days', 117, 10, 127],
-      ['180 Days', 137, 11, 147],
-      ['12 Months Access', 147, 12, 157],
-      ['36 Months Access', 197, 20, 207]
+      ['30 Days', 97, 5, 107, 4],
+      ['90 Days', 117, 8, 127, 7],
+      ['180 Days', 137, 9, 147, 8],
+      ['12 Months Access', 147, 10, 157, 10],
+      ['36 Months Access', 197, 20, 207, 20]
     ];
     // A percentage is taken from the price, rounded half up, and never more than the price
     function rateAmount(price, rate) { return typeof rate === 'number' ? rate : Math.min(price, Math.round(price * parseFloat(rate)) / 100); }
-    var COMMISSION = {};
-    RATES.forEach(function (r) { COMMISSION[r[0]] = rateAmount(r[1], r[2]); });
+    // The commission of an order depends on the plan and on how it was paid: in full or on a payment plan
+    var RATE_OF = {};
+    RATES.forEach(function (r) { RATE_OF[r[0]] = r; });
 
-    function order(t, plan, price, email, status, hideBelow) {
-      return { date: t, plan: plan, price: price, commission: COMMISSION[plan], email: email, status: status, hideBelow: !!hideBelow };
+    function order(t, plan, onPlan, email, status, hideBelow) {
+      var r = RATE_OF[plan];
+      var price = onPlan ? r[3] : r[1];
+      return { date: t, plan: plan, onPlan: !!onPlan, price: price, commission: rateAmount(price, onPlan ? r[4] : r[2]), email: email, status: status, hideBelow: !!hideBelow };
     }
 
-    // Sample orders of the active affiliate; the commission comes from the rate of the plan
+    // Sample orders of the active affiliate; true marks a payment plan
     var BASE = [
-      ['2026-09-12', '36 Months Access', 197, 'm***@gmail.com', 'hold'],
-      ['2026-09-12', '12 Months Access', 147, 'k***@yahoo.com', 'hold'],
-      ['2026-09-03', '90 Days', 117, 'd***@outlook.com', 'hold'],
-      ['2026-08-28', '30 Days', 97, 'a***@gmail.com', 'hold'],
-      ['2026-08-14', '36 Months Access', 197, 'w***@gmail.com', 'avail', true],
-      ['2026-08-11', '12 Months Access', 147, 't***@gmail.com', 'avail'],
-      ['2026-08-09', '180 Days', 137, 'f***@gmail.com', 'avail'],
-      ['2026-08-06', '12 Months Access', 147, 's***@icloud.com', 'avail'],
-      ['2026-08-02', '36 Months Access', 197, 'y***@yahoo.com', 'avail'],
-      ['2026-07-31', '90 Days', 117, 'p***@gmail.com', 'avail'],
-      ['2026-07-30', '36 Months Access', 197, 'r***@gmail.com', 'refund'],
-      ['2026-07-27', '12 Months Access', 147, 'u***@outlook.com', 'avail'],
-      ['2026-07-24', '30 Days', 97, 'h***@yahoo.com', 'avail'],
-      ['2026-07-19', '180 Days', 137, 'b***@gmail.com', 'paid'],
-      ['2026-07-12', '12 Months Access', 147, 'v***@outlook.com', 'paid'],
-      ['2026-07-02', '36 Months Access', 197, 'j***@hotmail.com', 'paid'],
-      ['2026-07-02', '12 Months Access', 147, 'l***@gmail.com', 'paid'],
-      ['2026-05-18', '36 Months Access', 197, 'c***@yahoo.com', 'paid'],
-      ['2026-05-12', '90 Days', 117, 'n***@gmail.com', 'paid'],
-      ['2026-05-08', '12 Months Access', 147, 'g***@gmail.com', 'paid'],
-      ['2026-04-29', '180 Days', 137, 'e***@icloud.com', 'paid']
+      ['2026-09-12', '36 Months Access', false, 'm***@gmail.com', 'hold'],
+      ['2026-09-12', '12 Months Access', false, 'k***@yahoo.com', 'hold'],
+      ['2026-09-08', '30 Days', true, 'o***@gmail.com', 'hold'],
+      ['2026-09-03', '90 Days', false, 'd***@outlook.com', 'hold'],
+      ['2026-08-28', '30 Days', false, 'a***@gmail.com', 'hold'],
+      ['2026-08-14', '36 Months Access', false, 'w***@gmail.com', 'avail', true],
+      ['2026-08-11', '12 Months Access', false, 't***@gmail.com', 'avail'],
+      ['2026-08-09', '180 Days', false, 'f***@gmail.com', 'avail'],
+      ['2026-08-06', '12 Months Access', false, 's***@icloud.com', 'avail'],
+      ['2026-08-04', '90 Days', true, 'z***@yahoo.com', 'avail'],
+      ['2026-08-02', '36 Months Access', false, 'y***@yahoo.com', 'avail'],
+      ['2026-07-31', '90 Days', false, 'p***@gmail.com', 'avail'],
+      ['2026-07-30', '36 Months Access', false, 'r***@gmail.com', 'refund'],
+      ['2026-07-27', '12 Months Access', false, 'u***@outlook.com', 'avail'],
+      ['2026-07-24', '180 Days', false, 'h***@yahoo.com', 'avail'],
+      ['2026-07-19', '180 Days', false, 'b***@gmail.com', 'paid'],
+      ['2026-07-12', '12 Months Access', false, 'v***@outlook.com', 'paid'],
+      ['2026-07-02', '36 Months Access', false, 'j***@hotmail.com', 'paid'],
+      ['2026-07-02', '12 Months Access', false, 'l***@gmail.com', 'paid'],
+      ['2026-05-18', '36 Months Access', false, 'c***@yahoo.com', 'paid'],
+      ['2026-05-12', '36 Months Access', false, 'n***@gmail.com', 'paid'],
+      ['2026-05-08', '12 Months Access', false, 'g***@gmail.com', 'paid'],
+      ['2026-04-29', '180 Days', false, 'e***@icloud.com', 'paid']
     ].map(function (r) { return order(utc(r[0]), r[1], r[2], r[3], r[4], r[5]); });
     var BASE_PAYOUTS = [
-      { date: utc('2026-08-20'), amount: 108, count: 8 }
+      { requested: utc('2026-08-19'), paid: utc('2026-08-21'), amount: 108, count: 8, status: 'paid' }
     ];
 
-    // A busy affiliate: a year of orders, payouts on the 20th once the available balance reaches $100
+    // A busy affiliate: a year of orders; payouts were requested now and then, with irregular gaps, and paid a few days later
     var MANY = (function () {
       var seed = 20260915;
       function rand() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
-      var PLANS = [['30 Days', 97, 2], ['90 Days', 117, 3], ['180 Days', 137, 2], ['12 Months Access', 147, 4], ['36 Months Access', 197, 3]];
+      var PLANS = [['30 Days', 2], ['90 Days', 3], ['180 Days', 2], ['12 Months Access', 4], ['36 Months Access', 3]];
       var DOMAINS = ['gmail.com', 'gmail.com', 'gmail.com', 'yahoo.com', 'outlook.com', 'icloud.com', 'hotmail.com'];
       var LETTERS = 'abcdefghjklmnprstvw';
       var orders = [];
@@ -899,20 +949,20 @@
         var n = rand() < 0.35 ? 0 : (rand() < 0.62 ? 1 : 2);
         for (var i = 0; i < n; i++) {
           var w = rand() * 14, k = 0;
-          while (w >= PLANS[k][2]) { w -= PLANS[k][2]; k++; }
+          while (w >= PLANS[k][1]) { w -= PLANS[k][1]; k++; }
+          var onPlan = rand() < 0.25;
           var email = LETTERS.charAt(Math.floor(rand() * LETTERS.length)) + '***@' + DOMAINS[Math.floor(rand() * DOMAINS.length)];
-          orders.push(order(t, PLANS[k][0], PLANS[k][1], email, rand() < 0.04 ? 'refund' : null));
+          orders.push(order(t, PLANS[k][0], onPlan, email, rand() < 0.04 ? 'refund' : null));
         }
       }
       var payouts = [];
-      for (var m = 10; ; m++) {
-        var paidOn = Date.UTC(2025, m, 20);
-        if (paidOn > TODAY) break;
-        var due = orders.filter(function (o) { return !o.status && o.date + HOLD_DAYS * DAY < paidOn; });
+      for (var requestedOn = Date.UTC(2025, 10, 6); requestedOn <= TODAY; requestedOn += (24 + Math.floor(rand() * 40)) * DAY) {
+        var due = orders.filter(function (o) { return !o.status && o.date + HOLD_DAYS * DAY <= requestedOn; });
         var sum = round2(due.reduce(function (a, o) { return a + o.commission; }, 0));
-        if (due.length && sum >= MINIMUM) {
+        var paidOn = requestedOn + (2 + Math.floor(rand() * 3)) * DAY;
+        if (due.length && sum >= MINIMUM && paidOn <= TODAY) {
           due.forEach(function (o) { o.status = 'paid'; });
-          payouts.unshift({ date: paidOn, amount: sum, count: due.length });
+          payouts.unshift({ requested: requestedOn, paid: paidOn, amount: sum, count: due.length, status: 'paid' });
         }
       }
       orders.forEach(function (o) { if (!o.status) o.status = o.date + HOLD_DAYS * DAY <= TODAY ? 'avail' : 'hold'; });
@@ -920,15 +970,26 @@
       return { orders: orders, payouts: payouts };
     })();
 
+    // A sent request keeps the data of the state it was sent from: the sample affiliate, or the busy one
+    function baseMode(mode) { return mode === 'requested' ? 'active' : (mode === 'many-requested' ? 'many' : mode); }
     function ordersFor(mode) {
+      mode = baseMode(mode);
       if (mode === 'new') return [];
       if (mode === 'many') return MANY.orders;
       if (mode === 'below') return BASE.filter(function (o) { return !o.hideBelow; });
       return BASE;
     }
+    // After a request, the available commissions stay Available until we pay them; the request shows up in Payouts
+    function requestFor(mode) {
+      if (mode !== 'requested' && mode !== 'many-requested') return null;
+      var avail = ordersFor(mode).filter(function (o) { return o.status === 'avail'; });
+      return { requested: TODAY, paid: null, amount: round2(avail.reduce(function (a, o) { return a + o.commission; }, 0)), count: avail.length, status: 'requested' };
+    }
     function payoutsFor(mode) {
       if (mode === 'new') return [];
-      return mode === 'many' ? MANY.payouts : BASE_PAYOUTS;
+      var past = baseMode(mode) === 'many' ? MANY.payouts : BASE_PAYOUTS;
+      var request = requestFor(mode);
+      return request ? [request].concat(past) : past;
     }
     function totals(orders) {
       var t = { hold: 0, avail: 0, paid: 0, refund: 0, count: { hold: 0, avail: 0, paid: 0, refund: 0 }, revenue: 0 };
@@ -959,15 +1020,16 @@
       document.querySelector('[data-stat="epc"]').dataset.many = money((t.hold + t.avail + t.paid) / clicksTotal);
     })();
 
-    // The rates table, the same in Links and in the Commissions section
+    // The rates table, the same in Links, Commissions and Terms: what the affiliate earns when the plan is paid in full or on a payment plan
     (function () {
-      var html = '<table><thead><tr><th>Plan</th><th class="r">Price</th><th class="r">You earn</th></tr></thead><tbody>' +
+      function earn(label, price, rate) {
+        var share = typeof rate === 'string' ? rate + ' of a ' : '';
+        return '<td class="r num rates__earn" data-label="' + label + '">' + money(rateAmount(price, rate)) +
+          '<small>' + share + money(price).replace('.00', '') + ' purchase</small></td>';
+      }
+      var html = '<table><thead><tr><th>Plan</th><th class="r">Paid in full</th><th class="r">Payment plan</th></tr></thead><tbody>' +
         RATES.map(function (r) {
-          var share = typeof r[2] === 'string' ? '<small>' + r[2] + ' of the price</small>' : '';
-          return '<tr><td class="rates__plan">' + r[0] + '</td>' +
-            '<td class="r num rates__price">' + money(r[1]) +
-              '<small>' + money(r[3]) + ' with a plan</small></td>' +
-            '<td class="r num rates__earn">' + money(rateAmount(r[1], r[2])) + share + '</td></tr>';
+          return '<tr><td class="rates__plan">' + r[0] + '</td>' + earn('Paid in full', r[1], r[2]) + earn('Payment plan', r[3], r[4]) + '</tr>';
         }).join('') + '</tbody></table>';
       document.querySelectorAll('.rates__body').forEach(function (el) { el.innerHTML = html; });
     })();
@@ -989,7 +1051,7 @@
       var refunded = o.status === 'refund';
       return '<tr data-status="' + o.status + '">' +
         '<td class="num">' + fmtDate(o.date) + '</td>' +
-        '<td><span class="product">HESI Exam Study</span><span class="plan">' + o.plan + '</span></td>' +
+        '<td><span class="product">HESI Exam Study</span><span class="plan">' + o.plan + (o.onPlan ? ' · Payment plan' : '') + '</span></td>' +
         '<td class="col-customer">' + o.email + '</td>' +
         '<td class="r num">' + money(o.price) + '</td>' +
         '<td class="r num">' + (refunded ? '<span class="strike">' + money(o.commission) + '</span>$0.00' : money(o.commission)) + '</td>' +
@@ -1017,6 +1079,14 @@
       else if (t.avail === 0) minimum.textContent = '$100 to the payout minimum';
       else minimum.textContent = money(round2(MINIMUM - t.avail)) + ' to the $100 minimum';
       document.querySelector('.balance .tab__bar i').style.transform = 'scaleX(' + Math.min(t.avail / MINIMUM, 1) + ')';
+      // The payout request: offered from $100, replaced by its status once sent
+      var request = requestFor(mode);
+      body.dataset.payout = request ? 'requested' : (t.avail >= MINIMUM ? 'ready' : 'below');
+      if (request) {
+        document.querySelector('[data-requested-amount]').textContent = money(request.amount);
+        document.querySelector('[data-requested-date]').textContent = fmtDate(request.requested);
+        document.querySelector('[data-requested-short]').textContent = MONTHS[new Date(request.requested).getUTCMonth()] + ' ' + new Date(request.requested).getUTCDate();
+      }
 
       var open = Object.prototype.hasOwnProperty.call(FILTERS, filter);
       var byButton = body.dataset.orders === 'button';
@@ -1064,7 +1134,8 @@
       var tbody = document.querySelector('.payouts-body');
       tbody.querySelectorAll('.payout-row').forEach(function (row) { row.remove(); });
       var html = payoutsFor(mode).map(function (p) {
-        return '<tr class="payout-row"><td data-label="Date paid" class="num">' + fmtDate(p.date) + '</td><td data-label="Amount" class="r num">' + money(p.amount) + '</td><td data-label="Commissions" class="r num">' + p.count + '</td><td data-label="PayPal account">jordan.lee@example.com</td></tr>';
+        var status = p.status === 'requested' ? '<span class="status st-hold">Requested</span>' : '<span class="status st-paid">Paid</span>';
+        return '<tr class="payout-row"><td data-label="Requested" class="num">' + fmtDate(p.requested) + '</td><td data-label="Paid" class="num">' + (p.paid ? fmtDate(p.paid) : '—') + '</td><td data-label="Amount" class="r num">' + money(p.amount) + '</td><td data-label="Commissions" class="r num">' + p.count + '</td><td data-label="Status">' + status + '</td><td data-label="PayPal account">jordan.lee@example.com</td></tr>';
       }).join('');
       tbody.insertAdjacentHTML('afterbegin', html);
     }
@@ -1076,7 +1147,9 @@
       document.title = (TITLES[body.dataset.section] || 'Links') + ' | YourBestGrade Affiliate Dashboard';
       document.querySelectorAll('.mock-seg').forEach(function (seg) {
         seg.querySelectorAll('button').forEach(function (btn) {
-          btn.setAttribute('aria-pressed', String(btn.dataset.value === body.dataset[seg.dataset.key]));
+          var current = body.dataset[seg.dataset.key];
+          if (seg.dataset.key === 'state' && current === 'many-requested') current = 'many';
+          btn.setAttribute('aria-pressed', String(btn.dataset.value === current));
         });
       });
       document.querySelectorAll('.nav a').forEach(function (link) {
@@ -1084,8 +1157,9 @@
         else link.removeAttribute('aria-current');
       });
       var mode = body.dataset.state;
+      var dataMode = baseMode(mode);
       stateful.forEach(function (el) {
-        var value = (mode === 'below' && el.dataset.below) || (mode === 'new' && el.dataset.new) || (mode === 'many' && el.dataset.many) || el.dataset.active;
+        var value = (dataMode === 'below' && el.dataset.below) || (dataMode === 'new' && el.dataset.new) || (dataMode === 'many' && el.dataset.many) || el.dataset.active;
         if (el.firstChild && el.firstChild.nodeType === 3) el.firstChild.textContent = value; else el.textContent = value;
       });
       renderEarnings(mode, state.filter, state.page);
@@ -1127,6 +1201,10 @@
       btn.addEventListener('click', function () { go('filter', btn.dataset.filter); });
     });
     document.querySelector('.orders__close').addEventListener('click', function () { go('filter', 'none'); });
+    // Request payout sends the request: in the mockup it switches to the requested state
+    document.querySelectorAll('[data-request]').forEach(function (btn) {
+      btn.addEventListener('click', function () { go('state', baseMode(body.dataset.state) === 'many' ? 'many-requested' : 'requested'); });
+    });
     document.querySelector('.pager__pages').addEventListener('click', function (event) {
       var btn = event.target.closest('button[data-page]');
       if (!btn || btn.disabled) return;
