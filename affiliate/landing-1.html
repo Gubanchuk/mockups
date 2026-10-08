@@ -15,10 +15,7 @@
     --orange: #ef561f;
     --orange-hover: #c8430f;
     --ground: #eff5fe;
-    --panel: #f6f9fe;
-    --surface: #eeeff5;
     --line: #dbe6f4;
-    --field: #c9d6e8;
     --path-line: #cddcef;
     --ink: #1f2a3c;
     --muted: #56657c;
@@ -103,98 +100,63 @@
     box-shadow: 0 4px 18px rgba(24, 50, 97, 0.07), 0 1px 2px rgba(24, 50, 97, 0.06);
   }
 
-  /* ---------- First screen: the offer in one column; the idea follows right under it ---------- */
+  /* ---------- First screen: the offer on the left, the idea in three steps on the right ---------- */
   .hero {
     /* the waves fade into the page ground instead of ending on a hard edge */
     background:
       linear-gradient(to bottom, rgba(239, 245, 254, 0) 70%, var(--ground) 100%),
       url(assets/login-page-bg.jpg) center top / cover no-repeat,
       var(--ground);
-    padding: 72px var(--gutter) 64px;
+    padding: 64px var(--gutter) 64px;
   }
-  .hero__inner { max-width: var(--w); margin: 0 auto; }
-  .hero__pitch { max-width: 760px; }
+  .hero__inner {
+    max-width: var(--w); margin: 0 auto;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 440px); gap: 56px; align-items: center;
+  }
   .hero h1 {
     margin: 0; color: var(--navy); font-size: 36px; line-height: 1.18; font-weight: 700;
     letter-spacing: -0.01em; text-wrap: balance;
   }
-  .hero__lead { margin: 18px 0 0; max-width: 600px; color: var(--ink); font-size: 16.5px; line-height: 1.6; text-wrap: pretty; }
-  .proof-line { margin: 22px 0 0; max-width: 540px; color: var(--navy); font-size: 14px; font-weight: 500; line-height: 1.7; }
-  .proof-line span { white-space: nowrap; }
+  .hero__lead { margin: 18px 0 0; max-width: 540px; color: var(--ink); font-size: 16.5px; line-height: 1.6; text-wrap: pretty; }
   .hero .actions { margin-top: 30px; }
+
+  /* The idea: get a link, share it, get paid */
+  .idea { padding: 30px 32px 32px; }
+  .idea h2 { margin: 0 0 22px; color: var(--navy); font-size: 18px; font-weight: 600; line-height: 1.3; }
+  .idea__steps { list-style: none; margin: 0; padding: 0; }
+  .idea__step { position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: 16px; padding: 0 0 24px; }
+  .idea__step:last-child { padding-bottom: 0; }
+  .idea__step:not(:last-child)::before {
+    content: ""; position: absolute; left: 16px; top: 40px; bottom: 4px; width: 2px;
+    background: var(--path-line); border-radius: 1px;
+  }
+  .idea__node {
+    grid-row: 1 / span 2; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+    background: #fff; border: 2px solid var(--blue); color: var(--blue);
+    font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums;
+  }
+  .idea__step:last-child .idea__node { background: var(--blue); color: #fff; }
+  .idea__step h3 { margin: 6px 0 0; color: var(--navy); font-size: 16px; font-weight: 600; line-height: 1.35; }
+  .idea__step p { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; text-wrap: pretty; }
+  .idea__amount { font-weight: 700; white-space: nowrap; }
 
   /* ---------- Sections under the first screen ---------- */
   .section { max-width: calc(var(--w) + 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--gutter); }
   .section + .section { margin-top: 88px; }
-  /* How it works sits right under the first screen in both versions */
-  .hero + .section { margin-top: 24px; }
+  /* first visible section of each version: A starts with the rates, B skips the hidden rates section */
+  .hero + .section,
+  body[data-version="b"] .hero + .section + .section { margin-top: 24px; }
   .section__head { max-width: 640px; margin: 0 0 28px; }
   .section__title { margin: 0; color: var(--navy); font-size: 26px; font-weight: 600; line-height: 1.22; text-wrap: balance; }
   .section__lead { margin: 10px 0 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
 
-  /* Rates table (version A) */
-  .rates { padding: 6px 0; overflow: hidden; }
-  .rates table { width: 100%; border-collapse: collapse; font-size: 15px; }
-  .rates th { padding: 16px 28px 12px; color: var(--muted); font-size: 13px; font-weight: 500; text-align: left; border-bottom: 1px solid var(--line); }
-  .rates td { padding: 18px 28px; border-bottom: 1px solid var(--line); transition: background-color 160ms ease-out; }
-  .rates tr:last-child td { border-bottom: 0; }
-  .rates tbody tr:hover td { background: var(--panel); }
-  .rates .r { text-align: right; }
-  .rates__plan { color: var(--navy); font-weight: 600; }
-  .rates__earn { color: var(--navy); font-size: 22px; font-weight: 700; }
-  .rates__earn small { display: block; margin-top: 1px; color: var(--muted); font-size: 12.5px; font-weight: 400; white-space: nowrap; }
-  .rates-notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 40px; margin: 18px 0 0; padding: 0; list-style: none; }
-  .rates-notes li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; color: var(--muted); font-size: 14px; line-height: 1.55; }
-  .rates-notes svg.icon { color: var(--blue); margin-top: 2px; }
-
-  /* Path from a link to a payout */
-  .path-card { padding: 34px 40px 32px; }
-  .path { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); column-gap: 28px; }
-  .path--3 { grid-template-columns: repeat(3, 1fr); column-gap: 40px; }
-  .station { position: relative; }
-  .station:not(:last-child)::before {
-    content: ""; position: absolute; top: 16px; left: 44px; height: 2px;
-    width: calc(100% + 28px - 54px); background: var(--path-line); border-radius: 1px;
-  }
-  .path--3 .station:not(:last-child)::before { width: calc(100% + 40px - 54px); }
-  .station__node {
-    width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
-    background: #fff; border: 2px solid var(--blue); color: var(--blue);
-    font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums;
-  }
-  .station--last .station__node { background: var(--blue); color: #fff; }
-  .station h3 { margin: 14px 0 0; color: var(--navy); font-size: 15.5px; font-weight: 600; line-height: 1.35; }
-  .station p { margin: 6px 0 0; color: var(--muted); font-size: 13.5px; line-height: 1.6; text-wrap: pretty; }
-  .station strong { color: var(--navy); font-weight: 600; }
-
-  /* Who we're looking for + what to tell followers */
-  .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
-  .split .card { padding: 32px 36px; }
-  body[data-version="b"] .split--who { grid-template-columns: minmax(0, 1fr); }
-  .split h3 { margin: 0; color: var(--navy); font-size: 18px; font-weight: 600; line-height: 1.3; }
-  .split p { margin: 10px 0 0; max-width: 65ch; color: var(--ink); font-size: 14.5px; line-height: 1.65; }
-  .channels { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; }
-  .channels li { padding: 6px 12px; border-radius: 999px; background: var(--surface); color: var(--navy); font-size: 13px; font-weight: 500; }
-  .ticks { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 11px; }
-  .ticks li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; color: var(--ink); font-size: 14.5px; line-height: 1.55; }
-  .ticks svg.icon { color: var(--blue); margin-top: 2px; stroke-width: 2.2; }
-  .ticks b { color: var(--navy); font-weight: 600; }
-  .ticks-note { margin: 16px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.6; }
-  /* "Sound like you?" sits at the bottom of the who card, level with the end of the talking points */
-  .split--who > .card:first-child { display: flex; flex-direction: column; }
-  .who-cta { margin-top: auto; padding-top: 24px; }
-  .split .who-cta__ask { margin: 0 0 12px; color: var(--navy); font-size: 16px; font-weight: 600; }
-  /* Version B has no talking-points card next to it: the card spans the row, so the call to action takes the right column */
-  @media (min-width: 901px) {
-    body[data-version="b"] .split--who > .card:first-child {
-      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 260px); column-gap: 40px; align-content: start;
-    }
-    body[data-version="b"] .split--who > .card:first-child > * { grid-column: 1; }
-    body[data-version="b"] .split--who > .card:first-child > .who-cta {
-      grid-column: 2; grid-row: 1 / span 4; align-self: center;
-      margin: 0; padding: 4px 0 4px 40px; border-left: 1px solid var(--line);
-    }
-  }
+  /* Rates (version A): one amount per plan */
+  .rates { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); overflow: hidden; }
+  .rates li { padding: 24px 26px 22px; }
+  .rates li + li { border-left: 1px solid var(--line); }
+  .rates__plan { display: block; color: var(--muted); font-size: 14px; font-weight: 500; }
+  .rates__earn { display: block; margin-top: 4px; color: var(--navy); font-size: 26px; font-weight: 700; line-height: 1.2; }
+  .rates__note { margin: 16px 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
 
   /* Why students choose (version B): the photo from the login pages beside two lists */
   .why { display: grid; grid-template-columns: 240px minmax(0, 1fr) minmax(0, 1fr); overflow: hidden; }
@@ -202,6 +164,11 @@
   .why__text { padding: 32px 32px 30px; }
   .why__text + .why__text { border-left: 1px solid var(--line); }
   .why h3 { margin: 0; color: var(--navy); font-size: 18px; font-weight: 600; line-height: 1.3; }
+  .ticks { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 11px; }
+  .ticks li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; color: var(--ink); font-size: 14.5px; line-height: 1.55; }
+  .ticks svg.icon { color: var(--blue); margin-top: 2px; stroke-width: 2.2; }
+  .ticks b { color: var(--navy); font-weight: 600; }
+  .ticks-note { margin: 16px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.6; }
 
   /* Student voices (version B) */
   .voices { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 24px; }
@@ -209,25 +176,25 @@
   .voice blockquote { margin: 0; color: var(--navy); font-size: 17px; font-weight: 500; line-height: 1.5; text-wrap: pretty; }
   .voice figcaption { margin-top: 12px; color: var(--muted); font-size: 13px; }
 
-  /* Rules and questions */
-  .info { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); overflow: hidden; }
-  .info__col { padding: 34px 40px 32px; }
-  .info__col--faq { background: var(--panel); border-left: 1px solid var(--line); }
-  .info h3 { margin: 0 0 4px; color: var(--navy); font-size: 18px; font-weight: 600; }
-  .rules { list-style: none; margin: 0; padding: 0; counter-reset: rule; }
-  .rules li { counter-increment: rule; padding: 16px 0 0; }
-  .rules h4 { display: flex; gap: 10px; margin: 0; color: var(--navy); font-size: 15px; font-weight: 600; line-height: 1.35; }
-  .rules h4::before { content: counter(rule) "."; min-width: 18px; color: var(--blue); font-variant-numeric: tabular-nums; }
-  .rules p { margin: 5px 0 0 28px; color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 62ch; }
-  .rules__more { margin: 20px 0 0; font-size: 14px; font-weight: 500; }
-  .faq { margin: 0; }
-  .faq dt { margin: 18px 0 0; color: var(--navy); font-size: 15px; font-weight: 600; line-height: 1.35; }
-  .faq dd { margin: 5px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 62ch; }
+  /* Good to know: the rules and answers in short lines */
+  .facts { padding: 34px 40px 30px; }
+  .facts__list { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 56px; }
+  .facts__list dt { color: var(--navy); font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .facts__list dd { margin: 5px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 60ch; }
+  .facts__more {
+    display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 28px 0 0; padding: 20px 0 0;
+    border-top: 1px solid var(--line); color: var(--muted); font-size: 14px;
+  }
+  .facts__more > a { font-weight: 500; }
 
+  /* Closing: who we are looking for, then the form */
   .closing { text-align: center; padding: 96px 20px 104px; }
   .closing h2 { margin: 0; color: var(--navy); font-size: 32px; font-weight: 600; line-height: 1.22; text-wrap: balance; }
-  .closing p { margin: 10px auto 0; max-width: 520px; color: var(--muted); font-size: 15px; line-height: 1.6; }
-  .closing .actions { margin-top: 26px; justify-content: center; }
+  .closing p { margin: 12px auto 0; max-width: 560px; color: var(--muted); font-size: 15px; line-height: 1.6; text-wrap: pretty; }
+  .closing .closing__who { color: var(--ink); font-size: 16px; }
+  .channels { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 20px 0 0; padding: 0; list-style: none; }
+  .channels li { padding: 6px 12px; border-radius: 999px; background: #fff; color: var(--navy); font-size: 13px; font-weight: 500; }
+  .closing .actions { margin-top: 28px; justify-content: center; }
 
   /* ---------- Footer (HESI, as login-1) ---------- */
   .footer-hesi { background: var(--navy-deep); color: #fff; }
@@ -250,22 +217,17 @@
 
   /* ---------- Narrow desktop and tablet ---------- */
   @media (max-width: 1100px) {
+    .hero__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: 40px; }
     .hero h1 { font-size: 32px; }
-    .path { grid-template-columns: 1fr; }
-    .path-card .station { display: grid; grid-template-columns: 34px 1fr; column-gap: 16px; padding: 0 0 22px; }
-    .path-card .station:last-child { padding-bottom: 0; }
-    .path-card .station:not(:last-child)::before { top: 40px; left: 16px; bottom: 4px; width: 2px; height: auto; }
-    .path-card .station h3 { margin-top: 6px; }
-    .path-card .station__node { grid-row: 1 / span 2; }
+    .rates li { padding: 22px 18px 20px; }
   }
 
   @media (max-width: 900px) {
-    .split, .voices, .info { grid-template-columns: minmax(0, 1fr); }
+    .hero__inner { grid-template-columns: minmax(0, 1fr); gap: 36px; max-width: 620px; }
+    .voices, .facts__list { grid-template-columns: minmax(0, 1fr); }
     .why { grid-template-columns: 200px minmax(0, 1fr); }
     .why__photo { grid-row: span 2; }
     .why__text + .why__text { border-left: 0; border-top: 1px solid var(--line); }
-    .info__col--faq { border-left: 0; border-top: 1px solid var(--line); }
-    .rates-notes { grid-template-columns: minmax(0, 1fr); }
   }
 
   /* ---------- Phone ---------- */
@@ -280,23 +242,26 @@
     .hero__lead { font-size: 15px; }
     .hero .actions { flex-direction: column; align-items: stretch; text-align: center; }
     .hero .actions .btn { width: 100%; }
-    .rates th, .rates td { padding-top: 14px; padding-bottom: 14px; }
-    .rates th.r { white-space: nowrap; }
+    .idea { padding: 24px 20px 26px; }
     .section + .section { margin-top: 64px; }
-    .hero + .section { margin-top: 16px; }
-    .who-cta .btn { width: 100%; }
+    .hero + .section,
+    body[data-version="b"] .hero + .section + .section { margin-top: 16px; }
     .section__title { font-size: 24px; }
-    .rates th, .rates td { padding-left: 16px; padding-right: 16px; }
-    .rates__earn { font-size: 18px; }
-    .path-card, .split .card, .info__col { padding: 26px 20px 24px; }
+    .rates { grid-template-columns: minmax(0, 1fr); }
+    .rates li { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 14px 20px; }
+    .rates li + li { border-left: 0; border-top: 1px solid var(--line); }
+    .rates__earn { margin-top: 0; font-size: 22px; }
+    .facts { padding: 26px 20px 24px; }
+    .facts__list { gap: 20px; }
+    .facts__more { flex-direction: column; }
     .voice { padding: 22px 20px; }
     .why { grid-template-columns: minmax(0, 1fr); }
     .why__photo { grid-row: auto; height: 220px; min-height: 0; object-position: center 18%; }
     .why__text { padding: 24px 20px 22px; }
     .voice blockquote { font-size: 16px; }
-    .rules p { margin-left: 0; }
     .closing { padding: 64px 16px 72px; }
     .closing h2 { font-size: 24px; }
+    .closing .closing__who { font-size: 15px; }
     .closing .actions { flex-direction: column; }
     .closing .actions .btn { width: 100%; }
     .footer-hesi__inner { padding: 30px 20px 26px; }
@@ -331,71 +296,36 @@
   <section class="hero">
     <div class="hero__inner">
       <div class="hero__pitch">
-        <h1 class="v-a">Earn $4–$20 for every HESI Exam Study plan your followers buy</h1>
+        <h1 class="v-a">Recommend HESI Exam Study and earn $4–$20 for every plan bought through your link</h1>
         <h1 class="v-b">Recommend HESI exam prep to nursing students and earn on every plan they buy</h1>
-        <p class="hero__lead v-a">For nurses and nursing students whose followers or classmates are getting ready for the HESI Exit. Share your link, and every plan bought through it earns you a fixed commission, paid to your PayPal.</p>
-        <p class="hero__lead v-b">The YourBestGrade Affiliate Program pays a fixed commission on every HESI Exam Study plan bought through your link, whether you share it with followers or classmates.</p>
-        <p class="proof-line v-b"><span>Since 2010&nbsp;&middot;</span> <span>Over 90% of our students succeed*&nbsp;&middot;</span> <span>Success Guarantee**</span></p>
+        <p class="hero__lead">For nurses and nursing students whose followers or classmates are getting ready for the HESI Exit.</p>
         <div class="actions">
           <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>
           <span class="actions__login">Already an affiliate? <a href="/affiliate/login-1#screen=login">Log in</a></span>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- From a link to a payout -->
-  <section class="section">
-    <div class="section__head">
-      <h2 class="section__title">How it works</h2>
-    </div>
-    <div class="card path-card v-a">
-      <ol class="path">
-        <li class="station">
-          <span class="station__node">1</span>
-          <h3>Apply</h3>
-          <p>Tell us where you'll share your link. We review every application and email you once it's approved.</p>
-        </li>
-        <li class="station">
-          <span class="station__node">2</span>
-          <h3>Share your link</h3>
-          <p>Copy it from your dashboard. It can lead to our home page, the HESI Exam Study page or the pricing page.</p>
-        </li>
-        <li class="station">
-          <span class="station__node">3</span>
-          <h3>A follower buys</h3>
-          <p>They buy within <strong>30 days</strong> of clicking your link. If they clicked several affiliate links, the last one counts.</p>
-        </li>
-        <li class="station">
-          <span class="station__node">4</span>
-          <h3>30-day hold</h3>
-          <p>The commission is on hold for <strong>30 days</strong> after the purchase, then it becomes available.</p>
-        </li>
-        <li class="station station--last">
-          <span class="station__node">5</span>
-          <h3>Request a payout</h3>
-          <p>Once you have <strong>$100</strong> or more available, request a payout in your dashboard. We send it to your PayPal within a few days.</p>
-        </li>
-      </ol>
-    </div>
-    <div class="card path-card v-b">
-      <ol class="path path--3">
-        <li class="station">
-          <span class="station__node">1</span>
-          <h3>Apply</h3>
-          <p>Tell us who you are and where you'll share your link. We review every application and email you once it's approved.</p>
-        </li>
-        <li class="station">
-          <span class="station__node">2</span>
-          <h3>Share your link</h3>
-          <p>Copy it from your dashboard and share it with nursing students preparing for the HESI Exit.</p>
-        </li>
-        <li class="station station--last">
-          <span class="station__node">3</span>
-          <h3>Get paid</h3>
-          <p>After a 30-day hold, request a payout once you have $100 or more. We send it to your PayPal within a few days.</p>
-        </li>
-      </ol>
+      <div class="card idea">
+        <h2>How it works</h2>
+        <ol class="idea__steps">
+          <li class="idea__step">
+            <span class="idea__node">1</span>
+            <h3>Apply and get your link</h3>
+            <p>We review every application and email you once it's approved.</p>
+          </li>
+          <li class="idea__step">
+            <span class="idea__node">2</span>
+            <h3>Share it with followers or classmates</h3>
+            <p>A purchase counts if it's made within 30 days of a click on your link.</p>
+          </li>
+          <li class="idea__step">
+            <span class="idea__node">3</span>
+            <h3 class="v-a">Get <span class="idea__amount">$4–$20</span> for every plan</h3>
+            <h3 class="v-b">Get a fixed commission for every plan</h3>
+            <p>Once you have $100, request a payout to your PayPal.</p>
+          </li>
+        </ol>
+      </div>
     </div>
   </section>
 
@@ -403,24 +333,15 @@
   <section class="section v-a" id="rates">
     <div class="section__head">
       <h2 class="section__title">What you earn per plan</h2>
-      <p class="section__lead">A fixed amount for every HESI Exam Study plan bought through your link.</p>
     </div>
-    <div class="card rates">
-      <table>
-        <thead><tr><th>Plan</th><th class="r">Paid in full</th><th class="r">Payment plan</th></tr></thead>
-        <tbody>
-          <tr><td class="rates__plan">30 Days</td><td class="r rates__earn num">$5<small>$97 purchase</small></td><td class="r rates__earn num">$4<small>$107 purchase</small></td></tr>
-          <tr><td class="rates__plan">90 Days</td><td class="r rates__earn num">$8<small>$117 purchase</small></td><td class="r rates__earn num">$7<small>$127 purchase</small></td></tr>
-          <tr><td class="rates__plan">180 Days</td><td class="r rates__earn num">$9<small>$137 purchase</small></td><td class="r rates__earn num">$8<small>$147 purchase</small></td></tr>
-          <tr><td class="rates__plan">12 Months Access</td><td class="r rates__earn num">$10<small>$147 purchase</small></td><td class="r rates__earn num">$10<small>$157 purchase</small></td></tr>
-          <tr><td class="rates__plan">36 Months Access</td><td class="r rates__earn num">$20<small>$197 purchase</small></td><td class="r rates__earn num">$20<small>$207 purchase</small></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <ul class="rates-notes">
-      <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>A plan paid with Klarna, Afterpay or Affirm counts too, at the payment plan rate.</li>
-      <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>The amount is fixed at the moment of purchase. If a rate changes, the new one applies only to later purchases.</li>
+    <ul class="card rates" aria-label="Commission per HESI Exam Study plan">
+      <li><span class="rates__plan">30 Days</span><b class="rates__earn num">$5</b></li>
+      <li><span class="rates__plan">90 Days</span><b class="rates__earn num">$8</b></li>
+      <li><span class="rates__plan">180 Days</span><b class="rates__earn num">$9</b></li>
+      <li><span class="rates__plan">12 Months</span><b class="rates__earn num">$10</b></li>
+      <li><span class="rates__plan">36 Months</span><b class="rates__earn num">$20</b></li>
     </ul>
+    <p class="rates__note">Paid with Klarna, Afterpay or Affirm, the 30 Days, 90 Days and 180 Days plans earn $1 less.</p>
   </section>
 
   <!-- Version B: why students choose the course -->
@@ -462,69 +383,56 @@
     </div>
   </section>
 
-  <!-- Who we're looking for; version A also gets the talking points -->
+  <!-- Rules and answers in short lines -->
   <section class="section">
-    <div class="split split--who">
-      <div class="card">
-        <h3>Who we're looking for</h3>
-        <p>Nurses, recent graduates and nursing students who share study tips and nursing school life with followers or classmates getting ready for the HESI Exit.</p>
-        <ul class="channels" aria-label="Where our affiliates share their links">
-          <li>TikTok</li><li>Instagram</li><li>YouTube</li><li>Facebook</li><li>Classmates</li>
-        </ul>
-        <p class="v-b">This isn't a discount program: purchases through your own link don't earn a commission.</p>
-        <div class="who-cta">
-          <p class="who-cta__ask">Sound like you?</p>
-          <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>
-        </div>
-      </div>
-      <div class="card v-a">
-        <h3>What you can tell your followers</h3>
-        <ul class="ticks">
-          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Success Guarantee:</b> a full refund if they actively use the program and still fail the HESI Exit. Not for 30-day plans.</span></li>
-          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Over 90%</b> of our students succeed on their exams*</span></li>
-          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Helping students with the HESI <b>since 2010</b></span></li>
-          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Realistic RN and PN practice tests with a rationale for every question</span></li>
-          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Free practice tests to try first: <a href="https://www.beta.yourbestgrade.com/hesi/tests/1/tos" target="_blank" rel="noopener">RN</a> &middot; <a href="https://www.beta.yourbestgrade.com/hesi/tests/15/tos" target="_blank" rel="noopener">PN</a></span></li>
-        </ul>
-        <p class="ticks-note">*From our surveys of students who took the HESI Exit. <a href="https://www.beta.yourbestgrade.com/hesi/pricing" target="_blank" rel="noopener">Full guarantee terms are on our Pricing page.</a></p>
-      </div>
+    <div class="section__head">
+      <h2 class="section__title">Good to know</h2>
     </div>
-  </section>
-
-  <!-- Rules and questions -->
-  <section class="section">
-    <div class="card info">
-      <div class="info__col">
-        <h3>Good to know</h3>
-        <ol class="rules">
-          <li class="v-b"><h4>What counts</h4><p>A purchase counts if the buyer clicked your link within the last 30 days and yours was the last affiliate link they clicked.</p></li>
-          <li><h4>Refunds</h4><p>If an order is refunded, fully or in part, its commission is cancelled. If it was already paid out, it's deducted from your future payouts.</p></li>
-          <li><h4>Not allowed</h4><p>Don't spam your links, buy through your own link or generate fake clicks. If you break the rules, we may suspend or close your account.</p></li>
-        </ol>
-        <p class="rules__more"><a href="https://www.beta.yourbestgrade.com/affiliate/terms_of_use" target="_blank" rel="noopener">Read the full Terms of Use</a></p>
-      </div>
-      <div class="info__col info__col--faq">
-        <h3>Questions</h3>
-        <dl class="faq">
-          <dt class="v-b">How much do I earn?</dt>
-          <dd class="v-b">Every plan has its own fixed commission. You'll see the rate for each plan in your dashboard once you're approved, before you share your link.</dd>
-          <dt class="v-b">Where can my link lead?</dt>
-          <dd class="v-b">To our home page, the HESI Exam Study page or the pricing page.</dd>
-          <dt class="v-b">Do payment plans count?</dt>
-          <dd class="v-b">Yes. A plan paid with Klarna, Afterpay or Affirm earns a commission too. Your dashboard shows the rate for paying in full and for a payment plan.</dd>
-          <dt>Where do I see my results?</dt>
-          <dd>Your dashboard shows clicks, unique visitors and purchases for each link, and every order with its status.</dd>
-          <dt>Who do I contact with questions?</dt>
-          <dd>Email <a href="mailto:support@yourbestgrade.com">support@yourbestgrade.com</a>.</dd>
-        </dl>
-      </div>
+    <div class="card facts">
+      <dl class="facts__list">
+        <div>
+          <dt>Last click counts</dt>
+          <dd>If someone clicked several affiliate links before buying, the purchase counts for the last one.</dd>
+        </div>
+        <div>
+          <dt>30-day hold</dt>
+          <dd>Each commission is on hold for 30 days after the purchase, then it becomes available.</dd>
+        </div>
+        <div>
+          <dt>Payouts</dt>
+          <dd>Once you have $100 or more available, request a payout in your dashboard. We send it to your PayPal within a few days.</dd>
+        </div>
+        <div>
+          <dt>Refunds</dt>
+          <dd>If an order is refunded, fully or in part, its commission is cancelled. If it was already paid out, it's deducted from your future payouts.</dd>
+        </div>
+        <div>
+          <dt>Not allowed</dt>
+          <dd>Purchases through your own link don't earn a commission: this isn't a discount program. Don't spam your link or generate fake clicks, or we may suspend or close your account.</dd>
+        </div>
+        <div class="v-a">
+          <dt>Rate changes</dt>
+          <dd>The amount is fixed at the moment of purchase. If a rate changes, the new one applies only to later purchases.</dd>
+        </div>
+        <div class="v-b">
+          <dt>Rates</dt>
+          <dd>Every plan has its own fixed commission, and plans paid with Klarna, Afterpay or Affirm count too. You'll see the rates in your dashboard once you're approved.</dd>
+        </div>
+      </dl>
+      <p class="facts__more">
+        <a href="https://www.beta.yourbestgrade.com/affiliate/terms_of_use" target="_blank" rel="noopener">Read the full Terms of Use</a>
+        <span>Questions? Email <a href="mailto:support@yourbestgrade.com">support@yourbestgrade.com</a></span>
+      </p>
     </div>
   </section>
 
   <section class="closing">
-    <h2>Join the YourBestGrade Affiliate Program</h2>
-    <p class="v-a">Earn $4–$20 for every plan your followers buy. The form asks where you post, a few words about you and your audience, and your PayPal email for payouts.</p>
-    <p class="v-b">The form asks where you post, a few words about you and your audience, and your PayPal email for payouts.</p>
+    <h2>Who we're looking for</h2>
+    <p class="closing__who">Active nurses, recent graduates and nursing students who want to tell their community about HESI Exam Study and earn while doing it.</p>
+    <ul class="channels" aria-label="Where our affiliates share their links">
+      <li>TikTok</li><li>Instagram</li><li>YouTube</li><li>Facebook</li><li>Classmates</li>
+    </ul>
+    <p>The form asks where you post, a few words about you and your audience, and your PayPal email for payouts.</p>
     <div class="actions">
       <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>
       <span class="actions__login">Already an affiliate? <a href="/affiliate/login-1#screen=login">Log in</a></span>
