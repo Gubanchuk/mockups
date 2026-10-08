@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Affiliate Program | YourBestGrade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #183261;
+    --navy-deep: #0e2c56;
+    --blue: #1e5290;
+    --orange: #ef561f;
+    --orange-hover: #c8430f;
+    --ground: #eff5fe;
+    --line: #dbe6f4;
+    --ink: #1f2a3c;
+    --muted: #56657c;
+    --footer-note: #7e9ac1;
+    --gutter: 24px;
+    --w: 1100px;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * { box-sizing: border-box; }
+  html { scrollbar-color: #b9c9df var(--ground); scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: "Poppins", Arial, sans-serif;
+    color: var(--ink);
+    background: var(--ground);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--blue); color: #fff; }
+  a { color: var(--blue); text-underline-offset: 3px; }
+  a:hover { color: var(--orange-hover); }
+  :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
+  img { max-width: 100%; }
+
+  /* ---------- Mockup toolbar (not part of the page) ---------- */
+  .mock-bar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center;
+    padding: 10px 20px;
+    background: #16202e; color: #c7d2e1;
+    font: 500 12px/1 "Poppins", Arial, sans-serif;
+  }
+  .mock-group { display: flex; align-items: center; gap: 8px; }
+  .mock-group span { color: #8d9bb0; }
+  .mock-seg { display: flex; background: #243142; border-radius: 6px; padding: 2px; }
+  .mock-seg button {
+    font: inherit; color: #c7d2e1; background: none; border: 0; cursor: pointer;
+    padding: 7px 11px; border-radius: 4px;
+  }
+  .mock-seg button:hover { color: #fff; }
+  .mock-seg button[aria-pressed="true"] { background: #f3f6fb; color: #16202e; }
+  body[data-bare="1"] .mock-bar { display: none; }
+
+  /* Version switch: A for creators the SMM team brings in, B for people from Google.
+     Earnings switch, version A only: the amount on the page or no amount at all */
+  body[data-version="a"] .v-b,
+  body[data-version="b"] .v-a,
+  body[data-version="b"] .mock-group--a,
+  body[data-earn="none"] .earn-amount,
+  body[data-earn="amount"] .earn-none { display: none !important; }
+
+  /* ---------- Site header (Program chrome, as login-1) ---------- */
+  .site-header {
+    background: #fff;
+    border-bottom: 0.5px solid #d3d3d3;
+    box-shadow: 0 2px 17px 5px rgba(23, 106, 184, 0.1);
+    position: relative; z-index: 5;
+  }
+  .site-header__inner {
+    max-width: 1140px; margin: 0 auto; height: 74px;
+    display: flex; align-items: center; padding: 0 24px 0 40px;
+  }
+  .program-logo { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+  .program-logo img { display: block; width: 104px; height: auto; }
+  .program-logo__rule { width: 1.5px; height: 44px; background: #e3d3c3; border-radius: 1px; }
+  .program-logo__words { display: flex; flex-direction: column; font-family: Arial, Helvetica, sans-serif; font-weight: 700; font-size: 15.5px; line-height: 1.02; letter-spacing: 0.01em; text-transform: uppercase; }
+  .program-logo__words span:first-child { color: #434343; }
+  .program-logo__words span:last-child { color: #1768b8; }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    height: 48px; padding: 0 32px; border: 0; border-radius: 4px; cursor: pointer;
+    font: 600 15px "Poppins", Arial, sans-serif; text-decoration: none;
+    transition: background-color 160ms ease-out, transform 160ms ease-out;
+  }
+  .btn--primary { background: var(--orange); color: #fff; }
+  .btn--primary:hover { background: var(--orange-hover); color: #fff; }
+  .btn--primary:active { transform: translateY(1px); }
+  .btn--outline { background: #fff; color: var(--blue); border: 1.5px solid var(--blue); padding: 0 24px; }
+  .btn--outline:hover { color: var(--orange-hover); border-color: var(--orange-hover); }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+
+  .card {
+    background: #fff; border-radius: 10px;
+    box-shadow: 0 4px 18px rgba(24, 50, 97, 0.07), 0 1px 2px rgba(24, 50, 97, 0.06);
+  }
+  /* The page reads top to bottom; version B moves the earnings below the proof */
+  main { display: flex; flex-direction: column; }
+  body[data-version="b"] .lp-earn { order: 1; }
+  body[data-version="b"] .lp-faq,
+  body[data-version="b"] .lp-final { order: 2; }
+
+  .wrap { max-width: var(--w); margin: 0 auto; }
+
+  /* ---------- First screen: the blurred hospital, the nurse cut out on the right, as /hesi ---------- */
+  .lp-hero {
+    position: relative; overflow: hidden;
+    background: url(assets/hesi/banner-bg.webp) center / cover no-repeat, #e9eef4;
+    padding: 0 var(--gutter);
+  }
+  .lp-hero__inner {
+    position: relative; max-width: var(--w); margin: 0 auto; min-height: 560px;
+    display: flex; align-items: center;
+  }
+  .lp-hero__text { position: relative; z-index: 2; max-width: 560px; padding: 64px 0 150px; }
+  .lp-hero h1 { margin: 0; color: var(--navy); font-size: 36px; line-height: 1.18; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+  .lp-hero__lead { margin: 18px 0 0; max-width: 500px; color: var(--ink); font-size: 17px; line-height: 1.6; text-wrap: pretty; }
+  .lp-hero .actions { margin-top: 28px; }
+  .lp-hero__nurse { position: absolute; right: 0; bottom: 0; z-index: 1; width: auto; height: 96%; max-width: none; }
+
+  /* ---------- The navy box over the first screen ---------- */
+  .lp-how-wrap { position: relative; z-index: 3; width: calc(100% - 2 * var(--gutter)); max-width: var(--w); margin: -104px auto 0; }
+  /* the lighter tab behind the box's top left corner, as on /hesi */
+  .lp-how-wrap::before {
+    content: ""; position: absolute; left: -10px; top: -10px; width: 230px; height: 72px;
+    border-radius: 10px; background: var(--blue);
+  }
+  .lp-how {
+    position: relative;
+    padding: 36px 48px 40px; border-radius: 10px;
+    background: var(--navy); color: #fff;
+    box-shadow: 0 12px 30px rgba(24, 50, 97, 0.18);
+  }
+  .lp-how h2 { margin: 0; text-align: center; color: #fff; font-size: 22px; font-weight: 600; }
+  .lp-how__steps { list-style: none; margin: 26px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
+  .lp-how__steps li { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 14px; }
+  .lp-how__num {
+    grid-row: 1 / span 2; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+    border: 2px solid #8fb4ec; color: #fff; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums;
+  }
+  .lp-how h3 { margin: 8px 0 0; color: #fff; font-size: 16px; font-weight: 600; line-height: 1.35; }
+  .lp-how p { margin: 4px 0 0; color: #c4d2ea; font-size: 14px; line-height: 1.55; }
+
+  /* ---------- Earnings: the words on the left, the table on the right ---------- */
+  .lp-earn {
+    width: 100%; max-width: calc(var(--w) + 2 * var(--gutter)); margin: 0 auto; padding: 88px var(--gutter) 0;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); gap: 64px; align-items: center;
+  }
+  .lp-earn h2 { margin: 0; color: var(--navy); font-size: 28px; font-weight: 700; line-height: 1.2; }
+  .lp-earn__text > p { margin: 14px 0 0; color: var(--ink); font-size: 16px; line-height: 1.6; max-width: 56ch; }
+  .lp-earn__nosum { display: none; }
+  body[data-version="b"] .lp-earn__nosum,
+  body[data-earn="none"] .lp-earn__nosum { display: block; }
+  .lp-earn__text h3 { margin: 28px 0 0; color: var(--navy); font-size: 18px; font-weight: 600; }
+  .lp-paid { padding: 28px 32px 30px; }
+  .lp-paid h3 { margin: 0; color: var(--navy); font-size: 18px; font-weight: 600; }
+  .lp-paid, .lp-earn__paid { display: none; }
+  body[data-version="a"][data-earn="amount"] .lp-earn__paid { display: block; }
+  body[data-version="b"] .lp-paid,
+  body[data-earn="none"] .lp-paid { display: block; }
+  .lp-ticks { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 10px; }
+  .lp-ticks li { position: relative; padding-left: 28px; color: var(--ink); font-size: 15px; line-height: 1.55; }
+  .lp-ticks li::before {
+    content: ""; position: absolute; left: 2px; top: 6px; width: 12px; height: 7px;
+    border-left: 2.4px solid var(--blue); border-bottom: 2.4px solid var(--blue); transform: rotate(-45deg);
+  }
+  .lp-rates { padding: 28px 32px 26px; }
+  .lp-rates h3 { margin: 0 0 14px; color: var(--navy); font-size: 18px; font-weight: 600; }
+  .lp-rates table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .lp-rates th { padding: 0 0 10px; color: var(--muted); font-size: 13px; font-weight: 500; text-align: left; border-bottom: 1px solid var(--line); }
+  .lp-rates th:last-child, .lp-rates td:last-child { text-align: right; }
+  .lp-rates td { padding: 12px 0; border-bottom: 1px solid var(--line); color: var(--ink); font-size: 15px; }
+  .lp-rates td:last-child { color: var(--navy); font-size: 18px; font-weight: 700; }
+  .lp-rates tr:last-child td { border-bottom: 0; }
+  .lp-rates p { margin: 12px 0 0; color: var(--muted); font-size: 13.5px; line-height: 1.55; }
+
+  /* ---------- A real screen of the course beside the words, as /hesi ---------- */
+  .lp-row {
+    width: 100%; max-width: calc(var(--w) + 2 * var(--gutter)); margin: 0 auto; padding: 88px var(--gutter) 0;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center;
+  }
+  .lp-row__shot { margin: 0; padding: 10px; background: #fff; border-radius: 10px; box-shadow: 0 10px 30px rgba(24, 50, 97, 0.12), 0 1px 2px rgba(24, 50, 97, 0.06); }
+  .lp-row__shot img { display: block; width: 100%; height: auto; border-radius: 4px; }
+  .lp-row h2 { margin: 0; color: var(--navy); font-size: 28px; font-weight: 700; line-height: 1.2; text-wrap: balance; }
+  .lp-row p { margin: 14px 0 0; color: var(--ink); font-size: 16px; line-height: 1.6; }
+  .lp-row .lp-row__try { color: var(--muted); font-size: 15px; }
+  .lp-row__try a { font-weight: 600; }
+
+  .lp-row--alt {
+    display: block; max-width: none; margin-top: 88px; padding: 72px var(--gutter);
+    background: url(assets/hesi/section4-bg.webp) center / cover no-repeat, #eaf1fb;
+  }
+  .lp-row--alt .lp-row__in { max-width: var(--w); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 460px); gap: 64px; align-items: center; }
+  .lp-row--alt .lp-row__shot { padding: 8px; }
+  .lp-checks { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 12px; }
+  .lp-checks li { position: relative; padding-left: 30px; color: var(--ink); font-size: 15.5px; line-height: 1.55; }
+  .lp-checks li::before {
+    content: ""; position: absolute; left: 0; top: 3px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--blue);
+  }
+  .lp-checks li::after {
+    content: ""; position: absolute; left: 6px; top: 8px; width: 8px; height: 4.5px;
+    border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg);
+  }
+  .lp-checks b { color: var(--navy); font-weight: 600; }
+  .lp-row__actions { margin-top: 28px; }
+
+  /* ---------- The white strip with the 90%, as /hesi ---------- */
+  .lp-strip {
+    width: calc(100% - 2 * var(--gutter)); max-width: var(--w); margin: 72px auto 0; padding: 20px 24px;
+    background: #fff; border-radius: 10px; box-shadow: 0 4px 18px rgba(24, 50, 97, 0.07);
+    text-align: center; color: var(--navy); font-size: 20px; font-weight: 700; line-height: 1.4;
+  }
+  .lp-strip em { font-style: normal; color: var(--orange-hover); }
+
+  /* ---------- Navy band with the course features, as /hesi ---------- */
+  .lp-band { margin-top: 88px; padding: 72px var(--gutter) 76px; background: url(assets/hesi/section3-bg.webp) center / cover no-repeat, var(--navy); color: #fff; }
+  .lp-band__inner { max-width: 900px; margin: 0 auto; text-align: center; }
+  .lp-band h2 { margin: 0; color: #fff; font-size: 30px; font-weight: 700; line-height: 1.2; }
+  .lp-features { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 56px; text-align: left; }
+  .lp-features li { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 18px; align-items: center; color: #d3def0; font-size: 15px; line-height: 1.5; }
+  .lp-features img { display: block; width: 52px; height: 52px; }
+  .lp-features b { color: #fff; font-weight: 600; }
+  .lp-band .actions { justify-content: center; margin-top: 40px; }
+
+  /* ---------- Students' words ---------- */
+  .lp-voices { width: 100%; max-width: calc(var(--w) + 2 * var(--gutter)); margin: 0 auto; padding: 88px var(--gutter) 0; text-align: center; }
+  .lp-voices h2 { margin: 0; color: var(--navy); font-size: 28px; font-weight: 700; line-height: 1.2; text-wrap: balance; }
+  .lp-voices__grid { margin-top: 36px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: start; text-align: left; }
+  .lp-voice { margin: 0; padding: 28px 30px 26px; }
+  .lp-voice blockquote { margin: 0; color: var(--ink); font-size: 15px; line-height: 1.65; text-wrap: pretty; }
+  .lp-voice blockquote b { color: var(--navy); font-weight: 600; }
+  .lp-voice figcaption { margin-top: 16px; color: var(--muted); font-size: 13px; }
+  .lp-voice figcaption b { display: block; color: var(--navy); font-size: 14px; font-weight: 600; }
+
+  /* ---------- Questions ---------- */
+  .lp-faq { width: 100%; max-width: calc(820px + 2 * var(--gutter)); margin: 0 auto; padding: 88px var(--gutter) 0; }
+  .lp-faq h2 { margin: 0 0 22px; text-align: center; color: var(--navy); font-size: 28px; font-weight: 700; }
+  .qa { padding: 6px 30px 22px; }
+  .qa details { border-bottom: 1px solid var(--line); }
+  .qa summary {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 18px 0; cursor: pointer; list-style: none;
+    color: var(--navy); font-size: 16px; font-weight: 600; line-height: 1.4;
+  }
+  .qa summary::-webkit-details-marker { display: none; }
+  .qa summary:hover { color: var(--blue); }
+  .qa__icon { width: 20px; height: 20px; flex: none; fill: none; stroke: var(--blue); stroke-width: 2; stroke-linecap: round; transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1); }
+  .qa details[open] .qa__icon { transform: rotate(45deg); }
+  .qa details p { margin: 0 0 18px; max-width: 64ch; color: var(--muted); font-size: 15px; line-height: 1.6; }
+  .qa__more { margin: 18px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+  /* ---------- Closing with the nurse from the guarantee block ---------- */
+  .lp-final { margin-top: 88px; padding: 0 var(--gutter); background: url(assets/login-page-bg.jpg) center / cover no-repeat, var(--ground); }
+  .lp-final__inner { max-width: var(--w); margin: 0 auto; display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: 56px; align-items: end; }
+  .lp-final__nurse { display: block; width: 100%; height: auto; margin-top: 40px; }
+  .lp-final__text { padding: 72px 0 80px; align-self: center; }
+  .lp-final h2 { margin: 0; color: var(--navy); font-size: 30px; font-weight: 700; line-height: 1.2; }
+  .lp-final p { margin: 12px 0 0; max-width: 520px; color: var(--muted); font-size: 15px; line-height: 1.6; }
+  .lp-final .lp-final__who { color: var(--ink); font-size: 16px; }
+  .lp-channels { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; }
+  .lp-channels li { padding: 6px 12px; border-radius: 999px; background: #fff; color: var(--navy); font-size: 13px; font-weight: 500; }
+  .lp-final .actions { margin-top: 26px; }
+
+  /* ---------- Footer (HESI, as login-1) ---------- */
+  .footer-hesi { background: var(--navy-deep); color: #fff; }
+  .footer-hesi__inner { max-width: 1140px; margin: 0 auto; padding: 40px 40px 34px; }
+  .footer-hesi__row { display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+  .footer-hesi__seal img { display: block; width: 133px; height: auto; }
+  .footer-hesi__menu { display: flex; gap: 64px; }
+  .footer-hesi__menu div { display: grid; gap: 10px; }
+  .footer-hesi__menu a { color: #fff; font-size: 12px; text-decoration: none; }
+  .footer-hesi__menu a:hover { color: var(--orange); }
+  .footer-hesi__social { display: flex; gap: 14px; }
+  .footer-hesi__social img { display: block; width: 26px; height: 26px; }
+  .footer-hesi__legal { margin: 30px 0 0; padding: 22px 0 0; border-top: 1px solid rgba(126, 154, 193, 0.25); }
+  .footer-hesi__copy { font-size: 12.6px; }
+  .footer-hesi__note { margin: 10px 0 0; color: var(--footer-note); font-size: 11.7px; line-height: 1.6; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .qa__icon { transition: none; }
+  }
+
+  /* ---------- Narrow desktop ---------- */
+  @media (max-width: 1100px) {
+    .lp-hero__nurse { height: 84%; right: -48px; }
+    .lp-hero__text { max-width: 500px; }
+  }
+
+  /* ---------- Tablet ---------- */
+  @media (max-width: 900px) {
+    .lp-hero__inner { min-height: 0; display: block; }
+    .lp-hero__text { max-width: 620px; padding: 48px 0 20px; }
+    .lp-hero__nurse { position: static; display: block; width: min(340px, 78%); height: auto; margin: 0 auto; }
+    .lp-how-wrap { margin-top: -28px; }
+    .lp-how { padding: 30px 28px 32px; }
+    .lp-how__steps { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    .lp-earn, .lp-row { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+    .lp-row__shot { order: 2; }
+    .lp-row--alt .lp-row__in { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+    .lp-row--alt .lp-row__shot { max-width: 340px; margin: 0 auto; }
+    .lp-features { grid-template-columns: minmax(0, 1fr); }
+    .lp-voices__grid { grid-template-columns: minmax(0, 1fr); }
+    .lp-final__inner { grid-template-columns: minmax(0, 1fr); gap: 0; }
+    .lp-final__nurse { order: 2; width: min(300px, 70%); margin: 24px auto 0; }
+    .lp-final__text { padding: 56px 0 0; }
+  }
+
+  /* ---------- Phone ---------- */
+  @media (max-width: 767px) {
+    :root { --gutter: 16px; }
+    .site-header__inner { height: 64px; padding: 0 16px; }
+    .program-logo img { width: 86px; }
+    .program-logo__rule { height: 36px; }
+    .program-logo__words { font-size: 12.5px; }
+    .lp-hero h1 { font-size: 26px; }
+    .lp-hero__lead { font-size: 15px; }
+    .lp-hero__text { padding-top: 32px; }
+    .lp-hero .actions, .lp-final .actions { flex-direction: column; align-items: stretch; }
+    .lp-hero .actions .btn, .lp-final .actions .btn { width: 100%; }
+    .lp-how { padding: 26px 20px 28px; }
+    .lp-how-wrap::before { left: -6px; top: -6px; width: 150px; height: 56px; }
+    .lp-how h2 { font-size: 20px; }
+    .lp-earn, .lp-row, .lp-voices, .lp-faq { padding-top: 64px; }
+    .lp-row--alt { margin-top: 64px; padding: 52px var(--gutter); }
+    .lp-earn h2, .lp-row h2, .lp-voices h2, .lp-faq h2 { font-size: 24px; }
+    .lp-rates { padding: 22px 20px; }
+    .lp-strip { margin-top: 56px; font-size: 17px; }
+    .lp-band { margin-top: 64px; padding: 52px var(--gutter) 56px; }
+    .lp-band h2 { font-size: 24px; }
+    .lp-band .actions, .lp-row__actions { flex-direction: column; align-items: stretch; }
+    .lp-band .actions .btn, .lp-row__actions .btn { width: 100%; }
+    .qa { padding: 4px 20px 18px; }
+    .qa summary { font-size: 15px; }
+    .lp-final { margin-top: 64px; }
+    .lp-final h2 { font-size: 24px; }
+    .footer-hesi__inner { padding: 30px 20px 26px; }
+    .footer-hesi__row { flex-direction: column; text-align: center; gap: 22px; }
+    .footer-hesi__menu { gap: 28px; }
+  }
+</style>
+<style>
+  .mock-version { color: #c7d2e1; text-decoration: none; white-space: nowrap; }
+  .mock-version:hover { color: #ffffff; }
+  .mock-version-name { color: #ffffff; font-weight: 600; white-space: nowrap; margin-right: 8px; }
+  @media (max-width: 767px) { .mock-version-name { white-space: normal; } }
+</style>
+</head>
+<body data-version="b" data-earn="amount" data-bare="0">
+
+<div class="mock-bar" role="toolbar" aria-label="Mockup options">
+  <a class="mock-version" href="/affiliate">&larr; Affiliate program</a><span class="mock-version-name">Landing page &middot; Version 4 &middot; For people who find the program on Google, second take</span>
+  <div class="mock-group mock-group--a"><span>Earnings</span>
+    <div class="mock-seg" data-key="earn">
+      <button type="button" data-value="amount">Up to $20</button>
+      <button type="button" data-value="none">Not shown</button>
+    </div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="program-logo" href="#" aria-label="YourBestGrade Affiliate Program">
+      <img src="assets/colored-single.png" alt="">
+      <span class="program-logo__rule" aria-hidden="true"></span>
+      <span class="program-logo__words" aria-hidden="true"><span>Affiliate</span><span>Program</span></span>
+    </a>
+  </div>
+</header>
+
+<main>
+  <!-- ======================= First screen, as the live /hesi landing ======================= -->
+  <section class="lp-hero">
+    <div class="lp-hero__inner">
+      <div class="lp-hero__text">
+        <h1 class="v-a"><span class="earn-amount">Recommend HESI Exam Study and earn up to $20 for every plan</span><span class="earn-none">Recommend HESI Exam Study and earn on every plan</span></h1>
+        <h1 class="v-b">Recommend HESI Exam Study to nursing students and earn on every plan they buy</h1>
+        <p class="lp-hero__lead">For nurses and nursing students whose followers or classmates are getting ready for the HESI Exit.</p>
+        <div class="actions">
+          <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>
+          <a class="btn btn--outline" href="/affiliate/login-1#screen=login">Log in</a>
+        </div>
+      </div>
+      <img class="lp-hero__nurse" src="assets/hesi/banner-img.webp" alt="A smiling nurse in blue scrubs with her arms crossed">
+    </div>
+  </section>
+
+  <!-- The navy box that sits over the first screen, as the newsletter box on /hesi -->
+  <div class="lp-how-wrap">
+  <section class="lp-how" aria-labelledby="how-title">
+    <h2 id="how-title">How it works</h2>
+    <ol class="lp-how__steps">
+      <li><span class="lp-how__num">1</span><h3>Apply and get your link</h3><p>We review every application and email you once it's approved.</p></li>
+      <li><span class="lp-how__num">2</span><h3>Share it with followers or classmates</h3><p>A purchase counts if it's made within 30 days of a click on your link.</p></li>
+      <li><span class="lp-how__num">3</span><h3><span class="v-a">Get paid for every HESI Exam Study plan</span><span class="v-b">Get a commission for every HESI Exam Study plan</span></h3><p>Once you have $100, request a payout to your PayPal.</p></li>
+    </ol>
+  </section>
+  </div>
+
+  <!-- Earnings: in A right after the steps, in B after the proof (see the order rules in CSS) -->
+  <section class="lp-earn">
+    <div class="lp-earn__text">
+      <h2>Earn on every HESI Exam Study plan</h2>
+      <p class="earn-amount v-a">Every HESI Exam Study plan has its own commission, up to $20. The amount is fixed at the moment of purchase.</p>
+      <p class="lp-earn__nosum">A fixed commission for every HESI Exam Study plan bought through your link, including plans paid with Klarna, Afterpay or Affirm. You'll see the rates in your dashboard once you're approved.</p>
+      <div class="lp-earn__paid">
+        <h3>How you get paid</h3>
+        <ul class="lp-ticks">
+          <li>Each commission is on hold for 30 days after the purchase, then it becomes available.</li>
+          <li>Once you have $100 or more available, request a payout in your dashboard.</li>
+          <li>We send it to your PayPal within a few days.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card lp-paid">
+      <h3>How you get paid</h3>
+      <ul class="lp-ticks">
+        <li>Each commission is on hold for 30 days after the purchase, then it becomes available.</li>
+        <li>Once you have $100 or more available, request a payout in your dashboard.</li>
+        <li>We send it to your PayPal within a few days.</li>
+      </ul>
+    </div>
+    <div class="card lp-rates earn-amount v-a">
+      <h3>What you earn per plan</h3>
+      <table>
+        <thead><tr><th scope="col">HESI Exam Study plan</th><th scope="col">You earn</th></tr></thead>
+        <tbody>
+          <tr><td>30 Days</td><td>$5</td></tr>
+          <tr><td>90 Days</td><td>$8</td></tr>
+          <tr><td>180 Days</td><td>$9</td></tr>
+          <tr><td>12 Months</td><td>$10</td></tr>
+          <tr><td>36 Months</td><td>$20</td></tr>
+        </tbody>
+      </table>
+      <p>Plans paid with Klarna, Afterpay or Affirm may earn a different amount.</p>
+    </div>
+  </section>
+
+  <!-- What they recommend (version B only: people from Google don't know the course yet) -->
+  <section class="lp-row v-b">
+    <figure class="lp-row__shot"><img src="assets/hesi/test-screen.png" alt="A HESI-style practice question in HESI Exam Study"></figure>
+    <div class="lp-row__text">
+      <h2>Recommend practice tests that feel just like the HESI Exit</h2>
+      <p>Your followers get realistic RN and PN HESI-style practice tests for the Next Generation HESI Exit, the Legacy exam, HESI CAT and Specialty tests, with a detailed rationale for every single question.</p>
+      <p class="lp-row__try">Free practice tests to try first: <a href="https://www.beta.yourbestgrade.com/hesi/tests/1/tos" target="_blank" rel="noopener">RN</a> &middot; <a href="https://www.beta.yourbestgrade.com/hesi/tests/15/tos" target="_blank" rel="noopener">PN</a></p>
+    </div>
+  </section>
+
+  <!-- Second course row on the waves, as "Next Generation Prep" on /hesi -->
+  <section class="lp-row lp-row--alt v-b">
+    <div class="lp-row__in">
+      <div class="lp-row__text">
+        <h2>Next Generation prep designed to teach, test and challenge</h2>
+        <ul class="lp-checks">
+          <li><b>Full-length tests</b> that mimic the HESI Exit</li>
+          <li>Every HESI question type: select all that apply, ranking, fill-in-the-blank, hot spot, audio, NGN case studies, NGN bow tie, NGN trend and more</li>
+          <li><b>Detailed rationale breakdowns</b> for every single question</li>
+          <li>A clear view of their weak spots, so they know <b>what to focus on</b></li>
+          <li>The score they need, <b>or their money back</b>**</li>
+        </ul>
+        <div class="actions lp-row__actions">
+          <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>
+          <a class="btn btn--outline" href="/affiliate/login-1#screen=login">Log in</a>
+        </div>
+      </div>
+      <figure class="lp-row__shot"><img src="assets/hesi/test-creator-top.png" alt="The Test Creator in HESI Exam Study"></figure>
+    </div>
+  </section>
+
+  <p class="lp-strip v-b">We've helped over <em>90% of our students</em> succeed on their exams*</p>
+
+  <!-- Navy band with the course features, as on /hesi -->
+  <section class="lp-band v-b" aria-labelledby="band-title">
+    <div class="lp-band__inner">
+      <h2 id="band-title">What your followers get</h2>
+      <ul class="lp-features">
+        <li><img src="assets/hesi/icon1.png" alt=""><span><b>HESI exam-style practice questions</b>, including Next Gen items</span></li>
+        <li><img src="assets/hesi/icon2.png" alt=""><span><b>Specialty practice exams</b> to improve their weakest areas of study</span></li>
+        <li><img src="assets/hesi/icon3.png" alt=""><span><b>Full-length practice tests</b> for HESI RN and PN exit exams</span></li>
+        <li><img src="assets/hesi/icon4.png" alt=""><span><b>Test Creator</b> for targeted practice</span></li>
+        <li><img src="assets/hesi/icon5.png" alt=""><span><b>HESI exam review guide</b> with tips, tricks and strategies</span></li>
+        <li><img src="assets/hesi/icon6.png" alt=""><span><b>2 CAT Self-Assessments</b></span></li>
+      </ul>
+      <div class="actions"><a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a></div>
+    </div>
+  </section>
+
+  <!-- Students' words -->
+  <section class="lp-voices v-b" aria-labelledby="voices-title">
+    <h2 id="voices-title">Helping students succeed on their HESI exams since 2010</h2>
+    <div class="lp-voices__grid">
+      <figure class="card lp-voice">
+        <blockquote>“I passed my Exit Hesi with a score of 959!! … <b>There were many websites that I looked at but my classmates all recommended yours!</b> I went into the HESI Monday morning with confidence.”</blockquote>
+        <figcaption><b>Maria</b>Houston, TX</figcaption>
+      </figure>
+      <figure class="card lp-voice">
+        <blockquote>“I just wanted to inform you that I passed my HESI last week with a 944. I give you and your website all the credit. … <b>I know several of my classmates passed the second time as well, thanks to this site.</b>”</blockquote>
+        <figcaption><b>Ashley</b>Sacramento, CA</figcaption>
+      </figure>
+      <figure class="card lp-voice">
+        <blockquote>“The principles guiding the questions as well as the thoughtful explanations were extremely helpful! … Thank you again for creating such a wonderful program! <b>I am sharing my secret with other classmates!!</b>”</blockquote>
+        <figcaption><b>Alexis</b>Miami, FL</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Questions -->
+  <section class="lp-faq" aria-labelledby="faq-title">
+    <h2 id="faq-title">Questions affiliates ask</h2>
+    <div class="card qa">
+      <details open>
+        <summary>Which purchases count?<svg class="qa__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <p>Any HESI Exam Study plan bought within 30 days of a click on your link. If someone clicked several affiliate links before buying, the purchase counts for the last one.</p>
+      </details>
+      <details>
+        <summary>What if an order is refunded?<svg class="qa__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <p>If an order is refunded, fully or in part, its commission is cancelled. If it was already paid out, it's deducted from your future payouts.</p>
+      </details>
+      <details>
+        <summary>What's not allowed?<svg class="qa__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <p>Purchases through your own link don't earn a commission: this isn't a discount program. Don't spam your link or generate fake clicks, or we may suspend or close your account.</p>
+      </details>
+      <details class="lp-faq__rates">
+        <summary>Can the rates change?<svg class="qa__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary>
+        <p>The amount is fixed at the moment of purchase. If a rate changes, the new one applies only to later purchases.</p>
+      </details>
+      <p class="qa__more">The full rules are in our <a href="https://www.beta.yourbestgrade.com/affiliate/terms_of_use" target="_blank" rel="noopener">Terms of Use</a>. Questions? Email <a href="mailto:support@yourbestgrade.com">support@yourbestgrade.com</a></p>
+    </div>
+  </section>
+
+  <!-- Closing, with the nurse from the guarantee block on /hesi -->
+  <section class="lp-final">
+    <div class="lp-final__inner">
+      <img class="lp-final__nurse" src="assets/hesi/success-guarantee.png" alt="A nurse in scrubs with a stethoscope and a clipboard">
+      <div class="lp-final__text">
+        <h2>Who we're looking for</h2>
+        <p class="lp-final__who">Active nurses, recent graduates and nursing students who want to tell their community about HESI Exam Study and earn while doing it.</p>
+        <ul class="lp-channels" aria-label="Where our affiliates share their links">
+          <li>TikTok</li><li>Instagram</li><li>YouTube</li><li>Facebook</li><li>Classmates</li>
+        </ul>
+        <p>The form asks where you post, a few words about you and your audience, and your PayPal email for payouts.</p>
+        <div class="actions">
+          <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>
+          <a class="btn btn--outline" href="/affiliate/login-1#screen=login">Log in</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer-hesi">
+  <div class="footer-hesi__inner">
+    <div class="footer-hesi__row">
+      <a class="footer-hesi__seal" href="#"><img src="assets/footerlogo1.webp" alt="Norton Secured"></a>
+      <nav class="footer-hesi__menu" aria-label="Footer">
+        <div><a href="#">About</a><a href="#">FAQs</a></div>
+        <div><a href="#">Register</a><a href="#">Login</a></div>
+        <div><a href="#">Terms and Conditions</a><a href="#">Privacy Policy</a></div>
+      </nav>
+      <div class="footer-hesi__social">
+        <a href="#" aria-label="Facebook"><img src="assets/facebook.png" alt=""></a>
+        <a href="#" aria-label="Twitter"><img src="assets/twitter.png" alt=""></a>
+      </div>
+    </div>
+    <div class="footer-hesi__legal">
+      <div class="footer-hesi__copy">Copyright © 2026 Your Best Grade, Inc. All Rights Reserved.</div>
+      <p class="footer-hesi__note">
+        <span class="v-b">*We utilize surveys to measure the effectiveness of our program. Our latest results show that over 90% of customers who responded to our surveys and reported to have taken the HESI Exit since joining, passed their exam.<br>
+        **Please see the full terms and conditions of the success guarantee on our Pricing page.<br></span>
+        HESI is a registered trademark of Elsevier, Inc., creator and owner of the official HESI Examinations and Review Materials. Elsevier is not involved in the production of, and does not endorse, this website or its content.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var body = document.body;
+    var KEYS = ['version', 'earn', 'bare'];
+
+    function readHash() {
+      var state = {};
+      location.hash.replace(/^#/, '').split('&').forEach(function (pair) {
+        var parts = pair.split('=');
+        if (KEYS.indexOf(parts[0]) !== -1 && parts[1]) state[parts[0]] = decodeURIComponent(parts[1]);
+      });
+      return state;
+    }
+
+    function apply() {
+      var state = readHash();
+      KEYS.forEach(function (key) { if (state[key]) body.dataset[key] = state[key]; });
+      document.querySelectorAll('.mock-seg').forEach(function (seg) {
+        seg.querySelectorAll('button').forEach(function (btn) {
+          btn.setAttribute('aria-pressed', String(btn.dataset.value === body.dataset[seg.dataset.key]));
+        });
+      });
+    }
+
+    function go(key, value) {
+      var state = readHash();
+      KEYS.forEach(function (k) { if (!state[k] && body.dataset[k]) state[k] = body.dataset[k]; });
+      state[key] = value;
+      var hash = KEYS.filter(function (k) { return state[k]; }).map(function (k) { return k + '=' + state[k]; }).join('&');
+      history.replaceState(null, '', '#' + hash);
+      apply();
+      window.scrollTo(0, 0);
+    }
+
+    document.querySelectorAll('.mock-seg button').forEach(function (btn) {
+      btn.addEventListener('click', function () { go(btn.parentElement.dataset.key, btn.dataset.value); });
+    });
+
+
+    document.querySelectorAll('a[href="#"]').forEach(function (link) {
+      link.addEventListener('click', function (event) { event.preventDefault(); });
+    });
+    window.addEventListener('hashchange', apply);
+    apply();
+  })();
+</script>
+</body>
+</html>

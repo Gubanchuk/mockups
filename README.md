@@ -24,6 +24,8 @@ Live: https://mockups-seven-ashen.vercel.app
 | `/affiliate` | versions of the four mockups |
 | `/affiliate/landing-1` | YBG-1836 landing page - version 1, For creators our SMM team brings in |
 | `/affiliate/landing-2` | YBG-1836 landing page - version 2, For people who find the program on Google |
+| `/affiliate/landing-3` | YBG-1836 landing page - version 3, For creators our SMM team brings in, second take |
+| `/affiliate/landing-4` | YBG-1836 landing page - version 4, For people who find the program on Google, second take |
 | `/affiliate/login-1` | YBG-1802 login and signup - version 1, Card with steps |
 | `/affiliate/dashboard-1` | YBG-1803 affiliate dashboard - version 1, Commissions in Links |
 | `/affiliate/dashboard-2` | YBG-1803 affiliate dashboard - version 2, Commissions as its own section |

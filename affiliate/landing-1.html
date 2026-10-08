@@ -16,7 +16,6 @@
     --orange-hover: #c8430f;
     --ground: #eff5fe;
     --line: #dbe6f4;
-    --path-line: #cddcef;
     --ink: #1f2a3c;
     --muted: #56657c;
     --footer-note: #7e9ac1;
@@ -40,6 +39,7 @@
   img { max-width: 100%; }
   svg.icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
   .num { font-variant-numeric: tabular-nums; }
+  .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
   /* ---------- Mockup toolbar (not part of the page) ---------- */
   .mock-bar {
@@ -63,6 +63,9 @@
   /* Version switch: A for creators the SMM team brings in, B for people from Google */
   body[data-version="a"] .v-b,
   body[data-version="b"] .v-a { display: none !important; }
+  /* Rates switch, version A only: the rates block on the page or not */
+  body[data-version="b"] .mock-group--a,
+  body[data-rates="none"] .rates-section { display: none !important; }
 
   /* ---------- Site header (Program chrome, as login-1) ---------- */
   .site-header {
@@ -92,60 +95,65 @@
   .btn--primary { background: var(--orange); color: #fff; }
   .btn--primary:hover { background: var(--orange-hover); color: #fff; }
   .btn--primary:active { transform: translateY(1px); }
-  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; }
-  .actions__login { font-size: 14px; color: var(--muted); }
+  /* Apply and Log in side by side: the orange one leads, the outlined one is for existing affiliates */
+  .btn--outline { background: #fff; color: var(--blue); border: 1.5px solid var(--blue); padding: 0 24px; }
+  .btn--outline:hover { color: var(--orange-hover); border-color: var(--orange-hover); }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 
   .card {
     background: #fff; border-radius: 10px;
     box-shadow: 0 4px 18px rgba(24, 50, 97, 0.07), 0 1px 2px rgba(24, 50, 97, 0.06);
   }
 
-  /* ---------- First screen: the offer on the left, the idea in three steps on the right ---------- */
+  /* ---------- First screen: one card, a nurse with her phone beside the offer and the three steps ---------- */
   .hero {
     /* the waves fade into the page ground instead of ending on a hard edge */
     background:
       linear-gradient(to bottom, rgba(239, 245, 254, 0) 70%, var(--ground) 100%),
       url(assets/login-page-bg.jpg) center top / cover no-repeat,
       var(--ground);
-    padding: 64px var(--gutter) 64px;
+    padding: 56px var(--gutter) 64px;
   }
-  .hero__inner {
-    max-width: var(--w); margin: 0 auto;
-    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 440px); gap: 56px; align-items: center;
-  }
+  .hero__inner { max-width: var(--w); margin: 0 auto; }
+  .hero-card { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); overflow: hidden; }
+  .hero-card__photo { width: 100%; height: 100%; min-height: 460px; object-fit: cover; object-position: 50% 20%; display: block; }
+  .hero-card__body { padding: 44px 48px 46px; }
   .hero h1 {
-    margin: 0; color: var(--navy); font-size: 36px; line-height: 1.18; font-weight: 700;
+    margin: 0; color: var(--navy); font-size: 32px; line-height: 1.18; font-weight: 700;
     letter-spacing: -0.01em; text-wrap: balance;
   }
-  .hero__lead { margin: 18px 0 0; max-width: 540px; color: var(--ink); font-size: 16.5px; line-height: 1.6; text-wrap: pretty; }
-  .hero .actions { margin-top: 30px; }
+  .hero__lead { margin: 16px 0 0; max-width: 540px; color: var(--ink); font-size: 16.5px; line-height: 1.6; text-wrap: pretty; }
+  /* the steps and the button side by side under the offer */
+  .hero-card__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px; margin-top: 30px; align-items: start; }
+  .hero-card__row .actions { margin-top: 0; }
 
-  /* The idea: get a link, share it, get paid */
-  .idea { padding: 30px 32px 32px; }
-  .idea h2 { margin: 0 0 22px; color: var(--navy); font-size: 18px; font-weight: 600; line-height: 1.3; }
-  .idea__steps { list-style: none; margin: 0; padding: 0; }
-  .idea__step { position: relative; display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: 16px; padding: 0 0 24px; }
-  .idea__step:last-child { padding-bottom: 0; }
-  .idea__step:not(:last-child)::before {
-    content: ""; position: absolute; left: 16px; top: 40px; bottom: 4px; width: 2px;
-    background: var(--path-line); border-radius: 1px;
-  }
+  /* Version B first screen: two sides of one link, what the buyer gets and what you get */
+  .sides__top { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; align-items: end; padding: 48px 56px 38px; }
+  .sides__top h1 { max-width: 700px; }
+  .sides__top .actions { margin-top: 0; }
+  .sides__pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-top: 1px solid var(--line); }
+  .sides__side { padding: 30px 56px 34px; }
+  .sides__side + .sides__side { border-left: 1px solid var(--line); background: #f5f9ff; }
+  .sides__side h2 { margin: 0; color: var(--navy); font-size: 18px; font-weight: 600; line-height: 1.3; }
+
+  /* The idea: get a link, share it, get paid. Three equal steps, no progress line: nothing here is "done" yet */
+  .idea__steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+  .idea__step { display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: 16px; }
   .idea__node {
     grid-row: 1 / span 2; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
     background: #fff; border: 2px solid var(--blue); color: var(--blue);
     font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums;
   }
-  .idea__step:last-child .idea__node { background: var(--blue); color: #fff; }
   .idea__step h3 { margin: 6px 0 0; color: var(--navy); font-size: 16px; font-weight: 600; line-height: 1.35; }
-  .idea__step p { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; text-wrap: pretty; }
-  .idea__amount { font-weight: 700; white-space: nowrap; }
+  .idea__step p { margin: 4px 0 0; color: var(--muted); font-size: 13.5px; line-height: 1.55; text-wrap: pretty; }
 
   /* ---------- Sections under the first screen ---------- */
   .section { max-width: calc(var(--w) + 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--gutter); }
   .section + .section { margin-top: 88px; }
   /* first visible section of each version: A starts with the rates, B skips the hidden rates section */
   .hero + .section,
-  body[data-version="b"] .hero + .section + .section { margin-top: 24px; }
+  body[data-version="b"] .hero + .section + .section,
+  body[data-version="a"][data-rates="none"] .hero + .section + .section + .section { margin-top: 24px; }
   .section__head { max-width: 640px; margin: 0 0 28px; }
   .section__title { margin: 0; color: var(--navy); font-size: 26px; font-weight: 600; line-height: 1.22; text-wrap: balance; }
   .section__lead { margin: 10px 0 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
@@ -159,16 +167,16 @@
   .rates__note { margin: 16px 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
 
   /* Why students choose (version B): the photo from the login pages beside two lists */
-  .why { display: grid; grid-template-columns: 240px minmax(0, 1fr) minmax(0, 1fr); overflow: hidden; }
+  .why { display: grid; grid-template-columns: 240px minmax(0, 1fr); overflow: hidden; }
   .why__photo { width: 100%; height: 100%; min-height: 300px; object-fit: cover; object-position: center 20%; display: block; }
   .why__text { padding: 32px 32px 30px; }
-  .why__text + .why__text { border-left: 1px solid var(--line); }
   .why h3 { margin: 0; color: var(--navy); font-size: 18px; font-weight: 600; line-height: 1.3; }
   .ticks { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 11px; }
   .ticks li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; color: var(--ink); font-size: 14.5px; line-height: 1.55; }
   .ticks svg.icon { color: var(--blue); margin-top: 2px; stroke-width: 2.2; }
   .ticks b { color: var(--navy); font-weight: 600; }
   .ticks-note { margin: 16px 0 0; color: var(--muted); font-size: 12.5px; line-height: 1.6; }
+  .why .ticks { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 32px; }
 
   /* Student voices (version B) */
   .voices { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 24px; }
@@ -217,17 +225,20 @@
 
   /* ---------- Narrow desktop and tablet ---------- */
   @media (max-width: 1100px) {
-    .hero__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 400px); gap: 40px; }
-    .hero h1 { font-size: 32px; }
+    .hero-card { grid-template-columns: minmax(0, 280px) minmax(0, 1fr); }
+    .hero-card__body { padding: 40px 40px 42px; }
+    .hero-card__row { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .sides__top { grid-template-columns: minmax(0, 1fr); align-items: start; padding: 40px 40px 32px; }
+    .sides__side { padding: 28px 40px 30px; }
     .rates li { padding: 22px 18px 20px; }
   }
 
   @media (max-width: 900px) {
-    .hero__inner { grid-template-columns: minmax(0, 1fr); gap: 36px; max-width: 620px; }
+    .hero-card { grid-template-columns: minmax(0, 1fr); }
+    .hero-card__photo { height: 340px; min-height: 0; object-position: 50% 16%; }
     .voices, .facts__list { grid-template-columns: minmax(0, 1fr); }
     .why { grid-template-columns: 200px minmax(0, 1fr); }
-    .why__photo { grid-row: span 2; }
-    .why__text + .why__text { border-left: 0; border-top: 1px solid var(--line); }
+    .why .ticks { grid-template-columns: minmax(0, 1fr); }
   }
 
   /* ---------- Phone ---------- */
@@ -237,15 +248,22 @@
     .program-logo img { width: 86px; }
     .program-logo__rule { height: 36px; }
     .program-logo__words { font-size: 12.5px; }
-    .hero { padding-top: 36px; padding-bottom: 44px; background-size: 100% 100%, auto 100%; }
+    .hero { padding-top: 24px; padding-bottom: 40px; background-size: 100% 100%, auto 100%; }
+    .hero-card__photo { height: 300px; }
+    .hero-card__body { padding: 28px 20px 30px; }
+    .hero-card__row .actions { order: -1; }
+    .sides__top { padding: 28px 20px 24px; }
+    .sides__pair { grid-template-columns: minmax(0, 1fr); }
+    .sides__side { padding: 24px 20px 26px; }
+    .sides__side + .sides__side { border-left: 0; border-top: 1px solid var(--line); }
     .hero h1 { font-size: 26px; }
     .hero__lead { font-size: 15px; }
-    .hero .actions { flex-direction: column; align-items: stretch; text-align: center; }
+    .hero .actions { flex-direction: column; align-items: stretch; }
     .hero .actions .btn { width: 100%; }
-    .idea { padding: 24px 20px 26px; }
     .section + .section { margin-top: 64px; }
     .hero + .section,
-    body[data-version="b"] .hero + .section + .section { margin-top: 16px; }
+    body[data-version="b"] .hero + .section + .section,
+    body[data-version="a"][data-rates="none"] .hero + .section + .section + .section { margin-top: 16px; }
     .section__title { font-size: 24px; }
     .rates { grid-template-columns: minmax(0, 1fr); }
     .rates li { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 14px 20px; }
@@ -256,13 +274,13 @@
     .facts__more { flex-direction: column; }
     .voice { padding: 22px 20px; }
     .why { grid-template-columns: minmax(0, 1fr); }
-    .why__photo { grid-row: auto; height: 220px; min-height: 0; object-position: center 18%; }
+    .why__photo { grid-row: auto; height: auto; min-height: 0; }
     .why__text { padding: 24px 20px 22px; }
     .voice blockquote { font-size: 16px; }
     .closing { padding: 64px 16px 72px; }
     .closing h2 { font-size: 24px; }
     .closing .closing__who { font-size: 15px; }
-    .closing .actions { flex-direction: column; }
+    .closing .actions { flex-direction: column; align-items: stretch; }
     .closing .actions .btn { width: 100%; }
     .footer-hesi__inner { padding: 30px 20px 26px; }
     .footer-hesi__row { flex-direction: column; text-align: center; gap: 22px; }
@@ -276,10 +294,16 @@
   @media (max-width: 767px) { .mock-version-name { white-space: normal; } }
 </style>
 </head>
-<body data-version="a" data-bare="0">
+<body data-version="a" data-rates="block" data-bare="0">
 
 <div class="mock-bar" role="toolbar" aria-label="Mockup options">
   <a class="mock-version" href="/affiliate">&larr; Affiliate program</a><span class="mock-version-name">Landing page &middot; Version 1 &middot; For creators our SMM team brings in</span>
+  <div class="mock-group mock-group--a"><span>Rates</span>
+    <div class="mock-seg" data-key="rates">
+      <button type="button" data-value="block">Rates block</button>
+      <button type="button" data-value="none">No rates block</button>
+    </div>
+  </div>
 </div>
 
 <header class="site-header">
@@ -294,43 +318,76 @@
 
 <main>
   <section class="hero">
-    <div class="hero__inner">
-      <div class="hero__pitch">
-        <h1 class="v-a">Recommend HESI Exam Study and earn $4–$20 for every plan bought through your link</h1>
-        <h1 class="v-b">Recommend HESI exam prep to nursing students and earn on every plan they buy</h1>
+    <!-- Version A: the nurse with her phone, the offer and the steps -->
+    <div class="hero__inner card hero-card v-a">
+      <img class="hero-card__photo" src="assets/login-image-a2.jpg" alt="A smiling nurse in blue scrubs holding her phone">
+      <div class="hero-card__body">
+        <h1>Recommend HESI Exam Study and earn up to $20 for every plan bought through your link</h1>
         <p class="hero__lead">For nurses and nursing students whose followers or classmates are getting ready for the HESI Exit.</p>
-        <div class="actions">
-          <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>
-          <span class="actions__login">Already an affiliate? <a href="/affiliate/login-1#screen=login">Log in</a></span>
+        <div class="hero-card__row">
+          <div class="idea">
+            <h2 class="sr-only">How it works</h2>
+            <ol class="idea__steps">
+              <li class="idea__step">
+                <span class="idea__node">1</span>
+                <h3>Apply and get your link</h3>
+                <p>We review every application and email you once it's approved.</p>
+              </li>
+              <li class="idea__step">
+                <span class="idea__node">2</span>
+                <h3>Share it with followers or classmates</h3>
+                <p>A purchase counts within 30 days of a click on your link.</p>
+              </li>
+              <li class="idea__step">
+                <span class="idea__node">3</span>
+                <h3>Get paid for every plan</h3>
+                <p>Once you have $100, request a payout to your PayPal.</p>
+              </li>
+            </ol>
+          </div>
+          <div class="actions">
+            <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>
+            <a class="btn btn--outline" href="/affiliate/login-1#screen=login">Log in</a>
+          </div>
         </div>
       </div>
+    </div>
 
-      <div class="card idea">
-        <h2>How it works</h2>
-        <ol class="idea__steps">
-          <li class="idea__step">
-            <span class="idea__node">1</span>
-            <h3>Apply and get your link</h3>
-            <p>We review every application and email you once it's approved.</p>
-          </li>
-          <li class="idea__step">
-            <span class="idea__node">2</span>
-            <h3>Share it with followers or classmates</h3>
-            <p>A purchase counts if it's made within 30 days of a click on your link.</p>
-          </li>
-          <li class="idea__step">
-            <span class="idea__node">3</span>
-            <h3 class="v-a">Get <span class="idea__amount">$4–$20</span> for every plan</h3>
-            <h3 class="v-b">Get a fixed commission for every plan</h3>
-            <p>Once you have $100, request a payout to your PayPal.</p>
-          </li>
-        </ol>
+    <!-- Version B: two sides of one link -->
+    <div class="hero__inner card sides v-b">
+      <div class="sides__top">
+        <div>
+          <h1>Recommend HESI exam prep to nursing students and earn on every plan they buy</h1>
+          <p class="hero__lead">For nurses and nursing students whose followers or classmates are getting ready for the HESI Exit.</p>
+        </div>
+        <div class="actions">
+          <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>
+          <a class="btn btn--outline" href="/affiliate/login-1#screen=login">Log in</a>
+        </div>
+      </div>
+      <div class="sides__pair">
+        <div class="sides__side">
+          <h2>What your followers get</h2>
+          <ul class="ticks">
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Realistic RN and PN HESI-style practice tests for the Next Generation HESI Exit</li>
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>A detailed rationale for every single question</li>
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Success Guarantee:</b> a full refund if they actively use the program and still fail the HESI Exit. Not for 30-day plans.</span></li>
+          </ul>
+        </div>
+        <div class="sides__side">
+          <h2>What you get</h2>
+          <ul class="ticks">
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>A fixed commission for every plan bought through your link</li>
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>A purchase counts within 30 days of a click on your link</li>
+            <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>A payout to your PayPal once you have $100</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Version A: what each plan earns -->
-  <section class="section v-a" id="rates">
+  <section class="section v-a rates-section" id="rates">
     <div class="section__head">
       <h2 class="section__title">What you earn per plan</h2>
     </div>
@@ -341,7 +398,7 @@
       <li><span class="rates__plan">12 Months</span><b class="rates__earn num">$10</b></li>
       <li><span class="rates__plan">36 Months</span><b class="rates__earn num">$20</b></li>
     </ul>
-    <p class="rates__note">Paid with Klarna, Afterpay or Affirm, the 30 Days, 90 Days and 180 Days plans earn $1 less.</p>
+    <p class="rates__note">Plans paid with Klarna, Afterpay or Affirm may earn a different amount. You'll see every rate in your dashboard.</p>
   </section>
 
   <!-- Version B: why students choose the course -->
@@ -353,20 +410,12 @@
     <div class="card why">
       <img class="why__photo" src="assets/login-image.jpg" alt="A smiling nursing student in blue scrubs">
       <div class="why__text">
-        <h3>What students get</h3>
-        <ul class="ticks">
-          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Realistic RN and PN HESI-style practice tests for the Next Generation HESI Exit</li>
-          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Full-length tests that mimic the HESI Exit</li>
-          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>A detailed rationale for every single question</li>
-          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Free practice tests to try first: <a href="https://www.beta.yourbestgrade.com/hesi/tests/1/tos" target="_blank" rel="noopener">RN</a> &middot; <a href="https://www.beta.yourbestgrade.com/hesi/tests/15/tos" target="_blank" rel="noopener">PN</a></span></li>
-        </ul>
-      </div>
-      <div class="why__text">
         <h3>Why it's easy to recommend</h3>
         <ul class="ticks">
           <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Since 2010</b> helping students succeed on their HESI exams</span></li>
           <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Over 90%</b> of our students succeed on their exams*</span></li>
-          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span><b>Success Guarantee:</b> a full refund if they actively use the program and still fail the HESI Exit. Not for 30-day plans.</span></li>
+          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Full-length tests that mimic the HESI Exit</li>
+          <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Free practice tests to try first: <a href="https://www.beta.yourbestgrade.com/hesi/tests/1/tos" target="_blank" rel="noopener">RN</a> &middot; <a href="https://www.beta.yourbestgrade.com/hesi/tests/15/tos" target="_blank" rel="noopener">PN</a></span></li>
         </ul>
         <p class="ticks-note">*From our surveys of students who took the HESI Exit. <a href="https://www.beta.yourbestgrade.com/hesi/pricing" target="_blank" rel="noopener">Full guarantee terms are on our Pricing page.</a></p>
       </div>
@@ -435,7 +484,7 @@
     <p>The form asks where you post, a few words about you and your audience, and your PayPal email for payouts.</p>
     <div class="actions">
       <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>
-      <span class="actions__login">Already an affiliate? <a href="/affiliate/login-1#screen=login">Log in</a></span>
+      <a class="btn btn--outline" href="/affiliate/login-1#screen=login">Log in</a>
     </div>
   </section>
 </main>
@@ -468,7 +517,7 @@
 <script>
   (function () {
     var body = document.body;
-    var KEYS = ['version', 'bare'];
+    var KEYS = ['version', 'rates', 'bare'];
 
     function readHash() {
       var state = {};
