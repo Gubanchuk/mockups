@@ -23,13 +23,6 @@
     --ink: #1f2a3c;
     --muted: #56657c;
     --footer-note: #7e9ac1;
-    --hold-bg: #e3ecf9;
-    --avail-ink: #146c2e;
-    --avail-bg: #e2f4e6;
-    --avail-bar: #1cbb3f;
-    --paid-ink: #3f4a5c;
-    --paid-bg: #eeeff5;
-    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --gutter: 24px;
     --w: 1100px;
   }
@@ -110,98 +103,31 @@
     box-shadow: 0 4px 18px rgba(24, 50, 97, 0.07), 0 1px 2px rgba(24, 50, 97, 0.06);
   }
 
-  /* ---------- First screen: the pitch and the dashboard the affiliate gets ---------- */
+  /* ---------- First screen: the offer in one column; the idea follows right under it ---------- */
   .hero {
     /* the waves fade into the page ground instead of ending on a hard edge */
     background:
       linear-gradient(to bottom, rgba(239, 245, 254, 0) 70%, var(--ground) 100%),
       url(assets/login-page-bg.jpg) center top / cover no-repeat,
       var(--ground);
-    padding: 64px var(--gutter) 80px;
+    padding: 72px var(--gutter) 64px;
   }
-  .hero__inner {
-    max-width: var(--w); margin: 0 auto;
-    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 520px); gap: 56px; align-items: center;
-  }
+  .hero__inner { max-width: var(--w); margin: 0 auto; }
+  .hero__pitch { max-width: 760px; }
   .hero h1 {
     margin: 0; color: var(--navy); font-size: 36px; line-height: 1.18; font-weight: 700;
     letter-spacing: -0.01em; text-wrap: balance;
   }
-  .hero__lead { margin: 18px 0 0; max-width: 520px; color: var(--ink); font-size: 16.5px; line-height: 1.6; text-wrap: pretty; }
-  .hero__rates {
-    display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px;
-    margin: 22px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); max-width: 520px;
-  }
-  .hero__rates-label { flex-basis: 100%; color: var(--muted); font-size: 12.5px; font-weight: 500; }
-  .hero__rates-list { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 4px 14px; }
-  .hero__rates-list li { color: var(--muted); font-size: 13.5px; }
-  .hero__rates-list b { color: var(--navy); font-size: 16px; font-weight: 600; margin-left: 4px; }
-  .hero__rates a { font-size: 14px; font-weight: 500; white-space: nowrap; }
+  .hero__lead { margin: 18px 0 0; max-width: 600px; color: var(--ink); font-size: 16.5px; line-height: 1.6; text-wrap: pretty; }
   .proof-line { margin: 22px 0 0; max-width: 540px; color: var(--navy); font-size: 14px; font-weight: 500; line-height: 1.7; }
   .proof-line span { white-space: nowrap; }
   .hero .actions { margin-top: 30px; }
 
-  /* The dashboard slice: the same components as the affiliate dashboard (YBG-1803) */
-  .preview { position: relative; padding: 0; overflow: hidden; box-shadow: 0 18px 48px rgba(24, 50, 97, 0.16), 0 2px 6px rgba(24, 50, 97, 0.08); }
-  .preview__bar {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 14px 20px; background: var(--panel); border-bottom: 1px solid var(--line);
-  }
-  .preview__who { display: flex; flex-direction: column; }
-  .preview__who strong { color: var(--navy); font-size: 14px; font-weight: 600; }
-  .preview__who span { color: var(--muted); font-size: 12px; }
-  .example {
-    display: inline-flex; align-items: center; gap: 7px;
-    padding: 6px 12px; border-radius: 999px;
-    background: var(--navy); color: #fff; font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
-  }
-  .example svg.icon { width: 15px; height: 15px; }
-  .preview__body { padding: 18px 20px 20px; display: grid; gap: 16px; }
-  .preview__link-name { color: var(--navy); font-size: 13.5px; font-weight: 600; }
-  .copy { display: flex; gap: 8px; margin-top: 7px; }
-  .link-url {
-    flex: 1; min-width: 0; padding: 9px 12px; border: 1px solid var(--field); border-radius: 6px;
-    background: #f8fafd; font-size: 12.5px; line-height: 1.45; color: var(--ink); overflow-wrap: anywhere;
-  }
-  .copy button {
-    flex: none; display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 14px;
-    border: 0; border-radius: 6px; background: var(--orange); color: #fff;
-    font: 600 13px "Poppins", Arial, sans-serif; cursor: pointer; transition: background-color 160ms ease-out;
-  }
-  .copy button:hover { background: var(--orange-hover); }
-  .copy button svg.icon { width: 15px; height: 15px; }
-  .copy button.is-copied { background: var(--avail-ink); }
-  .preview__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .preview__stats div { padding: 10px 12px; background: var(--panel); border-radius: 6px; }
-  .preview__stats b { display: block; color: var(--navy); font-size: 18px; font-weight: 600; }
-  .preview__stats span { color: var(--muted); font-size: 12px; }
-  .preview__balances { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .balance { padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; }
-  .balance__label { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 12.5px; font-weight: 500; }
-  .balance__sum { display: block; margin-top: 2px; color: var(--navy); font-size: 18px; font-weight: 600; }
-  .balance__bar { display: block; height: 4px; margin: 6px 0 5px; background: var(--surface); border-radius: 2px; overflow: hidden; }
-  .balance__bar i { display: block; height: 100%; background: var(--avail-bar); border-radius: 2px; transform-origin: left center; animation: fill 900ms var(--ease-out) 300ms both; }
-  @keyframes fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-  .balance__meta { color: var(--muted); font-size: 11.5px; }
-  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
-  .dot-hold { background: var(--blue); }
-  .dot-avail { background: var(--avail-bar); }
-  .orders { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-  .orders th { padding: 0 8px 8px 0; color: var(--muted); font-size: 11.5px; font-weight: 500; text-align: left; border-bottom: 1px solid var(--line); }
-  .orders td { padding: 9px 8px 9px 0; border-bottom: 1px solid var(--line); color: var(--ink); white-space: nowrap; }
-  .orders tr:last-child td { border-bottom: 0; }
-  .orders .r { text-align: right; padding-right: 16px; }
-  .orders td.plan { color: var(--navy); font-weight: 500; }
-  .status { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 500; }
-  .st-hold { background: var(--hold-bg); color: var(--blue); }
-  .st-avail { background: var(--avail-bg); color: var(--avail-ink); }
-  .st-paid { background: var(--paid-bg); color: var(--paid-ink); }
   /* ---------- Sections under the first screen ---------- */
   .section { max-width: calc(var(--w) + 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--gutter); }
   .section + .section { margin-top: 88px; }
-  /* first visible section of each version: A starts with the rates, B skips the hidden rates section */
-  .hero + .section,
-  body[data-version="b"] .hero + .section + .section { margin-top: 72px; }
+  /* How it works sits right under the first screen in both versions */
+  .hero + .section { margin-top: 24px; }
   .section__head { max-width: 640px; margin: 0 0 28px; }
   .section__title { margin: 0; color: var(--navy); font-size: 26px; font-weight: 600; line-height: 1.22; text-wrap: balance; }
   .section__lead { margin: 10px 0 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
@@ -258,6 +184,17 @@
   .split--who > .card:first-child { display: flex; flex-direction: column; }
   .who-cta { margin-top: auto; padding-top: 24px; }
   .split .who-cta__ask { margin: 0 0 12px; color: var(--navy); font-size: 16px; font-weight: 600; }
+  /* Version B has no talking-points card next to it: the card spans the row, so the call to action takes the right column */
+  @media (min-width: 901px) {
+    body[data-version="b"] .split--who > .card:first-child {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 260px); column-gap: 40px; align-content: start;
+    }
+    body[data-version="b"] .split--who > .card:first-child > * { grid-column: 1; }
+    body[data-version="b"] .split--who > .card:first-child > .who-cta {
+      grid-column: 2; grid-row: 1 / span 4; align-self: center;
+      margin: 0; padding: 4px 0 4px 40px; border-left: 1px solid var(--line);
+    }
+  }
 
   /* Why students choose (version B): the photo from the login pages beside two lists */
   .why { display: grid; grid-template-columns: 240px minmax(0, 1fr) minmax(0, 1fr); overflow: hidden; }
@@ -309,12 +246,10 @@
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .balance__bar i { animation: none; }
   }
 
   /* ---------- Narrow desktop and tablet ---------- */
   @media (max-width: 1100px) {
-    .hero__inner { grid-template-columns: minmax(0, 1fr) minmax(0, 460px); gap: 40px; }
     .hero h1 { font-size: 32px; }
     .path { grid-template-columns: 1fr; }
     .path-card .station { display: grid; grid-template-columns: 34px 1fr; column-gap: 16px; padding: 0 0 22px; }
@@ -325,7 +260,6 @@
   }
 
   @media (max-width: 900px) {
-    .hero__inner { grid-template-columns: minmax(0, 1fr); gap: 36px; max-width: 620px; }
     .split, .voices, .info { grid-template-columns: minmax(0, 1fr); }
     .why { grid-template-columns: 200px minmax(0, 1fr); }
     .why__photo { grid-row: span 2; }
@@ -341,22 +275,15 @@
     .program-logo img { width: 86px; }
     .program-logo__rule { height: 36px; }
     .program-logo__words { font-size: 12.5px; }
-    .hero { padding-top: 36px; padding-bottom: 48px; background-size: 100% 100%, auto 100%; }
+    .hero { padding-top: 36px; padding-bottom: 44px; background-size: 100% 100%, auto 100%; }
     .hero h1 { font-size: 26px; }
     .hero__lead { font-size: 15px; }
     .hero .actions { flex-direction: column; align-items: stretch; text-align: center; }
     .hero .actions .btn { width: 100%; }
-    .preview__bar { padding: 12px 14px; }
-    .preview__body { padding: 14px 14px 16px; }
-    .preview__stats b { font-size: 16px; }
-    .orders td, .orders th { padding-right: 6px; }
-    .orders .r { padding-right: 12px; }
     .rates th, .rates td { padding-top: 14px; padding-bottom: 14px; }
     .rates th.r { white-space: nowrap; }
-    .orders .col-date { display: none; }
     .section + .section { margin-top: 64px; }
-    .hero + .section,
-    body[data-version="b"] .hero + .section + .section { margin-top: 52px; }
+    .hero + .section { margin-top: 16px; }
     .who-cta .btn { width: 100%; }
     .section__title { font-size: 24px; }
     .rates th, .rates td { padding-left: 16px; padding-right: 16px; }
@@ -406,75 +333,69 @@
       <div class="hero__pitch">
         <h1 class="v-a">Earn $4–$20 for every HESI Exam Study plan your followers buy</h1>
         <h1 class="v-b">Recommend HESI exam prep to nursing students and earn on every plan they buy</h1>
-        <p class="hero__lead v-a">For nurses and nursing students whose followers are getting ready for the HESI Exit. Share your link, and every plan bought through it earns you a fixed commission, paid to your PayPal.</p>
-        <p class="hero__lead v-b">The YourBestGrade Affiliate Program pays a fixed commission on every HESI Exam Study plan bought through your link.</p>
-        <div class="hero__rates v-a">
-          <span class="hero__rates-label">Paid in full</span>
-          <ul class="hero__rates-list" aria-label="Commission per plan paid in full">
-            <li>30 Days<b class="num">$5</b></li>
-            <li>90 Days<b class="num">$8</b></li>
-            <li>180 Days<b class="num">$9</b></li>
-            <li>12 Months<b class="num">$10</b></li>
-            <li>36 Months<b class="num">$20</b></li>
-          </ul>
-          <a href="#rates">See all plans</a>
-        </div>
+        <p class="hero__lead v-a">For nurses and nursing students whose followers or classmates are getting ready for the HESI Exit. Share your link, and every plan bought through it earns you a fixed commission, paid to your PayPal.</p>
+        <p class="hero__lead v-b">The YourBestGrade Affiliate Program pays a fixed commission on every HESI Exam Study plan bought through your link, whether you share it with followers or classmates.</p>
         <p class="proof-line v-b"><span>Since 2010&nbsp;&middot;</span> <span>Over 90% of our students succeed*&nbsp;&middot;</span> <span>Success Guarantee**</span></p>
         <div class="actions">
           <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>
           <span class="actions__login">Already an affiliate? <a href="/affiliate/login-1#screen=login">Log in</a></span>
         </div>
       </div>
+    </div>
+  </section>
 
-      <div class="card preview" aria-label="Example of the affiliate dashboard">
-        <div class="preview__bar">
-          <div class="preview__who"><strong>Your affiliate dashboard</strong><span>Links, clicks and orders</span></div>
-          <span class="example"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.01"/></svg>Example</span>
-        </div>
-        <div class="preview__body">
-          <div>
-            <div class="preview__link-name">HESI Exam Study</div>
-            <div class="copy">
-              <span class="link-url">https://www.yourbestgrade.com/hesi?aff=Jx7Kq2MvR9tLp4Wn</span>
-              <button type="button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg><span>Copy</span></button>
-            </div>
-          </div>
-          <div class="preview__stats">
-            <div><b class="num">214</b><span>clicks</span></div>
-            <div><b class="num">176</b><span>unique visitors</span></div>
-            <div><b class="num">13</b><span>purchases</span></div>
-          </div>
-          <div class="preview__balances v-a">
-            <div class="balance">
-              <span class="balance__label"><i class="dot dot-hold"></i>On hold</span>
-              <span class="balance__sum num">$47.00</span>
-              <span class="balance__meta">5 orders</span>
-            </div>
-            <div class="balance">
-              <span class="balance__label"><i class="dot dot-avail"></i>Available</span>
-              <span class="balance__sum num">$103.00</span>
-              <span class="balance__bar" aria-hidden="true"><i></i></span>
-              <span class="balance__meta">$100 payout minimum reached</span>
-            </div>
-          </div>
-          <table class="orders v-a">
-            <thead><tr><th class="col-date">Date</th><th>Plan</th><th class="r">Commission</th><th>Status</th></tr></thead>
-            <tbody>
-              <tr><td class="col-date num">Sep 12, 2026</td><td class="plan">36 Months Access</td><td class="r num">$20.00</td><td><span class="status st-hold">On hold</span></td></tr>
-              <tr><td class="col-date num">Sep 3, 2026</td><td class="plan">90 Days</td><td class="r num">$8.00</td><td><span class="status st-hold">On hold</span></td></tr>
-              <tr><td class="col-date num">Aug 11, 2026</td><td class="plan">12 Months Access</td><td class="r num">$10.00</td><td><span class="status st-avail">Available</span></td></tr>
-            </tbody>
-          </table>
-          <table class="orders v-b">
-            <thead><tr><th class="col-date">Date</th><th>Plan</th><th>Status</th></tr></thead>
-            <tbody>
-              <tr><td class="col-date num">Sep 12, 2026</td><td class="plan">36 Months Access</td><td><span class="status st-hold">On hold</span></td></tr>
-              <tr><td class="col-date num">Aug 11, 2026</td><td class="plan">12 Months Access</td><td><span class="status st-avail">Available</span></td></tr>
-              <tr><td class="col-date num">Jul 19, 2026</td><td class="plan">180 Days</td><td><span class="status st-paid">Paid out</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+  <!-- From a link to a payout -->
+  <section class="section">
+    <div class="section__head">
+      <h2 class="section__title">How it works</h2>
+    </div>
+    <div class="card path-card v-a">
+      <ol class="path">
+        <li class="station">
+          <span class="station__node">1</span>
+          <h3>Apply</h3>
+          <p>Tell us where you'll share your link. We review every application and email you once it's approved.</p>
+        </li>
+        <li class="station">
+          <span class="station__node">2</span>
+          <h3>Share your link</h3>
+          <p>Copy it from your dashboard. It can lead to our home page, the HESI Exam Study page or the pricing page.</p>
+        </li>
+        <li class="station">
+          <span class="station__node">3</span>
+          <h3>A follower buys</h3>
+          <p>They buy within <strong>30 days</strong> of clicking your link. If they clicked several affiliate links, the last one counts.</p>
+        </li>
+        <li class="station">
+          <span class="station__node">4</span>
+          <h3>30-day hold</h3>
+          <p>The commission is on hold for <strong>30 days</strong> after the purchase, then it becomes available.</p>
+        </li>
+        <li class="station station--last">
+          <span class="station__node">5</span>
+          <h3>Request a payout</h3>
+          <p>Once you have <strong>$100</strong> or more available, request a payout in your dashboard. We send it to your PayPal within a few days.</p>
+        </li>
+      </ol>
+    </div>
+    <div class="card path-card v-b">
+      <ol class="path path--3">
+        <li class="station">
+          <span class="station__node">1</span>
+          <h3>Apply</h3>
+          <p>Tell us who you are and where you'll share your link. We review every application and email you once it's approved.</p>
+        </li>
+        <li class="station">
+          <span class="station__node">2</span>
+          <h3>Share your link</h3>
+          <p>Copy it from your dashboard and share it with nursing students preparing for the HESI Exit.</p>
+        </li>
+        <li class="station station--last">
+          <span class="station__node">3</span>
+          <h3>Get paid</h3>
+          <p>After a 30-day hold, request a payout once you have $100 or more. We send it to your PayPal within a few days.</p>
+        </li>
+      </ol>
     </div>
   </section>
 
@@ -541,69 +462,14 @@
     </div>
   </section>
 
-  <!-- From a link to a payout -->
-  <section class="section">
-    <div class="section__head">
-      <h2 class="section__title">How it works</h2>
-    </div>
-    <div class="card path-card v-a">
-      <ol class="path">
-        <li class="station">
-          <span class="station__node">1</span>
-          <h3>Apply</h3>
-          <p>Tell us where you'll share your link. We review every application and email you once it's approved.</p>
-        </li>
-        <li class="station">
-          <span class="station__node">2</span>
-          <h3>Share your link</h3>
-          <p>Copy it from your dashboard. It can lead to our home page, the HESI Exam Study page or the pricing page.</p>
-        </li>
-        <li class="station">
-          <span class="station__node">3</span>
-          <h3>A follower buys</h3>
-          <p>They buy within <strong>30 days</strong> of clicking your link. If they clicked several affiliate links, the last one counts.</p>
-        </li>
-        <li class="station">
-          <span class="station__node">4</span>
-          <h3>30-day hold</h3>
-          <p>The commission is on hold for <strong>30 days</strong> after the purchase, then it becomes available.</p>
-        </li>
-        <li class="station station--last">
-          <span class="station__node">5</span>
-          <h3>Request a payout</h3>
-          <p>Once you have <strong>$100</strong> or more available, request a payout in your dashboard. We send it to your PayPal within a few days.</p>
-        </li>
-      </ol>
-    </div>
-    <div class="card path-card v-b">
-      <ol class="path path--3">
-        <li class="station">
-          <span class="station__node">1</span>
-          <h3>Apply</h3>
-          <p>Tell us who you are and where you'll share your link. We review every application and email you once it's approved.</p>
-        </li>
-        <li class="station">
-          <span class="station__node">2</span>
-          <h3>Share your link</h3>
-          <p>Copy it from your dashboard and share it with nursing students preparing for the HESI Exit.</p>
-        </li>
-        <li class="station station--last">
-          <span class="station__node">3</span>
-          <h3>Get paid</h3>
-          <p>After a 30-day hold, request a payout once you have $100 or more. We send it to your PayPal within a few days.</p>
-        </li>
-      </ol>
-    </div>
-  </section>
-
   <!-- Who we're looking for; version A also gets the talking points -->
   <section class="section">
     <div class="split split--who">
       <div class="card">
         <h3>Who we're looking for</h3>
-        <p>Nurses, recent graduates and nursing students who share study tips and nursing school life, with followers who are getting ready for the HESI Exit.</p>
+        <p>Nurses, recent graduates and nursing students who share study tips and nursing school life with followers or classmates getting ready for the HESI Exit.</p>
         <ul class="channels" aria-label="Where our affiliates share their links">
-          <li>TikTok</li><li>Instagram</li><li>YouTube</li><li>Facebook</li>
+          <li>TikTok</li><li>Instagram</li><li>YouTube</li><li>Facebook</li><li>Classmates</li>
         </ul>
         <p class="v-b">This isn't a discount program: purchases through your own link don't earn a commission.</p>
         <div class="who-cta">
@@ -731,27 +597,6 @@
     document.querySelectorAll('a[href="#"]').forEach(function (link) {
       link.addEventListener('click', function (event) { event.preventDefault(); });
     });
-    // "See all plans" scrolls to the table without touching the mockup state in the hash
-    document.querySelectorAll('a[href="#rates"]').forEach(function (link) {
-      link.addEventListener('click', function (event) {
-        event.preventDefault();
-        document.getElementById('rates').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    });
-
-    // Copy in the dashboard example copies the sample link
-    document.querySelectorAll('.copy button').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var text = btn.parentElement.querySelector('.link-url').textContent;
-        var done = function () {
-          btn.classList.add('is-copied');
-          btn.querySelector('span').textContent = 'Copied';
-          setTimeout(function () { btn.classList.remove('is-copied'); btn.querySelector('span').textContent = 'Copy'; }, 1600);
-        };
-        if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, done); else done();
-      });
-    });
-
     window.addEventListener('hashchange', apply);
     apply();
   })();
