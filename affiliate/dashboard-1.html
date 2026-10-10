@@ -197,9 +197,8 @@
   .balance-card:has(> .balance:hover) { border-color: #b9c9df; box-shadow: 0 6px 22px rgba(24, 50, 97, 0.11), 0 1px 2px rgba(24, 50, 97, 0.06); }
   .balance-card:has(> .balance[aria-pressed="true"]) { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue), 0 6px 22px rgba(24, 50, 97, 0.11); }
   .balance-card > .balance[aria-pressed="true"] { border: 0; box-shadow: none; }
-  .payout-cta { display: none; padding: 0 18px 16px; }
-  body[data-payout="ready"]:not([data-state="new"]) .payout-cta,
-  body[data-payout="requested"]:not([data-state="new"]) .payout-cta { display: block; }
+  .payout-cta { display: block; padding: 0 18px 16px; }
+  body[data-state="new"] .payout-cta { display: none; }
   .btn-request {
     display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 38px; padding: 0 16px; border: 0; border-radius: 6px;
     background: var(--orange); color: #fff; font: 600 13.5px "Poppins", Arial, sans-serif; white-space: nowrap; cursor: pointer;
@@ -209,9 +208,38 @@
   .btn-request:active { transform: translateY(1px); }
   .btn-request svg.icon { width: 16px; height: 16px; stroke-width: 2; }
   .payout-cta .btn-request { width: 100%; }
+  /* Below the minimum the button stays in place, greyed out, and explains itself on hover, focus or tap */
+  .btn-request[aria-disabled="true"], .btn-request[aria-disabled="true"]:hover { background: var(--line); color: var(--muted); cursor: not-allowed; }
+  .btn-request[aria-disabled="true"]:active { transform: none; }
+  .req { position: relative; display: block; }
+  .req__tip {
+    position: absolute; left: 50%; top: calc(100% + 10px); z-index: 20; width: max-content; max-width: 250px; padding: 9px 12px; border-radius: 6px;
+    background: var(--navy); color: #fff; font: 500 12.5px/1.5 "Poppins", Arial, sans-serif; text-align: center;
+    box-shadow: 0 6px 18px rgba(24, 50, 97, 0.22);
+    opacity: 0; visibility: hidden; pointer-events: none; transform: translate(-50%, -4px);
+    transition: opacity 140ms ease-out, transform 140ms ease-out, visibility 0s linear 140ms;
+  }
+  /* A transparent strip over the gap, so the pointer can move from the button onto the tooltip */
+  .req__tip::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: 10px; }
+  /* The arrow belongs to the button, so it stays under the button's middle wherever the tooltip is aligned */
+  .req::after {
+    content: ""; position: absolute; left: 50%; top: calc(100% - 2px); z-index: 21; margin-left: -6px; border: 6px solid transparent; border-bottom-color: var(--navy);
+    opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity 140ms ease-out, transform 140ms ease-out, visibility 0s linear 140ms;
+  }
+  /* Open on hover (button or tooltip), keyboard focus or tap; Escape closes it until the pointer leaves or focus moves */
+  .req:not(.is-dismissed):has(> [aria-disabled="true"]):hover .req__tip,
+  .req:not(.is-dismissed):has(> [aria-disabled="true"]:focus-visible) .req__tip,
+  .req.is-tip:not(.is-dismissed) .req__tip {
+    opacity: 1; visibility: visible; pointer-events: auto; transform: translate(-50%, 0); transition-delay: 0s;
+  }
+  .req:not(.is-dismissed):has(> [aria-disabled="true"]):hover::after,
+  .req:not(.is-dismissed):has(> [aria-disabled="true"]:focus-visible)::after,
+  .req.is-tip:not(.is-dismissed)::after {
+    opacity: 1; visibility: visible; transform: none; transition-delay: 0s;
+  }
   .payout-requested { display: none; align-items: center; gap: 7px; min-height: 38px; padding: 0 12px; border-radius: 6px; background: var(--hold-bg); color: var(--blue); font-size: 13px; font-weight: 500; }
   .payout-requested svg.icon { width: 16px; height: 16px; }
-  body[data-payout="requested"] .payout-cta .btn-request { display: none; }
+  body[data-payout="requested"] .payout-cta .req { display: none; }
   body[data-payout="requested"] .payout-requested { display: flex; }
   .balance__more { position: absolute; top: 15px; right: 14px; width: 16px; height: 16px; color: #9fb2cc; transition: transform 200ms ease-out, color 160ms ease-out; }
   .balance:hover .balance__more { color: var(--blue); }
@@ -302,8 +330,13 @@
   body[data-payout="below"] .next-payout .icon-done, body[data-payout="requested"] .next-payout .icon-done { display: none; }
   body[data-payout="below"] .next-payout .icon-wait, body[data-payout="requested"] .next-payout .icon-wait { display: block; }
   .next-payout b { color: var(--navy); }
-  .next-payout .btn-request { flex: none; height: 42px; padding: 0 20px; font-size: 14px; }
-  body:not([data-payout="ready"]) .next-payout .btn-request { display: none; }
+  .next-payout .req { flex: none; }
+  .next-payout .req__tip { left: auto; right: 0; transform: translateY(-4px); }
+  .next-payout .req:not(.is-dismissed):has(> [aria-disabled="true"]):hover .req__tip,
+  .next-payout .req:not(.is-dismissed):has(> [aria-disabled="true"]:focus-visible) .req__tip,
+  .next-payout .req.is-tip:not(.is-dismissed) .req__tip { transform: none; }
+  .next-payout .btn-request { height: 42px; padding: 0 20px; font-size: 14px; }
+  body[data-payout="requested"] .next-payout .req { display: none; }
   .payout-start { display: none; margin: -6px 0 16px; color: var(--muted); font-size: 13.5px; }
   body[data-state="new"] .payout-start { display: block; }
 
@@ -475,7 +508,12 @@
     .next-payout { flex-wrap: wrap; align-items: flex-start; }
     .next-payout svg.icon { margin-top: 3px; }
     .next-payout__text { flex-basis: calc(100% - 32px); }
-    .next-payout .btn-request { width: 100%; }
+    .next-payout .req, .next-payout .btn-request { width: 100%; }
+    .payout-cta .req__tip { width: 100%; max-width: none; }
+    .next-payout .req__tip { left: 50%; right: auto; transform: translate(-50%, -4px); }
+    .next-payout .req:not(.is-dismissed):has(> [aria-disabled="true"]):hover .req__tip,
+    .next-payout .req:not(.is-dismissed):has(> [aria-disabled="true"]:focus-visible) .req__tip,
+    .next-payout .req.is-tip:not(.is-dismissed) .req__tip { transform: translate(-50%, 0); }
 
 
     .section--payouts tr { display: block; padding: 12px 16px; border-bottom: 1px solid var(--line); }
@@ -515,43 +553,10 @@
 
 <div class="mock-bar" role="toolbar" aria-label="Mockup options">
   <a class="mock-version" href="/affiliate">&larr; Affiliate program</a><span class="mock-version-name">Affiliate dashboard &middot; Version 1 &middot; Commissions in Links</span>
-  <div class="mock-group"><span>Orders</span>
-    <div class="mock-seg" data-key="orders">
-      <button data-value="balance">Click a balance</button>
-      <button data-value="button">More details button</button>
-    </div>
-  </div>
-  <div class="mock-group"><span>Section</span>
-    <div class="mock-seg" data-key="section">
-      <button data-value="links">Links</button>
-      <button data-value="commissions">Commissions</button>
-      <button data-value="earnings">Earnings</button>
-      <button data-value="payouts">Payouts</button>
-      <button data-value="settings">Settings</button>
-      <button data-value="terms">Terms</button>
-    </div>
-  </div>
-  <div class="mock-group"><span>Header &amp; footer</span>
-    <div class="mock-seg" data-key="chrome">
-      <button data-value="program">Program</button>
-      <button data-value="hesi">HESI</button>
-      <button data-value="schools">Simple</button>
-      <button data-value="ybg">YourBestGrade</button>
-    </div>
-  </div>
-  <div class="mock-group"><span>Buyer email</span>
-    <div class="mock-seg" data-key="email">
-      <button data-value="hidden">Hidden</button>
-      <button data-value="masked">Masked</button>
-    </div>
-  </div>
   <div class="mock-group"><span>State</span>
     <div class="mock-seg" data-key="state">
-      <button data-value="active">Active</button>
       <button data-value="below">Below $100</button>
-      <button data-value="requested">Payout requested</button>
-      <button data-value="new">New affiliate</button>
-      <button data-value="many">Hundreds of orders</button>
+      <button data-value="active">$100 or more</button>
     </div>
   </div>
   <div class="mock-sample">Sample data</div>
@@ -692,7 +697,10 @@
               <span class="balance__meta" data-minimum>$100 payout minimum reached</span>
             </button>
             <div class="payout-cta">
-              <button class="btn-request" type="button" data-request>Request payout</button>
+              <span class="req">
+                <button class="btn-request" type="button" data-request>Request payout</button>
+                <span class="req__tip" role="tooltip" id="req-tip-card">You can request a payout once your available balance reaches $100.</span>
+              </span>
               <span class="payout-requested" role="status"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Requested <span class="num" data-requested-short>Sep 15</span></span></span>
             </div>
           </div>
@@ -762,7 +770,10 @@
           <span class="when-below">Your available balance is <b class="num" data-sum="avail">$83.00</b>. You can request a payout once it reaches $100.</span>
           <span class="when-requested">You requested a payout of <b class="num" data-requested-amount>$103.00</b> on <span class="num" data-requested-date>Sep 15, 2026</span>. We'll send it to your PayPal within a few days.</span>
         </span>
-        <button class="btn-request" type="button" data-request>Request payout</button>
+        <span class="req">
+          <button class="btn-request" type="button" data-request>Request payout</button>
+          <span class="req__tip" role="tooltip" id="req-tip-payouts">You can request a payout once your available balance reaches $100.</span>
+        </span>
       </div>
       <p class="payout-start">You can request a payout once your available balance reaches $100.</p>
       <div class="panel ledger">
@@ -1082,6 +1093,11 @@
       // The payout request: offered from $100, replaced by its status once sent
       var request = requestFor(mode);
       body.dataset.payout = request ? 'requested' : (t.avail >= MINIMUM ? 'ready' : 'below');
+      document.querySelectorAll('[data-request]').forEach(function (btn) {
+        var tip = btn.parentElement.querySelector('.req__tip');
+        if (body.dataset.payout === 'below') { btn.setAttribute('aria-disabled', 'true'); btn.setAttribute('aria-describedby', tip.id); }
+        else { btn.removeAttribute('aria-disabled'); btn.removeAttribute('aria-describedby'); btn.parentElement.classList.remove('is-tip'); }
+      });
       if (request) {
         document.querySelector('[data-requested-amount]').textContent = money(request.amount);
         document.querySelector('[data-requested-date]').textContent = fmtDate(request.requested);
@@ -1149,6 +1165,7 @@
         seg.querySelectorAll('button').forEach(function (btn) {
           var current = body.dataset[seg.dataset.key];
           if (seg.dataset.key === 'state' && current === 'many-requested') current = 'many';
+          if (seg.dataset.key === 'state' && current === 'requested') current = 'active';
           btn.setAttribute('aria-pressed', String(btn.dataset.value === current));
         });
       });
@@ -1203,7 +1220,25 @@
     document.querySelector('.orders__close').addEventListener('click', function () { go('filter', 'none'); });
     // Request payout sends the request: in the mockup it switches to the requested state
     document.querySelectorAll('[data-request]').forEach(function (btn) {
-      btn.addEventListener('click', function () { go('state', baseMode(body.dataset.state) === 'many' ? 'many-requested' : 'requested'); });
+      btn.addEventListener('click', function () {
+        // Greyed out below the minimum: a tap shows the tooltip instead (phones have no hover)
+        if (btn.getAttribute('aria-disabled') === 'true') {
+          var wrap = btn.parentElement;
+          wrap.classList.remove('is-dismissed');
+          wrap.classList.add('is-tip');
+          clearTimeout(wrap.tipTimer);
+          wrap.tipTimer = setTimeout(function () { wrap.classList.remove('is-tip'); }, 3500);
+          return;
+        }
+        go('state', baseMode(body.dataset.state) === 'many' ? 'many-requested' : 'requested');
+      });
+      btn.addEventListener('blur', function () { btn.parentElement.classList.remove('is-tip', 'is-dismissed'); });
+      btn.parentElement.addEventListener('mouseleave', function () { btn.parentElement.classList.remove('is-dismissed'); });
+    });
+    // Escape closes an open tooltip without moving the pointer or the focus
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape') return;
+      document.querySelectorAll('.req').forEach(function (wrap) { wrap.classList.remove('is-tip'); wrap.classList.add('is-dismissed'); });
     });
     document.querySelector('.pager__pages').addEventListener('click', function (event) {
       var btn = event.target.closest('button[data-page]');
