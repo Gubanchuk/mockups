@@ -59,6 +59,9 @@
   .mock-seg button:hover { color: #fff; }
   .mock-seg button[aria-pressed="true"] { background: #f3f6fb; color: #16202e; }
   body[data-bare="1"] .mock-bar { display: none; }
+  /* Patrick chose page 1 for both audiences (12.10), so the old Google page (version B) is no longer offered in the bar;
+     the group stays in the markup because the site build removes it and fixes the version per page */
+  .mock-group:has(> .mock-seg[data-key="version"]) { display: none; }
 
   /* Version switch: A for creators the SMM team brings in, B for people from Google */
   body[data-version="a"] .v-b,
@@ -66,6 +69,21 @@
   /* Rates switch, version A only: the rates block on the page or not */
   body[data-version="b"] .mock-group--a,
   body[data-rates="none"] .rates-section { display: none !important; }
+  /* The headline and the rates fact follow the Rates switch: no amount anywhere when the rates block is off (the Google page) */
+  body[data-version="a"][data-rates="block"] .h-norates,
+  body[data-version="a"][data-rates="none"] .h-rates,
+  body[data-version="a"][data-rates="block"] .fact-rates,
+  body[data-version="a"][data-rates="none"] .fact-rate-changes,
+  body[data-version="b"] .fact-rate-changes { display: none !important; }
+  /* Version A switches for the points Patrick left open (YBG-1836, 12.10.2026): where Log in sits, where "Who we're looking for" sits, practice questions or not */
+  body[data-version="b"] .site-login,
+  body[data-login="beside"] .site-login,
+  body[data-version="a"][data-login="header"] .actions .btn--outline,
+  body[data-who="bottom"] .who-section,
+  body[data-version="a"][data-who="top"] .closing--who,
+  body[data-version="b"] .closing--short,
+  body[data-who="bottom"] .closing--short,
+  body[data-practice="off"] .practice-section { display: none !important; }
 
   /* ---------- Site header (Program chrome, as login-1) ---------- */
   .site-header {
@@ -84,6 +102,16 @@
   .program-logo__words { display: flex; flex-direction: column; font-family: Arial, Helvetica, sans-serif; font-weight: 700; font-size: 15.5px; line-height: 1.02; letter-spacing: 0.01em; text-transform: uppercase; }
   .program-logo__words span:first-child { color: #434343; }
   .program-logo__words span:last-child { color: #1768b8; }
+  /* Log in in the header's right corner, where the site keeps Member's Login */
+  .site-login {
+    margin-left: auto; display: inline-flex; align-items: center; gap: 8px;
+    height: 40px; padding: 0 18px; border-radius: 4px;
+    background: var(--blue); color: #fff; font: 600 14px "Poppins", Arial, sans-serif; text-decoration: none;
+    transition: background-color 160ms ease-out, transform 160ms ease-out;
+  }
+  .site-login:hover { background: var(--navy); color: #fff; }
+  .site-login:active { transform: translateY(1px); }
+  .site-login svg.icon { width: 16px; height: 16px; stroke-width: 2; }
 
   /* ---------- Buttons ---------- */
   .btn {
@@ -150,10 +178,8 @@
   /* ---------- Sections under the first screen ---------- */
   .section { max-width: calc(var(--w) + 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--gutter); }
   .section + .section { margin-top: 88px; }
-  /* first visible section of each version: A starts with the rates, B skips the hidden rates section */
-  .hero + .section,
-  body[data-version="b"] .hero + .section + .section,
-  body[data-version="a"][data-rates="none"] .hero + .section + .section + .section { margin-top: 24px; }
+  /* the first visible section sits close to the first screen; the script marks it, since the switches hide sections in any combination */
+  .section.is-first { margin-top: 24px; }
   .section__head { max-width: 640px; margin: 0 0 28px; }
   .section__title { margin: 0; color: var(--navy); font-size: 26px; font-weight: 600; line-height: 1.22; text-wrap: balance; }
   .section__lead { margin: 10px 0 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
@@ -165,6 +191,20 @@
   .rates__plan { display: block; color: var(--muted); font-size: 14px; font-weight: 500; }
   .rates__earn { display: block; margin-top: 4px; color: var(--navy); font-size: 26px; font-weight: 700; line-height: 1.2; }
   .rates__note { margin: 16px 0 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+
+  /* Who we're looking for (version A, under the first screen): a short centered statement, then where they share */
+  .who-section { text-align: center; }
+  .who-section .section__head { max-width: 720px; margin: 0 auto; }
+  .who__text { margin: 14px 0 0; color: var(--navy); font-size: 20px; font-weight: 500; line-height: 1.5; text-wrap: balance; }
+  .who-section .channels { margin-top: 24px; }
+
+  /* Practice questions (version A): a real question from the course beside the words, as on version 4 */
+  .practice { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 56px; align-items: center; }
+  .practice__shot { margin: 0; padding: 10px; }
+  .practice__shot img { display: block; width: 100%; height: auto; border-radius: 4px; }
+  .practice__text p { margin: 14px 0 0; color: var(--ink); font-size: 16px; line-height: 1.6; text-wrap: pretty; }
+  .practice__text .practice__try { color: var(--muted); font-size: 15px; }
+  .practice__try a { font-weight: 600; }
 
   /* Why students choose (version B): the photo from the login pages beside two lists */
   .why { display: grid; grid-template-columns: 240px minmax(0, 1fr); overflow: hidden; }
@@ -237,6 +277,8 @@
     .hero-card { grid-template-columns: minmax(0, 1fr); }
     .hero-card__photo { height: 340px; min-height: 0; object-position: 50% 16%; }
     .voices, .facts__list { grid-template-columns: minmax(0, 1fr); }
+    .practice { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .practice__shot { order: 2; max-width: 560px; }
     .why { grid-template-columns: 200px minmax(0, 1fr); }
     .why .ticks { grid-template-columns: minmax(0, 1fr); }
   }
@@ -244,10 +286,13 @@
   /* ---------- Phone ---------- */
   @media (max-width: 767px) {
     :root { --gutter: 16px; }
+    /* five switch rows take a third of a phone screen: let the bar scroll away with the page */
+    .mock-bar { position: static; }
     .site-header__inner { height: 64px; padding: 0 16px; }
     .program-logo img { width: 86px; }
     .program-logo__rule { height: 36px; }
     .program-logo__words { font-size: 12.5px; }
+    .site-login { height: 36px; padding: 0 14px; font-size: 13.5px; }
     .hero { padding-top: 24px; padding-bottom: 40px; background-size: 100% 100%, auto 100%; }
     .hero-card__photo { height: 300px; }
     .hero-card__body { padding: 28px 20px 30px; }
@@ -261,9 +306,9 @@
     .hero .actions { flex-direction: column; align-items: stretch; }
     .hero .actions .btn { width: 100%; }
     .section + .section { margin-top: 64px; }
-    .hero + .section,
-    body[data-version="b"] .hero + .section + .section,
-    body[data-version="a"][data-rates="none"] .hero + .section + .section + .section { margin-top: 16px; }
+    .section.is-first { margin-top: 16px; }
+    .who__text { font-size: 17px; }
+    .practice__text p { font-size: 15px; }
     .section__title { font-size: 24px; }
     .rates { grid-template-columns: minmax(0, 1fr); }
     .rates li { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 14px 20px; }
@@ -294,14 +339,32 @@
   @media (max-width: 767px) { .mock-version-name { white-space: normal; } }
 </style>
 </head>
-<body data-version="a" data-rates="block" data-bare="0">
+<body data-version="a" data-rates="block" data-login="header" data-who="top" data-practice="on" data-bare="0">
 
 <div class="mock-bar" role="toolbar" aria-label="Mockup options">
-  <a class="mock-version" href="/affiliate">&larr; Affiliate program</a><span class="mock-version-name">Landing page &middot; Version 1 &middot; For creators our SMM team brings in</span>
-  <div class="mock-group mock-group--a"><span>Rates</span>
+  <a class="mock-version" href="/affiliate">&larr; Affiliate program</a><span class="mock-version-name">Landing page &middot; Version 1 &middot; For SMM and Google</span>
+  <div class="mock-group mock-group--a"><span>Page for</span>
     <div class="mock-seg" data-key="rates">
-      <button type="button" data-value="block">Rates block</button>
-      <button type="button" data-value="none">No rates block</button>
+      <button type="button" data-value="block">SMM, with rates</button>
+      <button type="button" data-value="none">Google, no rates</button>
+    </div>
+  </div>
+  <div class="mock-group mock-group--a"><span>Log in</span>
+    <div class="mock-seg" data-key="login">
+      <button type="button" data-value="header">In the header</button>
+      <button type="button" data-value="beside">Next to Apply</button>
+    </div>
+  </div>
+  <div class="mock-group mock-group--a"><span>Who we're looking for</span>
+    <div class="mock-seg" data-key="who">
+      <button type="button" data-value="top">Near the top</button>
+      <button type="button" data-value="bottom">At the bottom</button>
+    </div>
+  </div>
+  <div class="mock-group mock-group--a"><span>Practice questions</span>
+    <div class="mock-seg" data-key="practice">
+      <button type="button" data-value="on">Shown</button>
+      <button type="button" data-value="off">Hidden</button>
     </div>
   </div>
 </div>
@@ -313,6 +376,7 @@
       <span class="program-logo__rule" aria-hidden="true"></span>
       <span class="program-logo__words" aria-hidden="true"><span>Affiliate</span><span>Program</span></span>
     </a>
+    <a class="site-login" href="/affiliate/login-1#screen=login">Log in<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
   </div>
 </header>
 
@@ -322,7 +386,7 @@
     <div class="hero__inner card hero-card v-a">
       <img class="hero-card__photo" src="assets/login-image-a2.jpg" alt="A smiling nurse in blue scrubs holding her phone">
       <div class="hero-card__body">
-        <h1>Recommend HESI Exam Study and earn up to $20 for every plan bought through your link</h1>
+        <h1><span class="h-rates">Recommend HESI Exam Study and earn up to $20 for every plan bought through your link</span><span class="h-norates">Recommend HESI Exam Study and earn on every plan bought through your link</span></h1>
         <p class="hero__lead">For nurses and nursing students whose followers or classmates are getting ready for the HESI Exit.</p>
         <div class="hero-card__row">
           <div class="idea">
@@ -336,12 +400,12 @@
               <li class="idea__step">
                 <span class="idea__node">2</span>
                 <h3>Share it with followers or classmates</h3>
-                <p>A purchase counts within 30 days of a click on your link.</p>
+                <p>A purchase counts if it's made within 30 days of a click on your link.</p>
               </li>
               <li class="idea__step">
                 <span class="idea__node">3</span>
                 <h3>Get paid for every plan</h3>
-                <p>Once you have $100, request a payout to your PayPal.</p>
+                <p>Once you have $100 or more, request a payout to your PayPal at any time.</p>
               </li>
             </ol>
           </div>
@@ -382,6 +446,29 @@
             <li><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>A payout to your PayPal once you have $100</li>
           </ul>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Version A: who we're looking for, right under the first screen (switch: Who we're looking for → Near the top) -->
+  <section class="section v-a who-section" aria-labelledby="who-title">
+    <div class="section__head">
+      <h2 class="section__title" id="who-title">Who we're looking for</h2>
+      <p class="who__text">Active nurses, recent graduates and nursing students who want to tell their community about HESI Exam Study and earn while doing it.</p>
+    </div>
+    <ul class="channels" aria-label="Where our affiliates share their links">
+      <li>TikTok</li><li>Instagram</li><li>YouTube</li><li>Facebook</li><li>Classmates</li>
+    </ul>
+  </section>
+
+  <!-- Version A: a real practice question from the course, as on version 4 (switch: Practice questions) -->
+  <section class="section v-a practice-section" aria-labelledby="practice-title">
+    <div class="practice">
+      <figure class="card practice__shot"><img src="assets/hesi/test-screen.png" width="2368" height="1494" loading="lazy" alt="A HESI-style practice question in HESI Exam Study"></figure>
+      <div class="practice__text">
+        <h2 class="section__title" id="practice-title">Recommend practice tests that feel just like the HESI Exit</h2>
+        <p>Your followers get realistic RN and PN practice tests for the Next Generation HESI Exit, the HESI Exit Legacy exam, HESI CAT and HESI Specialty exams. Every question comes with a detailed rationale.</p>
+        <p class="practice__try">Free practice tests to try first: <a href="https://www.beta.yourbestgrade.com/hesi/tests/1/tos" target="_blank" rel="noopener">RN</a> &middot; <a href="https://www.beta.yourbestgrade.com/hesi/tests/15/tos" target="_blank" rel="noopener">PN</a></p>
       </div>
     </div>
   </section>
@@ -441,11 +528,11 @@
       <dl class="facts__list">
         <div>
           <dt>Last click counts</dt>
-          <dd>If someone clicked several affiliate links before buying, the purchase counts for the last one.</dd>
+          <dd>If a buyer clicked links from several affiliates, the commission goes to the affiliate whose link they clicked last.</dd>
         </div>
         <div>
           <dt>30-day hold</dt>
-          <dd>Each commission is on hold for 30 days after the purchase, then it becomes available.</dd>
+          <dd>Each commission is on hold for 30 days after the purchase. Then it's available for payout.</dd>
         </div>
         <div>
           <dt>Payouts</dt>
@@ -453,17 +540,17 @@
         </div>
         <div>
           <dt>Refunds</dt>
-          <dd>If an order is refunded, fully or in part, its commission is cancelled. If it was already paid out, it's deducted from your future payouts.</dd>
+          <dd>If an order is refunded, fully or in part, its commission is canceled. Any commission already paid out is deducted from your future payouts.</dd>
         </div>
         <div>
           <dt>Not allowed</dt>
-          <dd>Purchases through your own link don't earn a commission: this isn't a discount program. Don't spam your link or generate fake clicks, or we may suspend or close your account.</dd>
+          <dd>You can't earn a commission on your own purchases: this isn't a discount program. Don't spam your link or create fake clicks, or we may suspend or close your account.</dd>
         </div>
-        <div class="v-a">
+        <div class="fact-rate-changes">
           <dt>Rate changes</dt>
           <dd>The amount is fixed at the moment of purchase. If a rate changes, the new one applies only to later purchases.</dd>
         </div>
-        <div class="v-b">
+        <div class="fact-rates">
           <dt>Rates</dt>
           <dd>Every plan has its own fixed commission, and plans paid with Klarna, Afterpay or Affirm count too. You'll see the rates in your dashboard once you're approved.</dd>
         </div>
@@ -475,13 +562,23 @@
     </div>
   </section>
 
-  <section class="closing">
+  <!-- Version A with "Who we're looking for" near the top: a short closing with the form and the buttons -->
+  <section class="closing closing--short v-a">
+    <h2>Join the affiliate program</h2>
+    <p>In the form, tell us where you post, a little about you and your audience, and your PayPal email for payouts.</p>
+    <div class="actions">
+      <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>
+      <a class="btn btn--outline" href="/affiliate/login-1#screen=login">Log in</a>
+    </div>
+  </section>
+
+  <section class="closing closing--who">
     <h2>Who we're looking for</h2>
     <p class="closing__who">Active nurses, recent graduates and nursing students who want to tell their community about HESI Exam Study and earn while doing it.</p>
     <ul class="channels" aria-label="Where our affiliates share their links">
       <li>TikTok</li><li>Instagram</li><li>YouTube</li><li>Facebook</li><li>Classmates</li>
     </ul>
-    <p>The form asks where you post, a few words about you and your audience, and your PayPal email for payouts.</p>
+    <p>In the form, tell us where you post, a little about you and your audience, and your PayPal email for payouts.</p>
     <div class="actions">
       <a class="btn btn--primary" href="/affiliate/login-1#screen=apply">Apply to join</a>
       <a class="btn btn--outline" href="/affiliate/login-1#screen=login">Log in</a>
@@ -517,7 +614,7 @@
 <script>
   (function () {
     var body = document.body;
-    var KEYS = ['version', 'rates', 'bare'];
+    var KEYS = ['version', 'rates', 'login', 'who', 'practice', 'bare'];
 
     function readHash() {
       var state = {};
@@ -536,6 +633,13 @@
           btn.setAttribute('aria-pressed', String(btn.dataset.value === body.dataset[seg.dataset.key]));
         });
       });
+      // the switches hide sections in any combination, so the first one still shown gets the short gap under the first screen
+      var first = null;
+      document.querySelectorAll('main > .section').forEach(function (section) {
+        section.classList.remove('is-first');
+        if (!first && section.offsetParent !== null) first = section;
+      });
+      if (first) first.classList.add('is-first');
     }
 
     function go(key, value) {
