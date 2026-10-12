@@ -22,7 +22,8 @@ Live: https://mockups-seven-ashen.vercel.app
 | Path | Version |
 |---|---|
 | `/affiliate` | versions of the four mockups |
-| `/affiliate/landing-1` | YBG-1836 landing page - version 1, For SMM and Google |
+| `/affiliate/landing-1` | YBG-1836 landing page - version 1, For creators our SMM team brings in, with the rates block |
+| `/affiliate/landing-1-google` | YBG-1836 landing page - version 1, For Google, without the rates block |
 | `/affiliate/landing-2` | YBG-1836 landing page - version 2, For people who find the program on Google |
 | `/affiliate/landing-3` | YBG-1836 landing page - version 3, For creators our SMM team brings in, second take |
 | `/affiliate/landing-4` | YBG-1836 landing page - version 4, For people who find the program on Google, second take |
