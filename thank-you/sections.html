@@ -155,8 +155,11 @@
   .orig-h { font: 700 17px/1.4 "Poppins", Arial, sans-serif; color: var(--ink); text-wrap: balance; }
   .orig-sec .orig-p { margin-top: 6px; }
   .orig-sec .mail-id { margin-top: 12px; }
-  .orig-close { margin-top: 34px; padding-top: 28px; border-top: 1px solid var(--line); }
+  .orig-close { margin-top: 34px; }
   .orig-close .sign { margin-top: 0; }
+  /* P.S. at the size of the letter text, so it is not lost */
+  .orig-close .ps { font-size: 16px; line-height: 1.7; }
+  .is-phone .orig-close .ps { font-size: 15px; }
 
   /* Footers, as on the live program pages */
   .foot-light { padding: 30px 24px 40px; background: #fff; text-align: center; font: 400 12px/1.6 Arial, sans-serif; color: #000; }
@@ -239,12 +242,11 @@
       logo: '/thank-you/assets/a2-logo.png', logoAlt: 'Your Best Grade, HESI A2 Masterclass',
       nav: ['PRICING', 'FAQ', 'PREVIEW'], member: null,
       key: 'a2', cardAlt: 'HESI A2 Masterclass member card',
-      exam: 'HESI A2 Exam', we: 'I',
-      program: 'the A2 Masterclass',
+      exam: 'HESI A2 Exam',
+      name: 'A2 Masterclass',
       choosing: 'choosing the A2 Masterclass',
       // what the buyer will do inside: the A2 member area has video lessons with short quizzes and practice tests (/a2/members)
-      training: 'The training begins immediately, so you have enough time to go through all the A2 Masterclass video lessons, quizzes and practice tests.',
-      portal: 'where the whole A2 Masterclass is',
+      training: 'The training is available immediately, so you have enough time to go through all the A2 Masterclass video lessons, quizzes and practice tests.',
       ps: 'P.S. Don’t forget: the practice starts whenever you want, so be sure to make time to get started with the lessons!',
       loginUrl: 'yourbestgrade.com/a2/login',
       mail: { from: 'Your Best Grade Support', subject: '[HESI A2 MasterClass] Portal Login Credentials' },
@@ -254,11 +256,10 @@
       logo: '/thank-you/assets/header__logo.webp', logoAlt: 'Your Best Grade, HESI Exam Study',
       nav: ['PRICING', 'FAQ', 'ABOUT US'], member: "Member's Login",
       key: 'hesi', cardAlt: 'HESI Exam Study member card',
-      exam: 'HESI Exit Exam', we: 'we',
-      program: 'HESI Exam Study',
+      exam: 'HESI Exit Exam',
+      name: 'HESI Exam Study',
       choosing: 'choosing to become a HESI Exam Study Insider',
-      training: 'The training begins immediately, so you have enough time to read through our HESI Exam Review Guide and practice with all the HESI practice questions.',
-      portal: 'where all the HESI practice is',
+      training: 'The training is available immediately, so you have enough time to read through our HESI Exam Review Guide and practice with all the HESI practice questions.',
       ps: 'P.S. Don’t forget: the practice starts whenever you want, so be sure to make time to read the materials and get started!',
       loginUrl: 'yourbestgrade.com/hesi/login',
       mail: { from: 'info@yourbestgrade.com', subject: '[HESI Insider] Portal Login Credentials' },
@@ -302,7 +303,7 @@
   }
 
   function lead(p) {
-    return 'I’m so glad you’re as confident as I am that ' + p.we + ' can help you succeed on the ' + p.exam + '!';
+    return 'I’m so glad you’re as confident as I am that we can help you succeed on the ' + p.exam + '!';
   }
   function mailId(p) {
     return '<dl class="mail-id"><dt>From</dt><dd>' + p.mail.from + '</dd><dt>Subject</dt><dd>' + p.mail.subject + '</dd></dl>';
@@ -323,10 +324,11 @@
 
   var PACE = 'Go through it all at your own study pace. I want you to have the BEST experience possible.&nbsp;:)';
   function emailText(p) {
-    return 'Within 60 minutes, usually sooner, you’ll get an email from me with everything you need to access the private portal ' + p.portal + ':';
+    return 'Within 60 minutes, usually sooner, you’ll get an email with everything you need to access your ' + p.name + ':';
   }
+  // the support address on its own line, so it is easy to spot
   function helpText(p) {
-    return 'If you don’t get your email, or have any other issue at all with ' + p.program + ', please contact Customer Support: ' + SUPPORT;
+    return 'If you don’t get your email, or have any other issue at all with your ' + p.name + ', please contact our Customer Support:<br>' + SUPPORT;
   }
   function thanksText(p) {
     return 'That’s it for now. Thank you again for ' + p.choosing + ', and I look forward to helping you prepare for your exam!';
@@ -344,9 +346,9 @@
       '<p class="orig-p before">First, here are a few things to do right away:</p>' +
       '<section class="orig-sec"><h2 class="orig-h">Check your email</h2>' +
         '<p class="orig-p">' + emailText(p) + '</p>' + mailId(p) +
-        '<p class="orig-p">Follow the instructions in it to log in for the first time. The portal is here: <a href="#">' + p.loginUrl + '</a></p></section>' +
+        '<p class="orig-p">If you do not see this email after 60 minutes, please check your SPAM folder! Once you receive the email, follow its instructions to log in for the first time. Your portal is at: <a href="#">' + p.loginUrl + '</a></p></section>' +
       '<section class="orig-sec"><h2 class="orig-h">Add us to your safe senders</h2>' +
-        '<p class="orig-p">Please add yourbestgrade.com to your safe senders, so our emails don’t end up in your spam folder. If the email isn’t in your inbox within 60 minutes, look there, just in case.</p></section>' +
+        '<p class="orig-p">Talking about spam, you can add yourbestgrade.com to your safe senders, so our emails don’t end up in your spam folder.</p></section>' +
       '<section class="orig-sec"><h2 class="orig-h">Where to get help</h2>' +
         '<p class="orig-p">' + helpText(p) + '</p></section>' +
       '<section class="orig-sec"><h2 class="orig-h">Finally, thank you!</h2>' +
