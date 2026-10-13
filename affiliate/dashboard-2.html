@@ -160,10 +160,6 @@
   .hold-note svg.icon { width: 16px; height: 16px; margin-top: 2px; color: var(--blue); }
 
   .ledger { overflow: hidden; }
-  .tab__bar { width: 100%; max-width: 140px; height: 4px; margin: 4px 0 6px; background: var(--surface); border-radius: 2px; overflow: hidden; }
-  .tab__bar i { display: block; height: 100%; width: 100%; background: var(--avail-bar); border-radius: 2px; transform-origin: left center; transition: transform 240ms cubic-bezier(0.16, 1, 0.3, 1); }
-  body[data-state="below"] .tab__bar i { transform: scaleX(0.85); }
-  body[data-state="new"] .tab__bar i { transform: scaleX(0); }
 
   /* Ledger: the balances come first; a balance opens the orders behind it */
   .page-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 20px; margin: 4px 0 18px; }
@@ -185,7 +181,6 @@
   .balance__label { display: flex; align-items: center; color: var(--muted); font-size: 13px; font-weight: 500; }
   .balance__sum { color: var(--navy); font-size: 24px; font-weight: 600; line-height: 1.3; }
   .balance__meta { color: var(--muted); font-size: 12.5px; }
-  .balance .tab__bar { margin: 5px 0 3px; }
   /* Available is a card: the balance opens its orders, the payout request sits under it */
   .balance-card {
     display: flex; flex-direction: column; min-width: 0; background: #fff; border: 1px solid transparent; border-radius: 10px;
@@ -693,8 +688,7 @@
               <svg class="icon balance__more" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
               <span class="balance__label"><i class="dot dot-avail"></i>Available</span>
               <span class="balance__sum num" data-sum="avail">$103.00</span>
-              <span class="tab__bar" aria-hidden="true"><i></i></span>
-              <span class="balance__meta" data-minimum>$100 payout minimum reached</span>
+              <span class="balance__meta" data-order-count="avail">9 orders</span>
             </button>
             <div class="payout-cta">
               <span class="req">
@@ -1085,11 +1079,6 @@
       var t = totals(orders);
       document.querySelectorAll('[data-sum]').forEach(function (el) { el.textContent = money(t[el.dataset.sum]); });
       document.querySelectorAll('[data-order-count]').forEach(function (el) { el.textContent = plural(t.count[el.dataset.orderCount], 'order'); });
-      var minimum = document.querySelector('[data-minimum]');
-      if (t.avail >= MINIMUM) minimum.textContent = '$100 payout minimum reached';
-      else if (t.avail === 0) minimum.textContent = '$100 to the payout minimum';
-      else minimum.textContent = money(round2(MINIMUM - t.avail)) + ' to the $100 minimum';
-      document.querySelector('.balance .tab__bar i').style.transform = 'scaleX(' + Math.min(t.avail / MINIMUM, 1) + ')';
       // The payout request: offered from $100, replaced by its status once sent
       var request = requestFor(mode);
       body.dataset.payout = request ? 'requested' : (t.avail >= MINIMUM ? 'ready' : 'below');
