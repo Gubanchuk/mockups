@@ -345,24 +345,6 @@
 
 <div class="mock-bar" role="toolbar" aria-label="Mockup options">
   <a class="mock-version" href="/affiliate">&larr; Affiliate program</a><span class="mock-version-name">Landing page &middot; Version 1 &middot; For Google, without the rates block</span>
-  <div class="mock-group mock-group--a"><span>Log in</span>
-    <div class="mock-seg" data-key="login">
-      <button type="button" data-value="header">In the header</button>
-      <button type="button" data-value="beside">Next to Apply</button>
-    </div>
-  </div>
-  <div class="mock-group mock-group--a"><span>Who we're looking for</span>
-    <div class="mock-seg" data-key="who">
-      <button type="button" data-value="top">Near the top</button>
-      <button type="button" data-value="bottom">At the bottom</button>
-    </div>
-  </div>
-  <div class="mock-group mock-group--a"><span>Practice questions</span>
-    <div class="mock-seg" data-key="practice">
-      <button type="button" data-value="on">Shown</button>
-      <button type="button" data-value="off">Hidden</button>
-    </div>
-  </div>
 </div>
 
 <header class="site-header">
@@ -610,7 +592,7 @@
 <script>
   (function () {
     var body = document.body;
-    var KEYS = ['version', 'rates', 'login', 'who', 'practice', 'bare'];
+    var KEYS = ['bare'];
 
     function readHash() {
       var state = {};
