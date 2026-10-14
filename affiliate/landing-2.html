@@ -302,6 +302,8 @@
     .sides__side { padding: 24px 20px 26px; }
     .sides__side + .sides__side { border-left: 0; border-top: 1px solid var(--line); }
     .hero h1 { font-size: 26px; }
+    /* phones wrap the headline on their own; fixed breaks would leave short lines */
+    .br-wide { display: none; }
     .hero__lead { font-size: 15px; }
     .hero .actions { flex-direction: column; align-items: stretch; }
     .hero .actions .btn { width: 100%; }
@@ -386,7 +388,7 @@
     <div class="hero__inner card hero-card v-a">
       <img class="hero-card__photo" src="assets/login-image-a2.jpg" alt="A smiling nurse in blue scrubs holding her phone">
       <div class="hero-card__body">
-        <h1><span class="h-rates">Recommend HESI Exam Study and earn up to $20 for every plan bought through your link</span><span class="h-norates">Recommend HESI Exam Study and earn on every plan bought through your link</span></h1>
+        <h1><span class="h-rates">Recommend HESI Exam Study and earn up to $20 for every plan bought through your link</span><span class="h-norates">Recommend HESI Exam Study <br class="br-wide">and earn on every plan bought <br class="br-wide">through your link</span></h1>
         <p class="hero__lead">For nurses and nursing students whose followers or classmates are getting ready for the HESI Exit.</p>
         <div class="hero-card__row">
           <div class="idea">
