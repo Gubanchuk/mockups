@@ -50,4 +50,14 @@ Live: https://mockups-seven-ashen.vercel.app
 | `/thank-you/sections` | version 2, sections |
 | `/thank-you/email`, `/thank-you/try-a-question` | previous round (04.10), not listed |
 
-Static site, nothing to build on deploy. build-site.py writes the A2 pages, build-affiliate-site.js writes the index, /affiliate and the affiliate pages, build-image-question-site.js writes /image-question, build-thank-you-site.js writes /thank-you; all live outside this repo.
+## A2 member area
+
+| Path | Version |
+|---|---|
+| `/a2-members` | YBG-1877: four versions of the member area main page |
+| `/a2-members/study-desk` | version 1, study desk |
+| `/a2-members/exam-checklist` | version 2, exam checklist |
+| `/a2-members/subjects` | version 3, subjects |
+| `/a2-members/up-next` | version 4, up next |
+
+Static site, nothing to build on deploy. build-site.py writes the A2 pages, build-affiliate-site.js writes the index, /affiliate and the affiliate pages, build-image-question-site.js writes /image-question, build-thank-you-site.js writes /thank-you, build-a2-members-site.js writes /a2-members; all live outside this repo.
