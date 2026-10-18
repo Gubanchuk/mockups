@@ -49,7 +49,7 @@
 
   /* ---------- Member area shell (as on the live site) ---------- */
   .app { min-height: 100vh; background: var(--ground); padding: 16px; display: grid; grid-template-columns: 286px minmax(0, 1fr); gap: 20px; align-items: start; }
-  .side { position: sticky; top: 16px; height: calc(100vh - 32px); background: var(--sheet); border-radius: var(--r); box-shadow: var(--shadow); padding: 18px 12px; overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  .side { position: sticky; top: calc(var(--mock-h, 0px) + 16px); height: calc(100vh - var(--mock-h, 0px) - 32px); background: var(--sheet); border-radius: var(--r); box-shadow: var(--shadow); padding: 18px 12px; overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
   body[data-solo="1"] .side { top: 16px; }
   .side-toggle { display: flex; justify-content: flex-end; padding: 0 6px 10px; color: var(--blue); }
   .side-toggle svg { width: 20px; height: 20px; }

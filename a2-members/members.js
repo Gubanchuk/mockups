@@ -503,4 +503,9 @@
     document.body.setAttribute('data-screen', state.screen);
   }
   readHash(); document.body.setAttribute('data-screen', state.screen); render(true);
+
+  // The mockup bar sticks to the top of the window, so the sticky menu and rail start below it (the live site has no such bar)
+  var bar = document.querySelector('.mock-bar');
+  function barHeight() { document.documentElement.style.setProperty('--mock-h', (bar ? bar.offsetHeight : 0) + 'px'); }
+  barHeight(); addEventListener('resize', barHeight);
 })();
