@@ -1,0 +1,175 @@
+  @font-face { font-family: "Gotham Narrow"; src: url("assets/fonts/GothamNarrow-Black.d8117813.woff2") format("woff2"); font-weight: 900; font-display: swap; }
+  @font-face { font-family: "Gotham Narrow"; src: url("assets/fonts/GothamNarrow-Bold.4384608e.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+  @font-face { font-family: "Poppins"; src: url("assets/fonts/Poppins-Regular.581964a0.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Poppins"; src: url("assets/fonts/Poppins-Medium.0a448ffa.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+  @font-face { font-family: "Poppins"; src: url("assets/fonts/Poppins-Bold.31674544.woff2") format("woff2"); font-weight: 600 700; font-display: swap; }
+
+  :root {
+    /* Taken from the live HESI member area (beta, 18.10.2026) */
+    --field: #EEF6FE;
+    --sheet: #FFFFFF;
+    --ink: #183261;
+    --text: #1D2B45;
+    --muted: #56657C;
+    --blue: #1E5290;
+    --blue-hover: #18467D;
+    --orange: #EF561F;
+    --card-line: #C1D3DD;
+    --card-shadow: 0 2px 17px 5px rgba(23, 106, 184, .1);
+    --hair: #E2EAF2;
+    --tint: #F2F7FD;
+    --tint-2: #E6EFF9;
+    --face: #E3EDF8;
+    --dot: #2F6FD0;
+    --stage: #E3E9F1;
+    --stage-ink: #4A5A70;
+    --bezel: #1C2431;
+    --head: "Gotham Narrow", "Arial Narrow", Arial, sans-serif;
+    --body: "Poppins", Arial, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--stage); color: var(--ink); font: 400 16px/1.5 var(--body); -webkit-font-smoothing: antialiased; }
+  body[data-screen="laptop"] { background: var(--field); }
+  ::selection { background: #CFE2FA; color: var(--ink); }
+  a { color: var(--blue); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { background: none; border: 0; padding: 0; cursor: pointer; }
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
+  img { display: block; }
+  svg { display: block; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* ---------- Mockup toolbar (same as the other YBG mockups) ---------- */
+  .mock-bar { position: sticky; top: 0; z-index: 50; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 10px 20px; background: #16202e; color: #c7d2e1; font: 500 12px/1 var(--body); }
+  .mock-group { display: flex; align-items: center; gap: 8px; }
+  .mock-group > span { color: #8d9bb0; }
+  .mock-seg { display: flex; background: #243142; border-radius: 6px; padding: 2px; }
+  .mock-seg button { color: #c7d2e1; padding: 7px 10px; border-radius: 4px; }
+  .mock-seg button:hover { color: #fff; }
+  .mock-seg button[aria-pressed="true"] { background: #f3f6fb; color: #16202e; }
+  body[data-solo="1"] .mock-bar { display: none; }
+  @media (max-width: 760px) { .mock-bar { padding: 10px 12px; gap: 8px 12px; } }
+
+  /* ---------- Stage: desktop is the page at the window width; phones are framed ---------- */
+  .stage { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 36px 48px; padding: 32px 24px 64px; }
+  body[data-screen="laptop"] .stage, body[data-solo="1"] .stage { display: block; padding: 0; }
+  body[data-solo="1"][data-screen="phone"] { background: var(--sheet); }
+  .device { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .device figcaption { font: 500 12px/1 var(--body); color: var(--stage-ink); font-variant-numeric: tabular-nums; }
+  .bezel { background: var(--bezel); padding: 10px; border-radius: 38px; box-shadow: 0 24px 48px -24px rgba(20, 27, 38, .55); }
+  .screen { position: relative; overflow: hidden; border-radius: 28px; background: var(--sheet); }
+  .scroller { position: absolute; inset: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+  .scroller::-webkit-scrollbar { display: none; }
+
+  /* ---------- Member area shell, as on the live HESI pages ---------- */
+  .site { min-height: 100vh; background: var(--field) url("assets/members-bg.png") center top / 100% auto no-repeat; display: flex; flex-direction: column; }
+  .hdr { background: var(--sheet); box-shadow: var(--card-shadow); position: relative; z-index: 2; }
+  .hdr-in { max-width: 1140px; margin: 0 auto; height: 79px; padding: 0 86px 4px 89px; display: flex; align-items: center; justify-content: space-between; }
+  .hdr-logo { width: 188px; height: auto; }
+  .hdr-tools { display: flex; align-items: center; gap: 14px; }
+  .rnpn { display: flex; border: 1px solid var(--blue); border-radius: 4px; overflow: hidden; }
+  .rnpn span { display: grid; place-items: center; width: 43px; height: 34px; font: 700 14px/1 var(--head); color: var(--blue); }
+  .rnpn span.on { background: var(--blue); color: #fff; }
+  .logout { display: inline-flex; align-items: center; gap: 10px; height: 36px; padding: 0 20px; border-radius: 4px; background: var(--blue); color: #fff; font: 700 14px/1 var(--head); text-decoration: none; }
+  .logout svg { width: 16px; height: 16px; }
+  .burger { width: 40px; height: 40px; display: grid; place-items: center; color: var(--blue); }
+  .burger svg { width: 30px; height: 30px; }
+
+  .wrap { flex: 1; width: 100%; max-width: 990px; margin: 0 auto; padding: 56px 12px 72px 10px; display: grid; grid-template-columns: 310px minmax(0, 1fr); gap: 10px; align-items: start; }
+  .card { background: var(--sheet); border: 1px solid var(--card-line); border-radius: 5px; box-shadow: var(--card-shadow); }
+  .menu { padding: 40px 0 34px; }
+  .menu h2 { margin: 0 38px 18px 52px; font: 700 25.5px/1.25 var(--head); color: var(--ink); }
+  .menu ul { list-style: none; margin: 0; padding: 0 30px 0 52px; }
+  .menu li a { display: block; padding: 11px 0; font: 400 16px/20px var(--body); color: var(--ink); text-decoration: none; }
+  .menu li a:hover { color: var(--orange); }
+  .menu li a.on { color: var(--orange); }
+  .menu hr { border: 0; border-top: 1px solid var(--card-line); margin: 32px 0 38px; }
+  .content { padding: 20px 24px 32px; min-height: 640px; }
+
+  .ftr { background: var(--sheet); text-align: center; padding: 40px 16px 36px; color: var(--ink); }
+  .ftr-logo { width: 188px; height: auto; margin: 0 auto 26px; }
+  .ftr-links { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px 0; margin-bottom: 30px; font: 500 15px/1.3 var(--body); }
+  .ftr-links a { color: var(--ink); text-decoration: none; padding: 0 22px; }
+  .ftr-links a + a { border-left: 1px solid #9DB0C7; }
+  .ftr-links svg { display: inline-block; width: 15px; height: 15px; vertical-align: -2px; margin-right: 4px; }
+  .ftr p { margin: 6px 0; font: 400 13px/1.5 var(--body); }
+
+  /* Phone: the menu card is gone, the header has the burger, the page is one white column */
+  .is-phone .site { background: var(--sheet); }
+  .is-phone .hdr-in { height: 68px; padding: 0 12px 0 16px; }
+  .is-phone .hdr-logo { width: 146px; }
+  .is-phone .wrap { display: block; padding: 0; max-width: none; }
+  .is-phone .menu { display: none; }
+  .is-phone .card.content { border: 0; border-radius: 0; box-shadow: none; padding: 22px 16px 36px; min-height: 0; }
+  .is-phone .ftr { border-top: 1px solid var(--hair); padding: 32px 16px 28px; }
+  .is-phone .ftr-logo { width: 150px; margin-bottom: 20px; }
+  .is-phone .ftr-links { flex-direction: column; gap: 12px; margin-bottom: 22px; }
+  .is-phone .ftr-links a + a { border-left: 0; }
+
+  /* ---------- Shared forum parts ---------- */
+  .h1 { margin: 0; font: 900 25.5px/1.2 var(--head); color: var(--ink); text-wrap: balance; }
+  .counts { margin: 6px 0 0; font: 400 14px/1.4 var(--body); color: var(--muted); }
+  .tools { display: flex; gap: 12px; align-items: center; margin: 18px 0 22px; }
+  .search { position: relative; flex: 1; }
+  .search input { width: 100%; height: 42px; padding: 0 14px 0 40px; border: 1px solid #C6D4E2; border-radius: 6px; background: var(--sheet); font: 400 15px/1 var(--body); color: var(--text); }
+  .search input::placeholder { color: #5D6B80; }
+  .search input:hover { border-color: #A9BCD0; }
+  .search input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(30, 82, 144, .14); }
+  .search svg { position: absolute; left: 13px; top: 50%; translate: 0 -50%; width: 18px; height: 18px; color: #6E7C91; pointer-events: none; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 42px; padding: 0 18px; border-radius: 4px; background: var(--blue); color: #fff; font: 700 15px/1 var(--head); text-decoration: none; white-space: nowrap; transition: background-color .15s ease-out; }
+  .btn:hover { background: var(--blue-hover); }
+  .btn svg { width: 18px; height: 18px; }
+  .btn--ghost { background: var(--sheet); color: var(--blue); border: 1px solid #B9CBDE; }
+  .btn--ghost:hover { background: var(--tint); }
+  .btn[disabled] { background: #E3EAF2; color: #56657C; cursor: not-allowed; }
+
+  .back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px; font: 500 14px/1.3 var(--body); color: var(--blue); text-decoration: none; }
+  .back:hover { text-decoration: underline; }
+  .back svg { width: 16px; height: 16px; }
+
+  .face { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--face); color: var(--ink); }
+  .face span { font: 600 13px/1 var(--body); letter-spacing: .02em; text-box: trim-both cap alphabetic; translate: 0 .03em; }
+  .team-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 4px; background: var(--tint-2); color: var(--blue); font: 600 12px/1 var(--body); white-space: nowrap; }
+  .who-name { font: 600 15px/1.3 var(--body); color: var(--ink); overflow-wrap: anywhere; }
+  .who-when { font: 400 13.5px/1.3 var(--body); color: var(--muted); white-space: nowrap; }
+
+  .ptext { font: 400 16px/1.65 var(--body); color: var(--text); overflow-wrap: break-word; }
+  .ptext p { margin: 0 0 .6em; }
+  .ptext p:last-child { margin-bottom: 0; }
+  .ptext ul { margin: 0 0 .7em; padding-left: 1.2em; list-style: disc; }
+  .ptext li::marker { color: var(--muted); }
+  .ptext li { margin: .15em 0; }
+  .ptext a { overflow-wrap: anywhere; }
+
+  .pager { display: flex; align-items: center; justify-content: center; gap: 4px; margin: 26px 0 4px; font: 500 14px/1 var(--body); }
+  .pager a, .pager span { min-width: 34px; height: 34px; padding: 0 8px; display: grid; place-items: center; border-radius: 6px; color: var(--blue); text-decoration: none; }
+  .pager a:hover { background: var(--tint); }
+  .pager .on { background: var(--blue); color: #fff; }
+  .pager .gap { color: var(--muted); min-width: 20px; padding: 0; }
+  .pager .wide { display: inline-flex; gap: 6px; padding: 0 10px; }
+  .pager svg { width: 16px; height: 16px; }
+  .pager .off { color: #9AA8BA; }
+
+  .composer { margin-top: 30px; }
+  .composer h2 { margin: 0 0 12px; font: 600 17px/1.3 var(--body); color: var(--ink); }
+  .editor { border: 1px solid #C6D4E2; border-radius: 6px; background: var(--sheet); }
+  .editor:focus-within { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(30, 82, 144, .14); }
+  .ed-bar { display: flex; flex-wrap: wrap; gap: 2px; padding: 6px; border-bottom: 1px solid var(--hair); }
+  .ed-bar button { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 4px; color: #4C5C74; }
+  .ed-bar button:hover { background: var(--tint); color: var(--ink); }
+  .ed-bar svg { width: 18px; height: 18px; }
+  .ed-bar i { width: 1px; margin: 6px 4px; background: var(--hair); }
+  .editor textarea { display: block; width: 100%; min-height: 120px; padding: 12px 14px; border: 0; border-radius: 0 0 6px 6px; resize: vertical; font: 400 16px/1.6 var(--body); color: var(--text); background: transparent; }
+  .editor textarea:focus { outline: none; }
+  .editor textarea::placeholder { color: #5D6B80; }
+  .composer-foot { display: flex; justify-content: flex-end; margin-top: 12px; }
+
+  .empty { padding: 28px 0 8px; text-align: center; color: var(--muted); font: 400 15px/1.5 var(--body); }
+  .empty button { color: var(--blue); text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
+
+  .is-phone .tools { margin: 16px 0 18px; gap: 10px; }
+  .is-phone .tools .btn { padding: 0 14px; }
+  .is-phone .search input { padding-right: 8px; }
+  .is-phone .h1 { font-size: 24px; }
+  .is-phone .pager { flex-wrap: wrap; }

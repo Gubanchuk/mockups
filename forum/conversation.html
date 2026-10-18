@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HESI Study Forum — Conversation</title>
+<link rel="stylesheet" href="forum.css?v=20261019b">
+<link rel="stylesheet" href="forum-versions.css?v=20261019b">
+<style>
+  .mock-version { color: #c7d2e1; text-decoration: none; white-space: nowrap; }
+  .mock-version:hover { color: #ffffff; }
+  .mock-version-name { color: #ffffff; font-weight: 600; white-space: nowrap; margin-right: 8px; }
+  @media (max-width: 767px) { .mock-version-name { white-space: normal; } }
+</style>
+</head>
+<body data-screen="laptop" data-version="conversation">
+
+<div class="mock-bar" role="toolbar" aria-label="Mockup options">
+  <a class="mock-version" href="/forum">&larr; Study Forum</a><span class="mock-version-name">Version 2 &middot; Conversation</span>
+  <div class="mock-group"><span>Page</span>
+    <div class="mock-seg" data-key="page">
+      <button data-value="list">Topic list</button>
+      <button data-value="topic">Topic</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Topic</span>
+    <div class="mock-seg" data-key="topic">
+      <button data-value="2038">Please help!</button>
+      <button data-value="159">HOW I PASSED!</button>
+      <button data-value="2059">HESI EXIT RETAKE</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Screen</span>
+    <div class="mock-seg" data-key="screen">
+      <button data-value="laptop">Desktop</button>
+      <button data-value="phone">Phone</button>
+    </div>
+  </div>
+</div>
+
+<div class="stage" id="stage"></div>
+
+<script src="data/forum.js?v=20261019b"></script>
+<script src="data/forum-long.js?v=20261019b"></script>
+<script src="forum.js?v=20261019b"></script>
+</body>
+</html>

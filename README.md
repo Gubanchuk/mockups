@@ -60,4 +60,13 @@ Live: https://mockups-seven-ashen.vercel.app
 | `/a2-members/subjects` | version 3, subjects |
 | `/a2-members/up-next` | version 4, up next |
 
-Static site, nothing to build on deploy. build-site.py writes the A2 pages, build-affiliate-site.js writes the index, /affiliate and the affiliate pages, build-image-question-site.js writes /image-question, build-thank-you-site.js writes /thank-you, build-a2-members-site.js writes /a2-members; all live outside this repo.
+## Study Forum
+
+| Path | Version |
+|---|---|
+| `/forum` | YBG-1492: three versions of the HESI Exit forum |
+| `/forum/updated-original` | version 1, updated original |
+| `/forum/conversation` | version 2, conversation |
+| `/forum/answer-first` | version 3, answer first |
+
+Static site, nothing to build on deploy. build-site.py writes the A2 pages, build-affiliate-site.js writes the index, /affiliate and the affiliate pages, build-image-question-site.js writes /image-question, build-thank-you-site.js writes /thank-you, build-a2-members-site.js writes /a2-members, build-forum-site.js writes /forum; all live outside this repo.
