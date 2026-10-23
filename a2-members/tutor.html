@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="r3-base.css?v=20261020z">
-<link rel="stylesheet" href="r3-tutor.css?v=20261020z">
+<link rel="stylesheet" href="r4-base.css?v=d191053">
+<link rel="stylesheet" href="r4-tutor.css?v=d191053">
 <style>
   .mock-version { color: #c7d2e1; text-decoration: none; white-space: nowrap; }
   .mock-version:hover { color: #ffffff; }
@@ -19,12 +19,33 @@
 <body data-screen="laptop">
 
 <div class="mock-bar" role="toolbar" aria-label="Mockup options">
-  <a class="mock-version" href="/a2-members">&larr; A2 member area</a><span class="mock-version-name">Version 2 &middot; Tutor</span>
+  <a class="mock-version" href="/a2-members">&larr; A2 member area</a><span class="mock-version-name">Version 1 &middot; Tutor</span>
+  <div class="mock-group is-key"><span>Version</span>
+    <div class="mock-seg" data-key="feat">
+      <button data-value="base">Redesign only</button>
+      <button data-value="new">With new features</button>
+    </div>
+  </div>
+  <div class="mock-group" data-only-new><span>New labels</span>
+    <div class="mock-seg" data-key="badges">
+      <button data-value="on">Show</button>
+      <button data-value="off">Hide</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Page</span>
+    <div class="mock-seg" data-key="view">
+      <button data-value="setup" data-only-new>First visit</button>
+      <button data-value="home">Home</button>
+      <button data-value="lessons">Lessons</button>
+      <button data-value="questions">Questions</button>
+      <button data-value="settings" data-only-new>Exam settings</button>
+    </div>
+  </div>
   <div class="mock-group"><span>Student</span>
     <div class="mock-seg" data-key="state">
-      <button data-value="new">Just started</button>
-      <button data-value="progress">In progress · sample</button>
-      <button data-value="done">All lessons done · sample</button>
+      <button data-value="new">Just bought</button>
+      <button data-value="progress">In progress</button>
+      <button data-value="done">All lessons done</button>
     </div>
   </div>
   <div class="mock-group"><span>Screen</span>
@@ -37,8 +58,8 @@
 
 <main class="stage" id="stage"></main>
 
-<script src="data/course.js?v=20261020z"></script>
-<script src="r3-tutor.js?v=20261020z"></script>
-<script src="r3-core.js?v=20261020z"></script>
+<script src="data/course.js?v=d191053"></script>
+<script src="r4-tutor.js?v=d191053"></script>
+<script src="r4-core.js?v=d191053"></script>
 </body>
 </html>
