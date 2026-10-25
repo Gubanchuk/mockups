@@ -33,7 +33,7 @@
   background: var(--ground); box-shadow: 0 1px 0 var(--line); }
 .tu-top.is-bare { position: static; box-shadow: none; background: transparent; }
 .tu-logo { flex: none; }
-.tu-logo img { height: 54px; width: auto; }
+.tu-logo img { height: 60px; width: auto; }
 .tu-tools { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 .tu-exam { display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 18px 0 6px; border-radius: 999px; background: var(--yellow); color: var(--ink); font: 700 15px/1 var(--round); white-space: nowrap; }
 .tu-exam b { display: inline-grid; place-items: center; height: 30px; padding: 0 12px; border-radius: 999px; background: var(--ink); color: var(--yellow); font-weight: 900; }
@@ -189,7 +189,7 @@
 .tu.is-phone { display: block; }
 .tu.is-phone .tu-main { padding: 0 12px 24px; }
 .tu.is-phone .tu-top { top: 0; height: 64px; gap: 10px; margin: 0 -12px; padding: 0 12px; }
-.tu.is-phone .tu-logo img { height: 36px; }
+.tu.is-phone .tu-logo img { height: 40px; }
 .tu.is-phone .tu-tools { gap: 6px; }
 .tu.is-phone .tu-exam { height: 34px; padding: 0 4px; font-size: 12.5px; }
 .tu.is-phone .tu-exam b { height: 26px; padding: 0 9px; }
@@ -266,3 +266,15 @@
 .tu-me { display: flex; align-items: center; gap: 2px; color: var(--muted); }
 .tu-me svg { width: 16px; height: 16px; }
 .tu-ri-me-w .r3-pop { min-width: 200px; }
+
+/* UX fixes (25.10.2026) */
+/* New answers counted on Questions, on the icon's corner */
+.tu-ri-ic { position: relative; }
+.tu-count { position: absolute; top: -5px; right: -1px; display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px;
+  background: #D93A40; color: #fff; font: 800 11px/1 var(--round); box-shadow: 0 0 0 2px #fff; }
+/* Claire AI at the foot of the rail, above the account */
+.tu-ri-ai { margin-top: auto; }
+.tu-ri-ai + .tu-ri-me-w { margin-top: 0; }
+/* Skip on the dark band of the first visit */
+.tu-top.is-bare .r4-skip-top { margin-left: auto; color: #fff; }
+.tu-top.is-bare .r4-skip-top:hover { text-decoration: underline; text-underline-offset: 3px; }

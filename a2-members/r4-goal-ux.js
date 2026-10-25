@@ -1,5 +1,7 @@
 // Version «One goal» (YBG-1877, round 4): a learning-platform home in the manner of Coursera's My learning.
 // The page shows one goal card (the exam, how far along, the next lesson) and the subjects as plain rows.
+// UX-fixes copy of r4-goal.js (ux-review, 25.10.2026): new answers counted on Questions, "Start here" for a subject not begun,
+// Skip in the first-visit header, the menu on top or on the left, Claire AI beside the account.
 (function () {
   var I = {
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
@@ -7,22 +9,30 @@
     chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
     right: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>',
     gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
-    flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4.5M5 5h11.5l-2 4 2 4H5"/></svg>'
+    flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4.5M5 5h11.5l-2 4 2 4H5"/></svg>',
+    // Menu on the left: one icon per place
+    home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.2L12 4l8 6.2V19a1.5 1.5 0 0 1-1.5 1.5H15v-6h-6v6H5.5A1.5 1.5 0 0 1 4 19z"/></svg>',
+    lessons: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 6.5H20M9.5 12H20M9.5 17.5H20"/><path d="M4 6.5h1.5M4 12h1.5M4 17.5h1.5"/></svg>',
+    tests: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 9.5l1.8 1.8 3.7-3.8M9 15.5h6"/></svg>',
+    questions: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 6.5A2.5 2.5 0 0 1 7 4h10a2.5 2.5 0 0 1 2.5 2.5v7A2.5 2.5 0 0 1 17 16h-6l-4 3.5V16a2.5 2.5 0 0 1-2.5-2.5z"/></svg>',
+    forum: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19.5v-1a4.5 4.5 0 0 1 4.5-4.5h2a4.5 4.5 0 0 1 4.5 4.5v1"/><path d="M15.5 5.6a3.2 3.2 0 0 1 0 5.8M17.5 14.2a4.5 4.5 0 0 1 3 4.3v1"/></svg>'
   };
   var planOpen = {};
 
   function top(m, phone, R) {
     var view = R.state.view;
+    // New answers from Claire are counted on Questions, so they are found from any page
+    var count = m.unread ? '<span class="go-count" aria-label="' + R.plural(m.unread, 'new answer') + '">' + m.unread + '</span>' : '';
     var items = [['Home', ' data-view="home"', view === 'home'], ['Lessons', ' data-view="lessons"', view === 'lessons'],
-      [phone ? 'Tests' : 'Practice tests', R.go('The Practice tests page (/a2/practice_tests)'), false], ['Questions', ' data-view="questions"', view === 'questions'],
+      [phone ? 'Tests' : 'Practice tests', R.go('The Practice tests page (/a2/practice_tests)'), false], ['Questions', ' data-view="questions"', view === 'questions', count],
       ['Forum', R.go('The Forum (/a2/forums)'), false]];
     var nav = '<nav class="go-nav" aria-label="Member area">' + items.map(function (t) {
-      return '<a href="#" class="go-nav-a' + (t[2] ? ' is-on' : '') + '"' + t[1] + (t[2] ? ' aria-current="page"' : '') + '>' + t[0] + '</a>';
+      return '<a href="#" class="go-nav-a' + (t[2] ? ' is-on' : '') + '"' + t[1] + (t[2] ? ' aria-current="page"' : '') + '>' + t[0] + (t[3] || '') + '</a>';
     }).join('') + '</nav>';
     var me = '<div class="go-me-w"><button type="button" class="go-me" data-pop="profile" aria-expanded="' + (R.state.pop === 'profile') + '" aria-label="Your account"><img src="assets/avatar.png" alt="">' +
       (phone ? '' : '<span>' + R.NAME + '</span>') + I.chev + '</button>' + (R.state.pop === 'profile' ? R.profileMenu() : '') + '</div>';
     return '<header class="go-top"><div class="go-top-in"><a href="#" class="go-logo" data-view="home"><img src="assets/a2-logo.png" alt="Your Best Grade, HESI A2 MasterClass"></a>' +
-      (phone ? '' : nav) + '<div class="go-tools">' + me + '</div></div>' + (phone ? nav : '') + '</header>';
+      (phone ? '' : nav) + '<div class="go-tools">' + R.aiButton(phone) + me + '</div></div>' + (phone ? nav : '') + '</header>';
   }
 
   // Greeting with Claire's plan folded to one line; the whole plan opens in place
@@ -82,7 +92,8 @@
     var cur = m.next && m.S.done !== 'all' ? m.next.sec.id : null;
     var rows = m.mine.map(function (s) {
       var pct = s.done / s.total * 100, done = s.done >= s.total;
-      return '<li class="go-row' + (done ? ' is-done' : '') + (s.id === cur ? ' is-here' : '') + '">' +
+      // The subject up next says "Start here" until its first lesson is done, then "In progress"
+      return '<li class="go-row' + (done ? ' is-done' : '') + (s.id === cur ? ' is-here' + (s.done === 0 ? ' is-start' : '') : '') + '">' +
         '<div class="go-row-name"><a href="#" data-view="lessons">' + s.name + '</a></div>' +
         // A subject not started keeps its place in the row but shows no empty bar
         '<span class="go-row-bar' + (s.done ? '' : ' is-empty') + '"><i style="width:' + pct.toFixed(1) + '%"></i></span>' +
@@ -103,17 +114,37 @@
   // Shared parts as sheets in the same column as the goal card
   function box(html) { return html ? '<div class="go-box">' + html + '</div>' : ''; }
 
+  // The page frame: the menu on top (as on the site), or on the left (mockup switch Menu: Left, computer only)
+  function left(phone, R) { return !phone && R.state.nav === 'left'; }
+  function shell(m, phone, R, inner) {
+    if (left(phone, R)) {
+      var v = R.state.view;
+      return R.sideNav('go', [{ label: 'Home', icon: I.home, attrs: ' data-view="home"', on: v === 'home' },
+        { label: 'Lessons', icon: I.lessons, attrs: ' data-view="lessons"', on: v === 'lessons' },
+        { label: 'Practice tests', icon: I.tests, attrs: R.go('The Practice tests page (/a2/practice_tests)') },
+        { label: 'Questions', icon: I.questions, attrs: ' data-view="questions"', on: v === 'questions', count: m.unread },
+        { label: 'Forum', icon: I.forum, attrs: R.go('The Forum (/a2/forums)') }], inner);
+    }
+    return '<div class="go' + (phone ? ' is-phone' : '') + '">' + top(m, phone, R) + inner + '</div>';
+  }
+
   window.R4V = {
+    // Claire AI takes this version's colours
+    root: 'go',
     render: function (m, phone) {
       var R = window.R4, v = R.state.view, cls = 'go' + (phone ? ' is-phone' : '');
+      // Skip sits in the header too: on a phone the form is two screens long, and a student without answers should not scroll it to leave
       if (v === 'setup') {
         return '<div class="' + cls + ' is-setup"><header class="go-top"><div class="go-top-in"><span class="go-logo"><img src="assets/a2-logo.png" alt="Your Best Grade, HESI A2 MasterClass"></span>' +
-          '<span class="go-setup-n">Set your goal</span></div></header>' + R.setupView(m) + '</div>';
+          // The form's own heading says what this page is, so the header keeps only the way out
+          '<button type="button" class="r4-btn-q r4-skip-top" data-skip>Skip for now</button></div></header>' + R.setupView(m) + '</div>';
       }
-      if (v === 'settings') return '<div class="' + cls + '">' + top(m, phone, R) + R.settingsView(m) + '</div>';
-      if (v === 'lessons') return '<div class="' + cls + '">' + top(m, phone, R) + R.lessonsView(m) + '</div>';
-      if (v === 'questions') return '<div class="' + cls + '">' + top(m, phone, R) + R.questionsView(m) + '</div>';
-      return '<div class="' + cls + '">' + top(m, phone, R) + '<main class="go-wrap">' + hello(m, R, phone) + remind(m) + goal(m, R) + box(R.answers(m)) + box(R.diagnostic(m)) + subjects(m, R) + '</main></div>';
+      if (v === 'settings') return shell(m, phone, R, R.settingsView(m));
+      if (v === 'lessons') return shell(m, phone, R, R.lessonsView(m));
+      if (v === 'questions') return shell(m, phone, R, R.questionsView(m));
+      // With the menu on the left the frame holds the page's one <main>, so the column is a plain block
+      var tag = left(phone, R) ? 'div' : 'main';
+      return shell(m, phone, R, '<' + tag + ' class="go-wrap">' + hello(m, R, phone) + remind(m) + goal(m, R) + box(R.answers(m)) + box(R.diagnostic(m)) + subjects(m, R) + '</' + tag + '>');
     },
     onClick: function (e, R) {
       var t = e.target.closest('[data-gplan]');

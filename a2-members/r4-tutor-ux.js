@@ -1,5 +1,7 @@
 // Version «Tutor» (YBG-1877, round 4): the page says what to do next. Without the new features it is the next lesson;
-// with them it is today's short list built from the student's pace, and a small Ask Claire bar under it.
+// with them it is today's short list built from the student's pace.
+// UX-fixes copy of r4-tutor.js (ux-review, 25.10.2026): new answers counted on Questions, a plain bubble for Questions (the bubble
+// with a spark is Claire AI now), the diagnostic quiz once for a new student, Skip in the first-visit header, Claire AI in the rail.
 (function () {
   // Hand-drawn icon set: round caps, slightly uneven lines
   var D = {
@@ -8,6 +10,7 @@
     tests: '<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.6 5.2H6.7c-1 0-1.6.7-1.6 1.7l.2 15.3c0 1 .7 1.6 1.7 1.6h14.2c1 0 1.6-.7 1.6-1.7l-.1-15.3c0-.9-.7-1.6-1.6-1.6h-1.9"/><path d="M10.2 3.9h7.5l.3 3.1h-8z"/><path d="M9.6 13.6l2 2 3.7-4.1M9.8 19.6h8.3"/></svg>',
     forum: '<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.6 6.8c0-1.3 1-2.2 2.3-2.2h9.6c1.3 0 2.2 1 2.2 2.3l-.1 5.8c0 1.2-1 2.2-2.3 2.2H10l-3.8 3.1.2-3.1h-.7c-.6 0-1.2-.6-1.2-1.3z"/><path d="M21.5 10.4h.6c1.2 0 2.1 1 2.1 2.2l-.1 5.4c0 1.2-.9 2.1-2.1 2.1h-.6l.2 2.9-3.6-2.9h-5.3c-1.1 0-2-.7-2.3-1.7"/></svg>',
     ask: '<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.3 4.6c5.3-.1 9.4 3.4 9.3 7.9-.1 4.4-4.3 7.8-9.5 7.7-1.2 0-2.3-.2-3.3-.5l-4.6 2.6.9-4.4c-1.6-1.4-2.6-3.3-2.5-5.4.1-4.5 4.4-7.9 9.7-7.9z"/><path d="M13.9 9.1l.9 2.3 2.3.9-2.3.9-.9 2.3-.9-2.3-2.3-.9 2.3-.9z"/></svg>',
+    talk: '<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.3 4.6c5.3-.1 9.4 3.4 9.3 7.9-.1 4.4-4.3 7.8-9.5 7.7-1.2 0-2.3-.2-3.3-.5l-4.6 2.6.9-4.4c-1.6-1.4-2.6-3.3-2.5-5.4.1-4.5 4.4-7.9 9.7-7.9z"/></svg>',
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.2 12.1h13.4M13.1 6.2l5.9 5.9-6 5.9"/></svg>',
     send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19.2V5.3M6.2 10.9l5.8-5.8 5.9 5.8"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.3 12.6l4.4 4.3 9-9.6"/></svg>',
@@ -19,14 +22,19 @@
 
   function rail(m, R, phone) {
     var view = R.state.view;
+    // New answers from Claire are counted on Questions, so they are found from any page
+    var count = m.unread ? '<span class="tu-count" aria-label="' + R.plural(m.unread, 'new answer') + '">' + m.unread + '</span>' : '';
     var items = [['home', 'Home', ' data-view="home"', view === 'home'], ['lessons', 'Lessons', ' data-view="lessons"', view === 'lessons'],
-      ['tests', 'Tests', R.go('The Practice tests page (/a2/practice_tests)'), false], ['ask', 'Questions', ' data-view="questions"', view === 'questions'],
+      ['tests', 'Tests', R.go('The Practice tests page (/a2/practice_tests)'), false], ['talk', 'Questions', ' data-view="questions"', view === 'questions', count],
       ['forum', 'Forum', R.go('The Forum (/a2/forums)'), false]];
     var links = items.map(function (it) {
-      return '<a href="#" class="tu-ri' + (it[3] ? ' is-on' : '') + '"' + it[2] + (it[3] ? ' aria-current="page"' : '') + '><span class="tu-ri-ic">' + D[it[0]] + '</span><span>' + it[1] + '</span></a>';
+      return '<a href="#" class="tu-ri' + (it[3] ? ' is-on' : '') + '"' + it[2] + (it[3] ? ' aria-current="page"' : '') + '><span class="tu-ri-ic">' + D[it[0]] + (it[4] || '') + '</span><span>' + it[1] + '</span></a>';
     }).join('');
     if (phone) return '<nav class="tu-tabbar" aria-label="Member area">' + links + '</nav>';
-    return '<nav class="tu-rail" aria-label="Member area">' + links + '<div class="tu-ri-me-w"><button type="button" class="tu-ri tu-ri-me" data-pop="profile" aria-expanded="' + (R.state.pop === 'profile') + '">' +
+    // Claire AI (mockup switch) sits at the foot of the rail, above the account
+    var ai = R.state.ai === 'on' ? '<button type="button" class="tu-ri tu-ri-ai' + (R.state.aiOpen ? ' is-on' : '') + '" data-ai-open aria-expanded="' + R.state.aiOpen + '">' +
+      '<span class="tu-ri-ic">' + D.ask + '</span><span>Claire AI</span></button>' : '';
+    return '<nav class="tu-rail" aria-label="Member area">' + links + ai + '<div class="tu-ri-me-w"><button type="button" class="tu-ri tu-ri-me" data-pop="profile" aria-expanded="' + (R.state.pop === 'profile') + '">' +
       '<img src="assets/avatar.png" alt=""><span>' + R.NAME + '</span></button>' + (R.state.pop === 'profile' ? R.profileMenu() : '') + '</div></nav>';
   }
 
@@ -42,7 +50,7 @@
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>' +
       (R.state.pop === 'profile' ? R.profileMenu() : '') + '</div>' : '';
     return '<header class="tu-top"><a href="#" class="tu-logo" data-view="home"><img src="assets/a2-logo.png" alt="Your Best Grade, HESI A2 MasterClass"></a>' +
-      '<div class="tu-tools">' + exam + '' + me + '</div></header>';
+      '<div class="tu-tools">' + exam + (phone ? R.aiButton(true) : '') + me + '</div></header>';
   }
 
   function planStrip(m, R, phone) {
@@ -178,10 +186,14 @@
   }
 
   window.R4V = {
+    // Claire AI takes this version's colours
+    root: 'tu',
     render: function (m, phone) {
       var R = window.R4, v = R.state.view;
       if (v === 'setup') {
-        return '<div class="tu is-setup' + (phone ? ' is-phone' : '') + '"><div class="tu-main"><header class="tu-top is-bare"><span class="tu-logo"><img src="assets/a2-logo.png" alt="Your Best Grade, HESI A2 MasterClass"></span></header>' +
+        // Skip sits in the header too: on a phone the form is two screens long, and a student without answers should not scroll it to leave
+        return '<div class="tu is-setup' + (phone ? ' is-phone' : '') + '"><div class="tu-main"><header class="tu-top is-bare"><span class="tu-logo"><img src="assets/a2-logo.png" alt="Your Best Grade, HESI A2 MasterClass"></span>' +
+          '<button type="button" class="r4-btn-q r4-skip-top" data-skip>Skip for now</button></header>' +
           '<div class="tu-sheet">' + R.setupView(m) + '</div></div></div>';
       }
       if (v === 'settings') return shell(m, R, phone, '<div class="tu-sheet">' + R.settingsView(m) + '</div>');
@@ -189,7 +201,9 @@
       if (v === 'questions') return shell(m, R, phone, '<div class="tu-sheet">' + R.questionsView(m) + '</div>');
       return shell(m, R, phone,
         '<div class="tu-hello"><h1>Hey there, ' + R.NAME + '! <span aria-hidden="true">👋</span></h1></div>' +
-        planStrip(m, R, phone) + remind(m) + (m.nf ? today(m, R) : upNext(m, R)) + card(R.answers(m)) + card(R.diagnostic(m)) + subjects(m, R));
+        planStrip(m, R, phone) + remind(m) + (m.nf ? today(m, R) : upNext(m, R)) + card(R.answers(m)) +
+        // A new student's Today already lists the diagnostic quiz, so its card waits until there is a score to show
+        card(m.nf && m.done === 0 ? '' : R.diagnostic(m)) + subjects(m, R));
     },
     onClick: function (e, R) {
       var tp = e.target.closest('[data-tplan]');

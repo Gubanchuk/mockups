@@ -7,8 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="r4-base.css?v=d191053">
-<link rel="stylesheet" href="r4-tutor.css?v=d191053">
+<link rel="stylesheet" href="r4-base.css?v=p8">
+<link rel="stylesheet" href="r4-tutor-ux.css?v=ux2">
+<link rel="stylesheet" href="r4-ux-extra.css?v=ux18">
 <style>
   .mock-version { color: #c7d2e1; text-decoration: none; white-space: nowrap; }
   .mock-version:hover { color: #ffffff; }
@@ -19,7 +20,7 @@
 <body data-screen="laptop">
 
 <div class="mock-bar" role="toolbar" aria-label="Mockup options">
-  <a class="mock-version" href="/a2-members">&larr; A2 member area</a><span class="mock-version-name">Version 1 &middot; Tutor</span>
+  <a class="mock-version" href="/a2-members">&larr; A2 member area</a><span class="mock-version-name">Version 3 &middot; Tutor</span>
   <div class="mock-group is-key"><span>Version</span>
     <div class="mock-seg" data-key="feat">
       <button data-value="base">Redesign only</button>
@@ -30,6 +31,19 @@
     <div class="mock-seg" data-key="badges">
       <button data-value="on">Show</button>
       <button data-value="off">Hide</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Claire AI</span>
+    <div class="mock-seg" data-key="ai">
+      <button data-value="off">Off</button>
+      <button data-value="on">On</button>
+    </div>
+  </div>
+  <div class="mock-group" data-only-ai><span>AI state</span>
+    <div class="mock-seg" data-key="aiState">
+      <button data-value="ok">Normal</button>
+      <button data-value="error">Error</button>
+      <button data-value="limit">Limit reached</button>
     </div>
   </div>
   <div class="mock-group"><span>Page</span>
@@ -59,7 +73,7 @@
 <main class="stage" id="stage"></main>
 
 <script src="data/course.js?v=d191053"></script>
-<script src="r4-tutor.js?v=d191053"></script>
-<script src="r4-core.js?v=d191053"></script>
+<script src="r4-tutor-ux.js?v=ux2"></script>
+<script src="r4-core-ux.js?v=ux17"></script>
 </body>
 </html>

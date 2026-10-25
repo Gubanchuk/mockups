@@ -11,6 +11,11 @@
       "source": "/thank-you/:old(card|timeline|checklist)",
       "destination": "/thank-you",
       "permanent": false
+    },
+    {
+      "source": "/a2-members/my-exam",
+      "destination": "/a2-members",
+      "permanent": false
     }
   ]
 }

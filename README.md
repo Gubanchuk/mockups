@@ -54,10 +54,12 @@ Live: https://mockups-seven-ashen.vercel.app
 
 | Path | Version |
 |---|---|
-| `/a2-members` | YBG-1877: three versions of the member area main page (round 3) |
-| `/a2-members/my-exam` | version 1, my exam |
-| `/a2-members/tutor` | version 2, tutor |
-| `/a2-members/acceptance-letter` | version 3, acceptance letter |
+| `/a2-members` | YBG-1877: four versions of the member area main page (round 4 after the UX review) |
+| `/a2-members/study-progress` | version 1, Study & Progress (favorite) |
+| `/a2-members/course-map` | version 2, Course map (favorite) |
+| `/a2-members/tutor` | version 3, Tutor |
+| `/a2-members/one-goal` | version 4, One goal |
+| `/a2-members/my-exam` | removed, redirects to /a2-members |
 | `/a2-members/study-desk`, `/exam-checklist`, `/subjects`, `/up-next` | round 2, not listed, kept for old links |
 
 ## Study Forum

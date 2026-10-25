@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HESI A2 MasterClass · Study and Progress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="r4-base.css?v=p8">
+<link rel="stylesheet" href="r4-prep-ux.css?v=ux16">
+<link rel="stylesheet" href="r4-ux-extra.css?v=ux16">
+<style>
+  .mock-version { color: #c7d2e1; text-decoration: none; white-space: nowrap; }
+  .mock-version:hover { color: #ffffff; }
+  .mock-version-name { color: #ffffff; font-weight: 600; white-space: nowrap; margin-right: 8px; }
+  @media (max-width: 767px) { .mock-version-name { white-space: normal; } }
+</style>
+</head>
+<body data-screen="laptop">
+
+<div class="mock-bar" role="toolbar" aria-label="Mockup options">
+  <a class="mock-version" href="/a2-members">&larr; A2 member area</a><span class="mock-version-name">Version 1 &middot; Study &amp; Progress</span>
+  <div class="mock-group is-key"><span>Version</span>
+    <div class="mock-seg" data-key="feat">
+      <button data-value="base">Redesign only</button>
+      <button data-value="new">With new features</button>
+    </div>
+  </div>
+  <div class="mock-group" data-only-new><span>New labels</span>
+    <div class="mock-seg" data-key="badges">
+      <button data-value="on">Show</button>
+      <button data-value="off">Hide</button>
+    </div>
+  </div>
+  <div class="mock-group" data-only-laptop><span>Menu</span>
+    <div class="mock-seg" data-key="nav">
+      <button data-value="top">Top</button>
+      <button data-value="left">Left</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Claire AI</span>
+    <div class="mock-seg" data-key="ai">
+      <button data-value="off">Off</button>
+      <button data-value="on">On</button>
+    </div>
+  </div>
+  <div class="mock-group" data-only-ai><span>AI state</span>
+    <div class="mock-seg" data-key="aiState">
+      <button data-value="ok">Normal</button>
+      <button data-value="error">Error</button>
+      <button data-value="limit">Limit reached</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Page</span>
+    <div class="mock-seg" data-key="view">
+      <button data-value="setup" data-only-new>First visit</button>
+      <button data-value="home">Study (Home)</button>
+      <button data-value="progress">Progress</button>
+      <button data-value="lessons">Lessons</button>
+      <button data-value="questions">Questions</button>
+      <button data-value="settings" data-only-new>Exam settings</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Student</span>
+    <div class="mock-seg" data-key="state">
+      <button data-value="new">Just bought</button>
+      <button data-value="progress">In progress</button>
+      <button data-value="done">All lessons done</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Screen</span>
+    <div class="mock-seg" data-key="screen">
+      <button data-value="laptop">Desktop</button>
+      <button data-value="phone">Phone</button>
+    </div>
+  </div>
+</div>
+
+<main class="stage" id="stage"></main>
+
+<script src="data/course.js?v=p8"></script>
+<script src="r4-prep-ux.js?v=ux16"></script>
+<script src="r4-core-ux.js?v=ux17"></script>
+</body>
+</html>
