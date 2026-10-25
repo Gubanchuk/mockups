@@ -240,3 +240,10 @@ body[data-ai-hdr="1"] .go-logo img { max-width: none; }
   body[data-screen="laptop"][data-ai-hdr="1"] .go-logo img { height: 48px; }
   body[data-screen="laptop"][data-ai-hdr="1"] .go-top-in { gap: 12px; }
 }
+@media (max-width: 800px) {
+  body[data-screen="laptop"][data-ai-hdr="1"] .go-top-in { gap: 8px; }
+  body[data-screen="laptop"][data-ai-hdr="1"] .go-nav-a { padding: 9px 6px; }
+}
+
+/* Menu items stay on one line: in a narrow header "Practice tests" and "Questions 2" broke in two */
+.go-nav-a { white-space: nowrap; }

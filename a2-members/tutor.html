@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="r4-base.css?v=p8">
 <link rel="stylesheet" href="r4-tutor-ux.css?v=ux2">
-<link rel="stylesheet" href="r4-ux-extra.css?v=ux18">
+<link rel="stylesheet" href="r4-ux-extra.css?v=ux19">
 <style>
   .mock-version { color: #c7d2e1; text-decoration: none; white-space: nowrap; }
   .mock-version:hover { color: #ffffff; }
@@ -46,13 +46,10 @@
       <button data-value="limit">Limit reached</button>
     </div>
   </div>
-  <div class="mock-group"><span>Page</span>
-    <div class="mock-seg" data-key="view">
-      <button data-value="setup" data-only-new>First visit</button>
-      <button data-value="home">Home</button>
-      <button data-value="lessons">Lessons</button>
-      <button data-value="questions">Questions</button>
-      <button data-value="settings" data-only-new>Exam settings</button>
+  <div class="mock-group" data-only-new title="The setup screen a student sees on the first login after buying the course"><span>First visit</span>
+    <div class="mock-seg" data-key="first">
+      <button data-value="off">Off</button>
+      <button data-value="on">On</button>
     </div>
   </div>
   <div class="mock-group"><span>Student</span>
@@ -74,6 +71,6 @@
 
 <script src="data/course.js?v=d191053"></script>
 <script src="r4-tutor-ux.js?v=ux2"></script>
-<script src="r4-core-ux.js?v=ux17"></script>
+<script src="r4-core-ux.js?v=ux18"></script>
 </body>
 </html>

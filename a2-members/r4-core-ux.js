@@ -679,6 +679,7 @@
 
   // Toolbar: the New labels switch and the setup and settings pages only exist with the new features on
   function syncBar() {
+    state.first = state.view === 'setup' ? 'on' : 'off';
     document.querySelectorAll('.mock-seg').forEach(function (seg) {
       var k = seg.getAttribute('data-key');
       seg.querySelectorAll('button').forEach(function (b) {
@@ -726,6 +727,8 @@
     var k = b.parentNode.getAttribute('data-key');
     state[k] = b.getAttribute('data-value');
     state.pop = null;
+    // First visit is the only page switch left in the bar: the other pages open from the site's own menu
+    if (k === 'first') state.view = state.first === 'on' ? 'setup' : 'home';
     if (k === 'state' || k === 'feat') state.view = landing();
     if (!isNew() && (state.view === 'setup' || state.view === 'settings')) state.view = 'home';
     toTop(); writeHash(); render();

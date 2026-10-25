@@ -220,3 +220,6 @@ html:has(.mp) { scrollbar-color: #C3C8D2 #F6F6F3; }
 
 /* Menu on the left: tint of the current place */
 .mp { --r4-side-on: var(--indigo-tint); }
+
+/* Menu items stay on one line: in a narrow header "Practice tests" broke in two */
+.mp-nav-a { white-space: nowrap; }

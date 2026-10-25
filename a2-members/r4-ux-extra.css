@@ -128,6 +128,7 @@ body[data-ai-hdr="1"] .pr-logo img, body[data-ai-hdr="1"] .mp-logo img { max-wid
 }
 @media (max-width: 800px) {
   body[data-screen="laptop"][data-ai-hdr="1"] .mp-top { gap: 18px; }
+  body[data-screen="laptop"][data-ai-hdr="1"] .mp-logo img { height: 48px; }
   body[data-screen="laptop"][data-ai-hdr="1"] .pr-top { gap: 16px; }
   body[data-screen="laptop"][data-ai-hdr="1"] .pr-logo img { height: 48px; }
   body[data-screen="laptop"][data-ai-hdr="1"] .pr-tab { padding: 0 8px; }
