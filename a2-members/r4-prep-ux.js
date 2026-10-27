@@ -28,7 +28,7 @@
   function header(m, phone, R) {
     var v = R.state.view;
     // All lessons are a place of their own in the menu, as on the live site, not only a link from Study
-    var tabs = [['study', 'Study', 'home', v === 'home'], ['lessons', 'Lessons', 'lessons', v === 'lessons'], ['progress', 'Progress', 'progress', v === 'progress'],
+    var tabs = [['study', 'Study', 'home', v === 'home'], ['lessons', 'Lessons', 'lessons', v === 'lessons' || v === 'lesson'], ['progress', 'Progress', 'progress', v === 'progress'],
       ['questions', 'Questions', 'questions', v === 'questions']];
     var count = m.unread ? '<span class="pr-count" aria-label="' + R.plural(m.unread, 'new answer') + '">' + m.unread + '</span>' : '';
     var links = tabs.map(function (t) {
@@ -194,7 +194,7 @@
     if (!phone && R.state.nav === 'left') {
       var v = R.state.view;
       return R.sideNav('pr', [{ label: 'Study', icon: I.study, attrs: ' data-view="home"', on: v === 'home' },
-        { label: 'Lessons', icon: I.lessons, attrs: ' data-view="lessons"', on: v === 'lessons' },
+        { label: 'Lessons', icon: I.lessons, attrs: ' data-view="lessons"', on: v === 'lessons' || v === 'lesson' },
         { label: 'Progress', icon: I.progress, attrs: ' data-view="progress"', on: v === 'progress' },
         { label: 'Questions', icon: I.questions, attrs: ' data-view="questions"', on: v === 'questions', count: m.unread },
         { label: 'Forum', icon: I.forum, attrs: R.go('The Forum (/a2/forums)') }], inner);
@@ -213,6 +213,8 @@
     // Claire AI takes this version's colours
     root: 'pr',
     homeName: 'Study',
+    // Every lesson link opens the sample lesson page (see LESSON in r4-core-ux.js)
+    lessonPage: true,
     render: function (m, phone) {
       var R = window.R4, v = R.state.view;
       // Skip sits in the header too: on a phone the form is two screens long, and a student without answers should not scroll it to leave
@@ -222,6 +224,7 @@
       }
       if (v === 'settings') return page(m, phone, R, R.settingsView(m));
       if (v === 'lessons') return page(m, phone, R, R.lessonsView(m));
+      if (v === 'lesson') return page(m, phone, R, R.lessonView(m));
       if (v === 'progress') return page(m, phone, R, progressView(m, R));
       if (v === 'questions') return page(m, phone, R, questionsView(m, R));
       // A student who skipped the first questions is reminded on Study, not only on Progress

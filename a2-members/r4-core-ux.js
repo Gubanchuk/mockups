@@ -57,7 +57,7 @@
   };
 
   var state = { state: 'progress', screen: 'laptop', feat: 'base', badges: 'on', view: 'home', pop: null, nav: 'top', navMini: null, ai: 'off', aiState: 'ok', aiWait: false, aiOpen: false, aiEnter: false, aiQ: {}, aiPick: {}, aiFree: {},
-    picks: {}, examSet: {}, setup: {}, read: {}, lvOpen: {}, open: {}, qaOpen: {} };
+    picks: {}, examSet: {}, setup: {}, read: {}, lvOpen: {}, open: {}, qaOpen: {}, lsDone: {} };
   Object.keys(STATES).forEach(function (k) {
     state.picks[k] = STATES[k].picks.slice(); state.examSet[k] = {}; state.lvOpen[k] = {}; state.open[k] = {};
     // Students under way did the setup long ago; the new one has not seen it yet
@@ -175,8 +175,39 @@
       '<span class="r3-tip-b" role="tooltip">' + text + '</span></span>';
   }
 
-  // A control that leads to a page the site already has: in the mockup it says where it goes instead of doing nothing
-  function go(where) { return ' data-goto="' + esc(where) + '"'; }
+  // The one lesson the mockup has: the sample student's next lesson, copied from the live page
+  // /a2/posts/anatomy-and-physiology-4-7 (the transcript is cut to its first lines). Every lesson link opens it, so whoever
+  // looks at the mockup finds the lesson page from any button. The comment under it is a sample, as everywhere in the mockup.
+  var LESSON = {
+    title: 'Endocrine System (Hormones)', sec: 'anatomy', prev: 'Senses (Vision and Hearing)', next: 'Male Reproductive System',
+    transcript: ['Hello again.', 'In the previous A&P videos, we learned that the nervous system is in charge of the body.', 'It gets help from the endocrine system.',
+      'The endocrine system consists of a network of glands', 'and organs that secrete hormones.', 'Hormones are the chemical messengers of the body.',
+      'They work directly on the surrounding tissues', 'and they travel through the blood to distant sites.', 'Hormones allow our body to maintain its homeostasis.',
+      'Homeostasis is a very important concept.', 'It is the body’s ability to keep its internal environment as stable as possible',
+      'by constantly adjusting the body’s physiological processes.', 'Homeostasis is all about balance.', 'Let’s look at an example together.',
+      'The pancreas is an accessory organ of the gastrointestinal tract.', 'The pancreas has two different functions.',
+      'It produces enzymes that help in digestion, which we’ll discuss in more detail', 'in the video about the gastrointestinal system,',
+      'and it produces the hormones insulin and glucagon.', 'We’ll use these two hormones as an example to learn about homeostasis.',
+      'Insulin and glucagon are responsible for the regulation of the blood sugar level.', 'They oppose each other’s action, and together ensure that a balance is maintained.'],
+    // Square brackets mark a blank; the answer only sets its width
+    blanks: ['[Homeostasis] describes the body’s attempt to keep its internal environment as stable as possible.',
+      'Most hormonal systems are regulated by a/an [negative feedback loop].',
+      'The fright-flight-fight response is mediated by the hormone [cortisol] and the [sympathetic] nervous system.',
+      'The [pituitary] gland is located at the [base of the brain] and is also known as the master gland.',
+      '[Hormones] are chemical messengers that are secreted by [endocrine] glands.'],
+    cols: ['Column 1: Anterior Pituitary', 'Column 2: Posterior Pituitary'],
+    chips: ['prolactin', 'LH', 'FSH', 'oxytocin', 'growth hormone', 'ACTH', 'TSH', 'vasopressin/ADH'],
+    comments: [{ who: 'Maya R.', time: '2 days ago', text: 'Is ADH the same hormone as vasopressin?',
+      reply: { name: 'Claire Corter', time: 'yesterday', text: 'Yes, it is one hormone with two names. The posterior pituitary releases it, and it helps the kidneys hold on to water.' } }]
+  };
+
+  // A control that leads to a page the site already has: in the mockup it says where it goes instead of doing nothing.
+  // In versions with lessonPage set, every lesson link opens the sample lesson.
+  function go(where) {
+    var w = String(where);
+    if (window.R4V && window.R4V.lessonPage && w.indexOf('The lesson page: ') === 0) return ' data-view="lesson"';
+    return ' data-goto="' + esc(where) + '"';
+  }
   function days(n) { return n + (n === 1 ? ' day' : ' days'); }
   function addDays(n) { var d = new Date(TODAY); d.setDate(d.getDate() + n); return MONTHS[d.getMonth()].slice(0, 3) + ' ' + d.getDate(); }
   function plural(n, one, many) { return n + ' ' + (n === 1 ? one : (many || one + 's')); }
@@ -231,7 +262,7 @@
     var fresh = c.reply && c.reply.unread && isNew() && state.read[state.state] !== true;
     var me = '<div class="r4-msg is-me"><img class="r4-av" src="assets/avatar.png" alt=""><div class="r4-msg-b"><p class="r4-msg-h"><b>You</b><span>' + c.time + '</span></p>' +
       '<p class="r4-msg-t">' + esc(c.text) + '</p></div></div>';
-    var her = c.reply ? '<div class="r4-msg is-claire' + (fresh ? ' is-fresh' : '') + '">' + CLAIRE_AV + '<div class="r4-msg-b"><p class="r4-msg-h"><b>' + c.reply.name + '</b><span class="r4-role">Instructor</span><span>' +
+    var her = c.reply ? '<div class="r4-msg is-claire' + (fresh ? ' is-fresh' : '') + '">' + CLAIRE_AV + '<div class="r4-msg-b"><p class="r4-msg-h"><b>' + c.reply.name + '</b><span class="r4-role">Admin</span><span>' +
       c.reply.time + '</span>' + (fresh ? '<span class="r4-unread">Unread</span>' : '') + '</p><p class="r4-msg-t">' + esc(c.reply.text) + '</p></div></div>'
       : '<p class="r4-msg-wait">No answer yet. Her answer will show up here and under the lesson.</p>';
     return '<li class="r4-th"><a href="#" class="r4-th-l"' + go('The lesson page: ' + c.lesson + ', comments under the lesson') + '><span class="r4-th-ic" style="--ic:url(assets/sec-' + lessonSecId(c.lesson) + '.svg)" aria-hidden="true"></span>' +
@@ -471,6 +502,56 @@
       (off ? '<h2 class="r3-lv-h2">Not on your exam</h2><p class="r3-lv-sum">Still here if your school asks for them later.</p><ol class="r3-lv-secs">' + off + '</ol>' : '') + '</section>';
   }
 
+  // Lesson page, laid out as on the live site: breadcrumbs, Previous and Next step, the video with its transcript beside it,
+  // the lesson's questions, Mark as completed and the comments. Only the menu and header around it belong to the version.
+  // Buttons that work on the site say what they do instead of doing it.
+  var PLAY_I = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 5.8v12.4a.8.8 0 0 0 1.2.7l9.6-6.2a.8.8 0 0 0 0-1.4L9.7 5.1a.8.8 0 0 0-1.2.7z" fill="currentColor"/></svg>';
+  function blankLine(s) {
+    return esc(s).replace(/\[([^\]]+)\]/g, function (x, a) {
+      return '<input class="r4-ls-blank" type="text" size="' + Math.max(6, a.length) + '" aria-label="Fill in the blank" autocomplete="off">';
+    });
+  }
+  function lessonView(m) {
+    var L = LESSON, sec = secById(m.secs, L.sec), idx = sec.lessons.indexOf(L.title);
+    var mark = state.lsDone[state.state], done = mark != null ? mark : idx < sec.done;
+    var qn = function (n) { return '<h3 class="r4-ls-qn">Question ' + n + '</h3>'; };
+    var note = function (t) { return '<p class="r4-ls-note"><span aria-hidden="true">!</span>' + t + '</p>'; };
+    var blanks = L.blanks.map(function (b, i) { return '<div class="r4-ls-q">' + qn(i + 1) + '<p class="r4-ls-qt">' + blankLine(b) + '</p></div>'; }).join('');
+    var com = L.comments.map(function (c) {
+      var ini = c.who.split(/\s+/).map(function (p) { return p.charAt(0); }).join('').slice(0, 2);
+      return '<li class="r4-th"><div class="r4-th-msgs">' +
+        '<div class="r4-msg is-me"><span class="r4-av is-other" aria-hidden="true">' + ini + '</span><div class="r4-msg-b"><p class="r4-msg-h"><b>' + esc(c.who) + '</b><span>' + c.time + '</span></p>' +
+        '<p class="r4-msg-t">' + esc(c.text) + '</p></div></div>' +
+        '<div class="r4-msg is-claire">' + CLAIRE_AV + '<div class="r4-msg-b"><p class="r4-msg-h"><b>' + c.reply.name + '</b><span class="r4-role">Admin</span><span>' + c.reply.time + '</span></p>' +
+        '<p class="r4-msg-t">' + esc(c.reply.text) + '</p></div></div></div>' +
+        '<a href="#" class="r4-ls-reply" data-does="Opens a reply form under this comment">Reply</a></li>';
+    }).join('');
+    return '<article class="r4-ls" aria-label="Lesson">' +
+      '<nav class="r4-ls-crumbs" aria-label="Breadcrumb"><a href="#" data-view="home">' + homeName() + '</a><span aria-hidden="true">/</span>' +
+      '<a href="#" data-lsec="' + sec.id + '">' + sec.name + '</a><span aria-hidden="true">/</span><span aria-current="page">' + esc(L.title) + '</span></nav>' +
+      '<div class="r4-ls-head"><h1 class="r4-ls-title">' + esc(L.title) + '</h1><div class="r4-ls-steps">' +
+      '<a href="#" class="r4-ls-prev"' + go('The lesson page: ' + L.prev) + '>Previous step</a><a href="#" class="r4-ls-next"' + go('The lesson page: ' + L.next) + '>Next step</a></div></div>' +
+      '<div class="r4-ls-media"><button type="button" class="r4-ls-video" data-does="Plays the lesson video" aria-label="Play the lesson video">' +
+      '<span class="r4-ls-play">' + PLAY_I + '</span><span class="r4-ls-vt">' + esc(L.title) + '</span><span class="r4-ls-vs">Video lesson</span></button>' +
+      '<div class="r4-ls-tr" tabindex="0" role="region" aria-label="Transcript">' + L.transcript.map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('') + '</div></div>' +
+      '<section class="r4-ls-card" aria-label="Fill in the blanks"><p class="r4-ls-kind">Fill in the blanks:</p>' + blanks + '</section>' +
+      '<section class="r4-ls-card" aria-label="Drag and drop"><p class="r4-ls-kind">Drag each hormone to the appropriate column:</p>' + note('Drag drop the answers to the correct columns.') +
+      qn(1) + '<p class="r4-ls-qt">Drag each hormone to the appropriate column:</p>' +
+      '<div class="r4-ls-cols">' + L.cols.map(function (c) { return '<div class="r4-ls-col"><p>' + c + '</p></div>'; }).join('') + '</div>' +
+      '<div class="r4-ls-chips">' + L.chips.map(function (c) { return '<span class="r4-ls-chip">' + esc(c) + '</span>'; }).join('') + '</div>' +
+      '<button type="button" class="r4-ls-btn" data-does="Shows which hormones are in the right column">Show Results</button></section>' +
+      '<section class="r4-ls-card" aria-label="Study question"><p class="r4-ls-kind">Draw the negative feedback loop for the thyroid hormones on a piece of paper. When ready, compare your drawing to the correct answer.</p>' +
+      note('Study question.') + qn(1) + '<p class="r4-ls-qt">Start with</p>' +
+      '<div class="r4-ls-loop" role="img" aria-label="Hypothalamus, then pituitary, then thyroid; chemoreceptors">' +
+      '<span>Hypothalamus</span><i aria-hidden="true">↓+</i><span>Pituitary</span><i aria-hidden="true">↓+</i><span>Thyroid</span><b aria-hidden="true"></b><em>chemoreceptors</em></div>' +
+      '<button type="button" class="r4-ls-btn" data-does="Shows the correct drawing">Show Results</button></section>' +
+      '<button type="button" class="r4-ls-mark" data-lsdone aria-pressed="' + done + '">' + (done ? 'Mark as incomplete' : 'Mark as completed') + '</button>' +
+      '<section class="r4-ls-com" aria-label="Comments"><h2 class="r4-ls-h2">Comments</h2>' +
+      '<textarea class="r4-ls-ta" rows="3" placeholder="Write your text here." aria-label="Your comment"></textarea>' +
+      '<button type="button" class="r4-ls-btn" data-does="Posts your comment under the lesson">Post</button>' +
+      '<ul class="r4-ls-thr">' + com + '</ul></section></article>';
+  }
+
   // The menu on the left, as in most dashboards (mockup switch Menu: Left, computer only): logo, the version's places with icons,
   // account at the foot. It folds into a rail of icons; a hovered icon names its place.
   var SIDE_I = {
@@ -642,7 +723,7 @@
     state: state, model: model, esc: esc, secById: secById, tip: tip, tag: tag, go: go, days: days, plural: plural, pace: pace,
     needsFocus: needsFocus, profileMenu: profileMenu, answers: answers, qaItem: qaItem, Q_EMPTY: Q_EMPTY, questionsView: questionsView, diagnostic: diagnostic, testsList: testsList,
     setupView: setupView, settingsView: settingsView,
-    lessonsView: lessonsView, X_ICON: X_ICON, testsLegend: testsLegend,
+    lessonsView: lessonsView, lessonView: lessonView, X_ICON: X_ICON, testsLegend: testsLegend,
     rerender: function () { render(); }
   };
   window.R4 = api;
@@ -735,11 +816,12 @@
   });
 
   var toastTimer;
-  function toast(text) {
+  // A link says where it goes; a button on the lesson page ("does") says what it does on the site
+  function toast(text, does) {
     var t = document.querySelector('.r3-toast');
     if (!t) { t = document.createElement('div'); t.className = 'r3-toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
     var out = text === 'Log out';
-    var head = out ? 'Log out' : 'Goes to', tail = out ? 'Works as on the site now.' : 'This page is on the site already and stays as it is.';
+    var head = out ? 'Log out' : does ? 'On the site' : 'Goes to', tail = out || does ? 'Works as on the site now.' : 'This page is on the site already and stays as it is.';
     t.innerHTML = '<b>' + head + (out ? '' : ':') + '</b>' + (out ? '' : ' ' + esc(text)) + '<span>' + tail + '</span>';
     t.classList.add('is-on'); clearTimeout(toastTimer);
     toastTimer = setTimeout(function () { t.classList.remove('is-on'); }, 3800);
@@ -863,6 +945,19 @@
       [].forEach.call(srow.querySelectorAll('[data-score]'), function (b) { b.classList.toggle('is-on', b === sc); b.setAttribute('aria-pressed', String(b === sc)); });
       return;
     }
+    var dz = e.target.closest('[data-does]');
+    if (dz) { e.preventDefault(); toast(dz.getAttribute('data-does'), true); return; }
+    if (e.target.closest('[data-lsdone]')) {
+      var ls = secById(model(state.state).secs, LESSON.sec), was = state.lsDone[state.state];
+      state.lsDone[state.state] = !(was != null ? was : ls.lessons.indexOf(LESSON.title) < ls.done); render(); return;
+    }
+    // The subject in the lesson's breadcrumbs opens Lessons on that subject
+    var lsec = e.target.closest('[data-lsec]');
+    if (lsec) {
+      e.preventDefault(); var so = state.lvOpen[state.state], sid = lsec.getAttribute('data-lsec');
+      C.sections.forEach(function (x) { so[x.id] = x.id === sid; });
+      state.view = 'lessons'; state.pop = null; toTop(); writeHash(); render(); return;
+    }
     var g = e.target.closest('[data-goto]');
     if (g) {
       e.preventDefault();
@@ -910,7 +1005,7 @@
     if (h.get('ai') === 'on') state.ai = 'on';
     if (h.get('aist') === 'error' || h.get('aist') === 'limit') state.aiState = h.get('aist');
     var v = h.get('view');
-    state.view = ['home', 'lessons', 'questions', 'setup', 'settings', 'progress'].indexOf(v) > -1 ? v : landing();
+    state.view = ['home', 'lessons', 'lesson', 'questions', 'setup', 'settings', 'progress'].indexOf(v) > -1 ? v : landing();
     if (!isNew() && (state.view === 'setup' || state.view === 'settings')) state.view = 'home';
     document.body.setAttribute('data-solo', h.get('solo') === '1' ? '1' : '0');
   }

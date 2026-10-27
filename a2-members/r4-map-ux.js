@@ -29,7 +29,7 @@
       (phone ? '' : '<span>' + R.NAME + '</span>') + I.chev + '</button>' + (pop === 'profile' ? R.profileMenu() : '') + '</div>';
     var logo = '<a href="#" class="mp-logo" data-view="home"><img src="assets/a2-logo.png" alt="Your Best Grade, HESI A2 MasterClass"></a>';
     if (phone) {
-      var all = [['Home', ' data-view="home"', v === 'home'], ['Lessons', ' data-view="lessons"', v === 'lessons']].concat(links);
+      var all = [['Home', ' data-view="home"', v === 'home'], ['Lessons', ' data-view="lessons"', v === 'lessons' || v === 'lesson']].concat(links);
       var menu = pop === 'menu' ? '<div class="r3-pop mp-menu" role="menu">' + all.map(function (l) {
         return '<a href="#" role="menuitem"' + l[1] + (l[2] ? ' aria-current="page"' : '') + '>' + l[0] + (l[3] || '') + '</a>';
       }).join('') + '</div>' : '';
@@ -37,7 +37,7 @@
         I.menu + (m.unread ? '<span class="mp-dot" aria-hidden="true"></span>' : '') + '</button>' + menu + '</div>' + me + '</div></header>';
     }
     // Home is a place of its own in the menu, so the student always sees where they are
-    var desk = [['Home', ' data-view="home"', v === 'home' || v === 'lessons']].concat(links);
+    var desk = [['Home', ' data-view="home"', v === 'home' || v === 'lessons' || v === 'lesson']].concat(links);
     return '<header class="mp-top">' + logo + '<nav class="mp-nav" aria-label="Member area">' + desk.map(function (l) {
       return '<a href="#" class="mp-nav-a' + (l[2] ? ' is-on' : '') + '"' + l[1] + (l[2] ? ' aria-current="page"' : '') + '>' + l[0] + (l[3] || '') + '</a>';
     }).join('') + '</nav>' + R.aiButton(false) + me + '</header>';
@@ -149,7 +149,7 @@
   function page(m, phone, R, inner) {
     if (!phone && R.state.nav === 'left') {
       var v = R.state.view;
-      return R.sideNav('mp', [{ label: 'Home', icon: I.home, attrs: ' data-view="home"', on: v === 'home' || v === 'lessons' },
+      return R.sideNav('mp', [{ label: 'Home', icon: I.home, attrs: ' data-view="home"', on: v === 'home' || v === 'lessons' || v === 'lesson' },
         { label: 'Practice tests', icon: I.tests, attrs: R.go('The Practice tests page (/a2/practice_tests)') },
         { label: 'Questions', icon: I.questions, attrs: ' data-view="questions"', on: v === 'questions', count: m.unread },
         { label: 'Forum', icon: I.forum, attrs: R.go('The Forum (/a2/forums)') }], inner);
@@ -158,6 +158,8 @@
   }
 
   window.R4V = {
+    // Every lesson link opens the sample lesson page (see LESSON in r4-core-ux.js)
+    lessonPage: true,
     // Claire AI takes this version's colours
     root: 'mp',
     // Questions show as comment threads with avatars (see chatItem in r4-core.js)
@@ -169,6 +171,7 @@
         '<button type="button" class="r4-btn-q r4-skip-top" data-skip>Skip for now</button></header>' + R.setupView(m) + '</div>';
       if (v === 'settings') return page(m, phone, R, R.settingsView(m));
       if (v === 'lessons') return page(m, phone, R, R.lessonsView(m));
+      if (v === 'lesson') return page(m, phone, R, R.lessonView(m));
       if (v === 'questions') return page(m, phone, R, R.questionsView(m));
       // No questions yet: Home stays quiet, the Questions page explains how to ask
       var ans = m.S.comments.length ? R.answers(m) : '';
