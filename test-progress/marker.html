@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Progress in a test · Readable marker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #333333;
+    --ink-soft: #5a5a5a;
+    --ink-faint: #7a7a7a;
+    --blue: #347bbc;
+    --track: #e4e4e4;
+    --line: #d0d0d0;
+    --panel: #f2f2f2;
+    --stage: #e9edf2;
+    --site-font: "Helvetica Neue", Arial, Verdana, Geneva, helvetica, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--stage); font-family: var(--site-font); color: var(--ink); }
+  button { font: inherit; border: 0; background: none; cursor: pointer; }
+  ::selection { background: #cfe0f1; color: #1d3f63; }
+
+  /* Mockup toolbar (same as the other YBG mockups) */
+  .mock-bar { position: sticky; top: 0; z-index: 50; display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding: 10px 20px; background: #16202e; color: #c7d2e1; font: 500 12px/1 "Poppins", Arial, sans-serif; }
+  .mock-group { display: flex; align-items: center; gap: 8px; }
+  .mock-group span { color: #8d9bb0; }
+  .mock-seg { display: flex; background: #243142; border-radius: 6px; padding: 2px; }
+  .mock-seg button { color: #c7d2e1; padding: 7px 10px; border-radius: 4px; font-variant-numeric: tabular-nums; }
+  .mock-seg button:hover { color: #fff; }
+  .mock-seg button:focus-visible { outline: 2px solid #8fb6de; outline-offset: 1px; }
+  .mock-seg button[aria-pressed="true"] { background: #f3f6fb; color: #16202e; }
+  body[data-embed="1"] .mock-bar { display: none; }
+
+  /* Phone frames */
+  .phones { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 36px 48px; padding: 32px 24px 64px; }
+  .phone { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .phone figcaption { font: 500 12px/1 "Poppins", Arial, sans-serif; color: #5b6878; font-variant-numeric: tabular-nums; }
+  .phone .bezel { padding: 10px; border-radius: 38px; background: #1b2330; box-shadow: 0 24px 48px -24px rgba(20, 27, 38, .55); }
+  .phone iframe { display: block; border: 0; border-radius: 28px; background: #fff; }
+
+  /* ---------- The test page, as on beta ---------- */
+  .page { background: #fff; min-height: 100vh; display: flex; flex-direction: column; font-size: 15px; line-height: 1.15; }
+  body:not([data-embed="1"]) .page { min-height: calc(100vh - 47px); }
+
+  .t-header { background: var(--blue); color: #fff; height: 40px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; font-size: 14px; }
+  .t-user { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .t-user b { font-weight: 700; white-space: nowrap; }
+  .t-user .t-email { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .t-font { display: flex; align-items: baseline; gap: 10px; font-weight: 700; }
+  .t-font span:nth-child(1) { font-size: 13px; }
+  .t-font span:nth-child(2) { font-size: 15px; text-decoration: underline; text-underline-offset: 3px; }
+  .t-font span:nth-child(3) { font-size: 16px; }
+  .t-exit { display: flex; align-items: center; gap: 7px; font-weight: 700; }
+  .ico { width: 16px; height: 16px; flex: none; }
+
+  .t-main { flex: 1; padding: 16px 40px 0; display: flex; flex-direction: column; }
+  .t-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .t-logo { width: 241px; height: auto; display: block; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; height: 35px; padding: 0 16px; background: var(--track); border: 1px solid #c6c6c6; border-radius: 4px; color: var(--ink-soft); font-size: 13px; letter-spacing: .02em; white-space: nowrap; }
+  .btn--wide { width: 241px; }
+
+  .t-body { flex: 1; display: flex; gap: 20px; margin-top: 32px; }
+  .t-section { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .t-qa { border-top: 3px solid var(--track); margin-top: 9.6px; padding-top: 15px; flex: 1; }
+  .t-question { margin: 0 0 22px; font-size: 15px; line-height: 1.53; }
+  .t-answers { display: flex; flex-direction: column; }
+  .t-answer { display: grid; grid-template-columns: 30px 50px minmax(0, 1fr); align-items: start; min-height: 30px; font-size: 15px; line-height: 1.33; }
+  .t-radio { width: 24px; height: 24px; border: 2px solid var(--ink); border-radius: 50%; }
+  .t-letter { color: #000; padding-top: 3px; }
+  .t-text { padding-top: 3px; }
+  .t-control { display: flex; justify-content: space-between; align-items: center; padding: 10px 0 20px; }
+  .t-control .btn { width: 233px; height: 36px; }
+  .t-links { display: flex; gap: 30px; font-size: 13px; }
+  .t-links a { color: var(--blue); display: inline-flex; align-items: center; gap: 6px; text-underline-offset: 3px; }
+  .t-links .ico { width: 13px; height: 13px; color: #7a7a7a; }
+
+  .t-side { width: 300px; flex: none; align-self: flex-start; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 1px 4px rgba(0,0,0,.12); padding: 16px 10px 10px; font-size: 15px; }
+  .t-side h3 { margin: 0 0 6px; font-size: 15px; font-weight: 700; }
+  .t-side p { margin: 0 0 58px; font-size: 13px; }
+  .t-notes { width: 100%; height: 192px; background: #f5f5f5; border: 1px solid var(--line); padding: 8px 6px; font: 14px/1.3 "Courier New", monospace; color: #888; }
+  .t-time { display: flex; align-items: center; justify-content: space-between; padding: 20px 0 12px; border-bottom: 1px solid var(--line); box-shadow: 0 1px 0 #fff; }
+  .t-time b { font-size: 14px; font-weight: 600; color: #2a2a2a; }
+  .t-time span { width: 140px; height: 32px; display: grid; place-items: center; background: #fff; border: 1px solid #515251; color: #515251; font-size: 12px; font-weight: 600; }
+  .t-calc { display: block; padding: 14px 0 4px; font-size: 14px; font-weight: 600; }
+
+  .t-footer { height: 39px; border-top: 1px solid var(--track); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; font-size: 11px; color: var(--ink-faint); }
+
+  /* ---------- Progress: what is on the site now ---------- */
+  .pg { position: relative; }
+  .pg-count { font-size: 22px; font-weight: 700; line-height: 1.15; color: var(--ink); }
+  .pg-track { height: 3px; background: var(--track); }
+  .pg-fill { height: 100%; background: var(--blue); }
+
+  .pg--now .pg-track { margin-bottom: 9.6px; }
+  .pg--now .pg-point { position: absolute; top: -24px; width: 17.5px; height: 20px; transform: translateX(-8.75px); background: url("assets/sprite-map.png") 0 0 / 121px 20px no-repeat; color: #fff; text-align: center; font-size: 6px; font-weight: 500; line-height: 6.9px; }
+  .pg--now .pg-point span { display: block; padding-top: 5px; }
+
+  /* Version 2: percent at the end of a thicker bar */
+  .pg--bar .pg-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 10px; }
+  .pg--bar .pg-pct { font-size: 22px; font-weight: 700; color: var(--blue); font-variant-numeric: tabular-nums; }
+  .pg--bar .pg-track { height: 8px; border-radius: 4px; overflow: hidden; }
+  .pg--bar + .t-qa { border-top: 0; margin-top: 0; padding-top: 22px; }
+
+  /* Version 3: percent next to the count, no marker */
+  .pg--count .pg-track { margin-bottom: 9.6px; }
+  .pg--count .pg-pct { font-weight: 400; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .pg--count .pg-dot { font-weight: 400; color: #9a9a9a; margin: 0 .3em; }
+
+  /* Version 1: the moving marker, readable */
+  .pg--marker .pg-track { height: 4px; margin-bottom: 9.6px; }
+  .pg--marker .pg-pill { position: absolute; top: -30px; width: 46px; height: 22px; border-radius: 11px; background: var(--blue); color: #fff; font-size: 12px; font-weight: 700; line-height: 22px; text-align: center; font-variant-numeric: tabular-nums; box-shadow: 0 2px 4px rgba(25, 61, 94, .25); }
+  .pg--marker .pg-tip { position: absolute; top: -9px; width: 0; height: 0; border: 5px solid transparent; border-top-color: var(--blue); border-bottom: 0; transform: translateX(-5px); }
+
+  /* ---------- Phone width, as the site does it ---------- */
+  @media (max-width: 767px) {
+    .t-header { padding: 0 20px; }
+    .t-user .t-dash, .t-user .t-email, .t-exit .t-exit-text { display: none; }
+    .t-font { margin-left: auto; margin-right: 22px; }
+    .t-main { padding: 14px 20px 0; }
+    .t-top .btn { display: none; }
+    .t-logo { width: 185px; }
+    .t-body { flex-direction: column; margin-top: 22px; gap: 0; }
+    .pg-count, .pg--bar .pg-pct { font-size: 18px; }
+    .t-question { font-size: 15px; }
+    .t-answer { grid-template-columns: 26px 30px minmax(0, 1fr); }
+    .t-radio { width: 22px; height: 22px; }
+    .t-control { flex-direction: column; align-items: stretch; gap: 20px; padding: 26px 0 18px; }
+    .t-control .btn { width: 100%; height: 42px; }
+    .t-control .btn + .btn { margin-top: -0px; }
+    .t-links { justify-content: space-around; }
+    .t-side { width: 100%; margin-bottom: 24px; }
+    .t-footer { display: none; }
+  }
+  .only-phone { display: none; }
+  @media (max-width: 767px) { .only-phone { display: inline-flex; } }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+<style>
+  .mock-version { color: #c7d2e1; text-decoration: none; white-space: nowrap; }
+  .mock-version:hover { color: #ffffff; }
+  .mock-version-name { color: #ffffff; font-weight: 600; white-space: nowrap; margin-right: 8px; }
+  @media (max-width: 767px) { .mock-version-name { white-space: normal; } }
+</style>
+</head>
+<body data-version="marker" data-q="21" data-screen="desktop" data-embed="0">
+
+<div class="mock-bar" role="toolbar" aria-label="Mockup options">
+  <a class="mock-version" href="/test-progress">&larr; Progress in a test</a><span class="mock-version-name">Version 1 &middot; Readable marker</span>
+  <div class="mock-group"><span>Question</span>
+    <div class="mock-seg" data-key="q">
+      <button data-value="1">1 of 55</button>
+      <button data-value="21">21 of 55</button>
+      <button data-value="55">55 of 55</button>
+    </div>
+  </div>
+  <div class="mock-group"><span>Screen</span>
+    <div class="mock-seg" data-key="screen">
+      <button data-value="desktop">Desktop</button>
+      <button data-value="phone">Phone</button>
+    </div>
+  </div>
+</div>
+
+<div id="stage"></div>
+
+<script>
+(function () {
+  var TOTAL = 55;
+  var KEYS = ['q', 'screen', 'embed'];
+  var body = document.body;
+  var stage = document.getElementById('stage');
+
+  var SVG = {
+    user: '<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="8" cy="8" r="7"/><circle cx="8" cy="6.3" r="2.4"/><path d="M3.6 12.8c1-1.7 2.6-2.5 4.4-2.5s3.4.8 4.4 2.5"/></svg>',
+    exit: '<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 2.4A6.6 6.6 0 1 0 10.5 13.6"/><path d="M7 8h7.2M11.6 5.4 14.2 8l-2.6 2.6"/></svg>',
+    flag: '<svg class="ico" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true"><circle cx="6.5" cy="6.5" r="5.9"/><path d="M4.6 9.6V3.6h4l-.8 1.4.8 1.4h-4" fill="currentColor" stroke-linejoin="round"/></svg>',
+    info: '<svg class="ico" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><circle cx="6.5" cy="6.5" r="5.9"/><path d="M6.5 3.4v4.2M6.5 9.4v.1"/></svg>'
+  };
+
+  function progress(version, q) {
+    var share = q / TOTAL * 100;          // the bar fill, as the site computes it
+    var pct = Math.floor(share);          // the number the site shows
+    var fill = '<div class="pg-track"><div class="pg-fill" style="width:' + share + '%"></div></div>';
+    if (version === 'now') {
+      return '<div class="pg pg--now">' + fill +
+        '<div class="pg-point" style="left:' + share + '%"><span>' + pct + '%</span></div>' +
+        '<div class="pg-count">' + q + ' of ' + TOTAL + '</div></div>';
+    }
+    if (version === 'bar') {
+      return '<div class="pg pg--bar"><div class="pg-row"><div class="pg-count">Question ' + q + ' of ' + TOTAL + '</div>' +
+        '<div class="pg-pct">' + pct + '%</div></div>' + fill + '</div>';
+    }
+    if (version === 'count') {
+      return '<div class="pg pg--count">' + fill +
+        '<div class="pg-count">' + q + ' of ' + TOTAL + '<span class="pg-dot">·</span><span class="pg-pct">' + pct + '%</span></div></div>';
+    }
+    // marker: the pill stays inside the bar, the tip points at the end of the fill
+    return '<div class="pg pg--marker">' +
+      '<div class="pg-pill" style="left:clamp(0px, calc(' + share + '% - 23px), calc(100% - 46px))">' + pct + '%</div>' +
+      '<div class="pg-tip" style="left:clamp(5px, ' + share + '%, calc(100% - 5px))"></div>' +
+      fill + '<div class="pg-count">' + q + ' of ' + TOTAL + '</div></div>';
+  }
+
+  function page(version, q) {
+    return '<div class="page">' +
+      '<header class="t-header">' +
+        '<div class="t-user">' + SVG.user + '<b>Andrew Gubanov</b><span class="t-dash">-</span><span class="t-email">an.guban79@gmail.com</span></div>' +
+        '<div class="t-font" aria-hidden="true"><span>A</span><span>A</span><span>A</span></div>' +
+        '<div class="t-exit"><span class="t-exit-text">Exit</span>' + SVG.exit + '</div>' +
+      '</header>' +
+      '<div class="t-main">' +
+        '<div class="t-top"><img class="t-logo" src="assets/logo.png" alt="Your Best Grade · HESI Exam Study">' +
+          '<span class="btn btn--wide">Submit Answer and Leave Exam</span></div>' +
+        '<div class="t-body">' +
+          '<div class="t-section">' + progress(version, q) +
+            '<div class="t-qa">' +
+              '<p class="t-question">A client received a purified protein derivative (PPD) skin test for tuberculosis. What should the nurse instruct the client about this test?</p>' +
+              '<div class="t-answers">' +
+                answer('A', 'Return to the physician’s office in one day to have the test read.') +
+                answer('B', 'There is no need to return to the physician’s office if the skin is not red or swollen.') +
+                answer('C', 'Schedule an appointment in 3 days to have the skin test read by the nurse.') +
+                answer('D', 'Swelling and redness are expected reactions and should disappear in a week.') +
+              '</div>' +
+            '</div>' +
+            '<div class="t-control"><span class="btn">Submit and Continue</span>' +
+              '<span class="btn only-phone">Submit Answer and Leave Exam</span>' +
+              '<div class="t-links"><a href="#" onclick="return false">' + SVG.flag + 'Flag for Review</a><a href="#" onclick="return false">' + SVG.info + 'Feedback / Problems</a></div>' +
+            '</div>' +
+          '</div>' +
+          '<aside class="t-side"><h3>Multiple-Choice</h3><p>Select the only correct answer.</p>' +
+            '<div class="t-notes">Notes for this question</div>' +
+            '<div class="t-time"><b>Remaining Time:</b><span>No Limit</span></div>' +
+            '<span class="t-calc">Show Calculator</span></aside>' +
+        '</div>' +
+      '</div>' +
+      '<footer class="t-footer"><span>Specialty Exam Practice V2026</span><span>Copyright © 2026 Your Best Grade, Inc. All Rights Reserved.</span></footer>' +
+    '</div>';
+  }
+
+  function answer(letter, text) {
+    return '<div class="t-answer"><span class="t-radio"></span><span class="t-letter">' + letter + '</span><span class="t-text">' + text + '</span></div>';
+  }
+
+  function readHash() {
+    var out = {};
+    location.hash.replace(/^#/, '').split('&').forEach(function (pair) {
+      var kv = pair.split('=');
+      if (kv[0]) out[kv[0]] = decodeURIComponent(kv[1] || '');
+    });
+    return out;
+  }
+
+  function hashFor(h) {
+    return '#' + KEYS.filter(function (k) { return h[k]; }).map(function (k) { return k + '=' + h[k]; }).join('&');
+  }
+
+  function mount() {
+    var h = readHash();
+    KEYS.forEach(function (k) { if (h[k]) body.dataset[k] = h[k]; });
+    document.querySelectorAll('.mock-seg').forEach(function (seg) {
+      seg.querySelectorAll('button').forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.dataset.value === body.dataset[seg.dataset.key]));
+      });
+    });
+    var version = body.dataset.version, q = +body.dataset.q || 21;
+    if (body.dataset.screen === 'phone' && body.dataset.embed !== '1') {
+      var inner = location.pathname + hashFor({ version: version, q: String(q), screen: 'desktop', embed: '1' });
+      stage.innerHTML = '<div class="phones">' + [390, 446].map(function (w) {
+        return '<figure class="phone"><div class="bezel"><iframe title="Phone ' + w + '" width="' + w + '" height="760" src="' + inner + '"></iframe></div><figcaption>' + w + ' px</figcaption></figure>';
+      }).join('') + '</div>';
+    } else {
+      stage.innerHTML = page(version, q);
+    }
+  }
+
+  function go(key, value) {
+    var h = readHash();
+    KEYS.forEach(function (k) { if (!h[k]) h[k] = body.dataset[k]; });
+    h[key] = value;
+    if (h.embed === '0') delete h.embed;
+    history.replaceState(null, '', hashFor(h));
+    mount();
+  }
+
+  document.querySelectorAll('.mock-seg button').forEach(function (b) {
+    b.addEventListener('click', function () { go(b.parentElement.dataset.key, b.dataset.value); });
+  });
+  window.addEventListener('hashchange', mount);
+  mount();
+})();
+</script>
+</body>
+</html>
