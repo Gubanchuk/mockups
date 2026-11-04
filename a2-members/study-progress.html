@@ -8,8 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="r4-base.css?v=p8">
-<link rel="stylesheet" href="r4-prep-ux.css?v=ux16">
-<link rel="stylesheet" href="r4-ux-extra.css?v=ux23">
+<link rel="stylesheet" href="r4-prep-ux.css?v=ux19">
+<link rel="stylesheet" href="r4-ux-review.css?v=ux27">
+<link rel="stylesheet" href="r4-call-review.css?v=9">
 <style>
   .mock-version { color: #c7d2e1; text-decoration: none; white-space: nowrap; }
   .mock-version:hover { color: #ffffff; }
@@ -39,7 +40,7 @@
       <button data-value="left">Left</button>
     </div>
   </div>
-  <div class="mock-group"><span>Claire AI</span>
+  <div class="mock-group" data-review-ai><span>Claire AI</span>
     <div class="mock-seg" data-key="ai">
       <button data-value="off">Off</button>
       <button data-value="on">On</button>
@@ -65,6 +66,12 @@
       <button data-value="done">All lessons done</button>
     </div>
   </div>
+  <div class="mock-group" data-final-switch><span>Final test (sample)</span>
+    <div class="mock-seg" data-key="final">
+      <button data-value="waiting">No result</button>
+      <button data-value="scored">With result</button>
+    </div>
+  </div>
   <div class="mock-group"><span>Screen</span>
     <div class="mock-seg" data-key="screen">
       <button data-value="laptop">Desktop</button>
@@ -76,7 +83,8 @@
 <main class="stage" id="stage"></main>
 
 <script src="data/course.js?v=p8"></script>
-<script src="r4-prep-ux.js?v=ux21"></script>
-<script src="r4-core-ux.js?v=ux21"></script>
+<script src="r4-call-review.js?v=10"></script>
+<script src="r4-prep-ux.js?v=ux33"></script>
+<script src="r4-core-review.js?v=ux32"></script>
 </body>
 </html>

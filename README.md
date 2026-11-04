@@ -55,6 +55,7 @@ Live: https://mockups-seven-ashen.vercel.app
 | Path | Version |
 |---|---|
 | `/a2-members` | YBG-1877: four versions of the member area main page (round 4 after the UX review) |
+| `/a2-members/compare-call-review` | interactive comparison of the previous and updated Study & Progress and Course map |
 | `/a2-members/study-progress` | version 1, Study & Progress (favorite) |
 | `/a2-members/course-map` | version 2, Course map (favorite) |
 | `/a2-members/tutor` | version 3, Tutor |

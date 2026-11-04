@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>A2 Member Area — было и стало · YBG-1877</title>
+  <style>
+    :root { color-scheme: light; --ink: #182539; --muted: #516176; --line: #d1dbe8; --accent: #284ac8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f4f6fa; color: var(--ink); font: 16px/1.5 system-ui, sans-serif; }
+    main { max-width: 1560px; margin: 0 auto; padding: clamp(18px, 4vw, 42px); }
+    h1, h2, p { margin: 0; }
+    h1 { font-size: clamp(28px, 4vw, 44px); line-height: 1.12; letter-spacing: -.027em; }
+    h2 { font-size: 21px; line-height: 1.2; }
+    .lead { margin: 10px 0 0; color: var(--muted); max-width: 68ch; }
+    .scenes { display: flex; flex-wrap: wrap; gap: 5px 16px; margin: 22px 0 14px; padding-bottom: 5px; border-bottom: 1px solid var(--line); }
+    .scenes button { padding: 8px 1px; border: 0; border-bottom: 3px solid transparent; background: none; color: var(--muted); font-weight: 650; }
+    .scenes button[aria-pressed="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+    .scenes button:hover { color: var(--accent); }
+    .controls { display: flex; flex-wrap: wrap; align-items: end; gap: 10px 14px; }
+    label { display: grid; gap: 4px; color: var(--muted); font-size: 13px; }
+    label[hidden] { display: none; }
+    select, button { min-height: 44px; color: var(--ink); font: inherit; }
+    select, #reset { padding: 7px 11px; border: 1px solid #afbdd1; border-radius: 8px; background: #fff; }
+    button { cursor: pointer; }
+    #reset:hover { background: #eef2fc; }
+    a { color: var(--accent); text-underline-offset: 3px; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .description { min-height: 2em; margin: 16px 0 20px; color: var(--muted); max-width: 76ch; }
+    .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+    main:not([data-device="desktop"]) .pair { max-width: calc(2 * var(--frame-width) + 22px); }
+    .panel { display: grid; min-width: 0; grid-template-rows: auto 1fr auto; }
+    .panel-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; }
+    .panel-head a { font-size: 14px; }
+    .panel p { margin: 5px 0 12px; color: var(--muted); font-size: 14px; }
+    .viewport { position: relative; width: 100%; max-width: var(--frame-width); overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    iframe { display: block; border: 0; transform-origin: top left; }
+    @media (max-width: 760px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>A2 Member Area · Было → стало</h1>
+    <p class="lead">Правки макетов после созвона 28 октября. Выбери сценарий, чтобы открыть старую и новую версии рядом. Обе версии интерактивны.</p>
+    <div class="scenes" id="scenes" role="group" aria-label="Сценарии сравнения"></div>
+    <div class="controls">
+      <label>Макет<select id="layout">
+        <option value="map">Course map</option>
+        <option value="study">Study &amp; Progress</option>
+      </select></label>
+      <label>Режим<select id="mode">
+        <option value="new">With new features</option>
+        <option value="base">Redesign only</option>
+      </select></label>
+      <label>Экран<select id="device">
+        <option value="390">Телефон 390 px</option>
+        <option value="446">Телефон 446 px</option>
+        <option value="desktop">Компьютер</option>
+      </select></label>
+      <label id="demo-label" hidden><span id="demo-title"></span><select id="demo"></select></label>
+      <button type="button" id="reset">Сбросить сценарий</button>
+    </div>
+    <p class="description" id="description" aria-live="polite"></p>
+    <div class="pair">
+      <section class="panel" aria-labelledby="before-title">
+        <div class="panel-head"><h2 id="before-title">Было</h2><a id="before-link" target="_blank" rel="noopener" aria-label="Открыть старый макет отдельно">Открыть отдельно</a></div>
+        <p id="before-summary"></p>
+        <div class="viewport"><iframe id="before" title="Макет до правок"></iframe></div>
+      </section>
+      <section class="panel" aria-labelledby="after-title">
+        <div class="panel-head"><h2 id="after-title">Стало</h2><a id="after-link" target="_blank" rel="noopener" aria-label="Открыть новый макет отдельно">Открыть отдельно</a></div>
+        <p id="after-summary"></p>
+        <div class="viewport"><iframe id="after" title="Макет после правок"></iframe></div>
+      </section>
+    </div>
+  </main>
+  <script>
+    const versions = {
+      map: ['before-review/course-map', 'course-map'],
+      study: ['before-review/study-progress', 'study-progress']
+    };
+    const scenes = {
+      first: { label: 'First visit', state: 'new', view: 'setup', mode: 'new',
+        cue: 'Прокрути форму до предметов. В новой версии кнопки остаются у нижнего края экрана.',
+        before: 'Пропуск в шапке и внизу, пояснения о настройках только в начале.',
+        after: 'Один пропуск. Над кнопками видно, что настройку можно закончить через Exam settings.' },
+      map: { label: 'Course map', state: 'progress', view: 'home', layout: 'map',
+        cue: 'Прокрути до Your course. В Biology рядом показаны 92% и 65%. Нажми Continue lesson, чтобы проверить, какой урок откроется.',
+        before: 'Уроки и компактные звёздочки тестов, счётчик All 13 done.',
+        after: 'Звёздочки показывают результат каждого теста. Счётчик уточняет, что завершены 13 уроков.' },
+      mapProgress: { label: 'Детали в карте', state: 'progress', view: 'home', layout: 'map',
+        cue: 'Прокрути до Your course и нажми Show progress details. Повторное нажатие свернёт детали.',
+        before: 'Карта показывает уроки и результаты рядом с предметами.',
+        after: 'Сводка раскрывается в карте. Счётчик уроков остаётся в заголовке.' },
+      done: { label: 'После уроков', state: 'done', view: 'home',
+        cue: 'Сравни карточки следующего действия. В новом макете можно открыть тест по предмету из карточки.',
+        before: 'Предлагается следующий тест, но связь со слабым предметом может теряться.',
+        after: 'Сразу видны предмет, причина рекомендации и кнопка конкретного теста.' },
+      review: { label: 'После всей практики', state: 'done', view: 'home', mode: 'new', shared: 'practice=complete',
+        cue: 'Справа нажми Review lessons. Для финального теста открой Final test на главной.',
+        before: 'В прежнем макете нет отдельного сценария для студента, который прошёл всю практику.',
+        after: 'В демоданных самый низкий результат по химии. Из карточки открываются уроки этого предмета.' },
+      progress: { label: 'Progress', state: 'progress', view: 'progress', layout: 'study',
+        cue: 'Сравни, как подписаны проценты, и проверь пустое состояние Final test.',
+        before: 'Одна шкала для Lesson quizzes, среднего студентов и порога школы.',
+        after: 'В таблице показаны Test 1 и Test 2 отдельно. Порог школы относится к финальному тесту.' },
+      final: { label: 'Результат финального', state: 'done', view: 'progress', layout: 'study', mode: 'new',
+        cue: 'Выбери «Без результата», нажми Open final test и затем View sample result.',
+        before: 'Порог школы сравнивается с результатами вопросов из уроков.',
+        after: 'Вход в финальный тест и пример итогового отчёта. В примере результат 86% при пороге школы 75%.' },
+      recent: { label: 'Recent comments', state: 'progress', view: 'home',
+        cue: 'На главной Course map прокрути до блока комментариев. Справа нажми Show 2 more.',
+        before: 'В Course map короткий анонс меняется при раскрытии. На Study блока нет.',
+        after: 'Последняя ветка видна целиком. Все действия стоят под ветками, а ссылка на Comments доступна сразу.' },
+      comments: { label: 'Страница Comments', state: 'progress', view: 'questions',
+        cue: 'Справа нажми Reply, введи текст и отправь. Поиск, фильтр и две сортировки доступны как варианты для обсуждения.',
+        before: 'Your questions показывает ответы. Для продолжения разговора нужно перейти в урок.',
+        after: 'Прежнее оформление веток, поиск, фильтр, сортировка и ответ прямо в ветке.' },
+      plan: { label: 'Claire’s plan', state: 'progress', view: 'home',
+        cue: 'Нажми See the plan в приветствии и сравни раскрытые шаги.',
+        before: 'Текущий шаг вписан в приветствие.',
+        after: 'Возвращён прежний вид. Кнопка See the plan раскрывает шаги под приветствием.' },
+      ai: { label: 'Claire AI', state: 'progress', view: 'lesson', mode: 'new', shared: 'ai=on',
+        cue: 'Слева открой Claire AI в шапке. Справа закрой панель и нажми Explain with AI в первом блоке вопросов.',
+        before: 'Вход через шапку. Примеры вопросов находятся в ленте чата.',
+        after: 'Конкретные вопросы видны целиком над полем ввода.' }
+    };
+
+    const main = document.querySelector('main');
+    const layout = document.querySelector('#layout');
+    const mode = document.querySelector('#mode');
+    const device = document.querySelector('#device');
+    const demo = document.querySelector('#demo');
+    const sceneBar = document.querySelector('#scenes');
+    const frames = [...document.querySelectorAll('iframe')];
+    const links = [document.querySelector('#before-link'), document.querySelector('#after-link')];
+    const requested = new URLSearchParams(location.hash.slice(1)).get('scene');
+    let current = Object.hasOwn(scenes, requested) ? requested : 'map';
+    let revision = 0;
+
+    sceneBar.innerHTML = Object.entries(scenes).map(([id, scene]) =>
+      '<button type="button" data-scene="' + id + '" aria-pressed="false">' + scene.label + '</button>').join('');
+
+    function fit() {
+      const desktop = device.value === 'desktop';
+      const width = desktop ? 1200 : Number(device.value);
+      const height = desktop ? 900 : 760;
+      main.dataset.device = device.value;
+      main.style.setProperty('--frame-width', width + 'px');
+      frames.forEach(frame => {
+        const viewport = frame.parentElement;
+        const ratio = Math.min(1, viewport.clientWidth / width);
+        frame.width = width;
+        frame.height = height;
+        viewport.style.height = Math.round(height * ratio + 2) + 'px';
+        frame.style.transform = 'scale(' + ratio + ')';
+      });
+    }
+
+    function render() {
+      const scene = scenes[current];
+      layout.disabled = Boolean(scene.layout);
+      mode.disabled = Boolean(scene.mode);
+      if (scene.layout) layout.value = scene.layout;
+      if (scene.mode) mode.value = scene.mode;
+      const desktop = device.value === 'desktop';
+      const params = new URLSearchParams({
+        feat: mode.value, state: scene.state, view: scene.view, screen: desktop ? 'laptop' : 'phone', solo: '1'
+      });
+      if (scene.shared) new URLSearchParams(scene.shared).forEach((value, key) => params.set(key, value));
+      const special = current === 'final' ? { title: 'Состояние Final test', values: ['scored', 'waiting'], labels: ['С результатом', 'Без результата'] } : null;
+      document.querySelector('#demo-label').hidden = !special;
+      if (special && demo.dataset.scene !== current) {
+        document.querySelector('#demo-title').textContent = special.title;
+        demo.replaceChildren(...special.values.map((value, index) => new Option(special.labels[index], value)));
+        demo.dataset.scene = current;
+      }
+      revision += 1;
+      frames.forEach((frame, index) => {
+        const path = versions[layout.value][index];
+        const specific = new URLSearchParams(params);
+        if (index === 1 && special) specific.set(current, demo.value);
+        if (index === 1 && current === 'ai') specific.set('aiopen', '1');
+        frame.src = path + '?comparison=' + revision + '#' + specific;
+        specific.delete('solo');
+        links[index].href = path + '#' + specific;
+      });
+      sceneBar.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.scene === current)));
+      document.querySelector('#description').textContent = scene.cue;
+      document.querySelector('#before-summary').textContent = scene.before;
+      document.querySelector('#after-summary').textContent = scene.after;
+      history.replaceState(null, '', '#scene=' + current);
+      fit();
+    }
+
+    sceneBar.addEventListener('click', event => {
+      const button = event.target.closest('[data-scene]');
+      if (button) { current = button.dataset.scene; render(); }
+    });
+    [layout, mode, device, demo].forEach(select => select.addEventListener('change', render));
+    document.querySelector('#reset').addEventListener('click', render);
+    const observer = new ResizeObserver(fit);
+    frames.forEach(frame => observer.observe(frame.parentElement));
+    render();
+  </script>
+</body>
+</html>

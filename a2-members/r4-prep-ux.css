@@ -199,15 +199,43 @@
 .pr-l-n { min-width: 52px; font-size: 14.5px; }
 .pr-r.is-done .pr-l-n { color: var(--mint-deep); font-weight: 600; }
 .pr-r.is-done .pr-bar i { background: var(--mint); }
-.pr-score-n { font: 700 15.5px/1 var(--sans); }
-.pr-score-n.is-ok { color: var(--mint-deep); }
-.pr-score-n.is-low { color: var(--amber); }
+.pr-test-results { display: grid; gap: 6px; min-width: 0; }
+.pr-test-results li { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; font-size: 14px; }
+.pr-test-results li > :last-child { text-align: right; }
+.pr-score-n { color: var(--ink); font: 700 15.5px/1 var(--sans); font-variant-numeric: tabular-nums; }
 .pr-muted { font-size: 14px; color: var(--muted); }
 .pr-dg { padding: 4px 9px; border-radius: 7px; background: var(--ground); font: 600 13px/1.2 var(--sans); color: var(--ink); white-space: nowrap; }
 .pr-dg.is-weak { background: var(--amber-tint); color: var(--amber); }
 .pr-off-h { margin-top: 26px; font: 700 16px/1.3 var(--sans); }
 .pr-off-p { margin-top: 2px; font-size: 14px; color: var(--muted); }
 .pr-tbl.is-off .pr-r { opacity: .72; }
+
+/* By subject comparison preview */
+.pr.is-subject-preview { min-height: 0; }
+.pr.is-subject-preview .pr-wrap { padding: 12px; }
+.pr.is-subject-preview .pr-subj { margin-top: 0; }
+.pr-subj.has-test-columns .pr-r { grid-template-columns: minmax(0, 1.4fr) minmax(76px, .8fr) minmax(128px, 1.35fr); gap: 12px; }
+.pr-subj.has-test-columns.has-diag .pr-r { grid-template-columns: minmax(0, 1.4fr) minmax(76px, .8fr) minmax(128px, 1.35fr) minmax(126px, 1fr); }
+.pr-subj.has-test-columns .pr-r.is-head { align-items: start; }
+.has-test-columns .pr-c-n { overflow-wrap: anywhere; }
+.has-test-columns .pr-l-n { min-width: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.has-test-columns .pr-bar.is-mini { flex: 1; min-width: 26px; max-width: 96px; }
+.pr-practice-head { display: grid; gap: 5px; text-align: center; }
+.pr-practice-head > span, .has-test-columns .pr-test-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.pr-practice-head > span { font-size: 12px; text-align: start; }
+.has-test-columns .pr-test-results li { display: grid; justify-content: stretch; gap: 3px; }
+.has-test-columns .pr-test-results li > :last-child { text-align: left; }
+.has-test-columns .pr-test-results .pr-muted, .has-test-columns .pr-test-label { font-size: 13px; color: var(--muted); }
+.pr-sr-only, .has-test-columns .pr-test-results li:not(.pr-test-extra) .pr-test-label {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+.pr.is-phone .pr-subj.has-test-columns .pr-r { grid-template-columns: minmax(0, 1fr) auto; }
+.pr.is-phone .has-test-columns .pr-c-l { grid-row: 2; }
+.pr.is-phone .has-test-columns .pr-c-d { grid-column: 2; grid-row: 2; }
+.pr.is-phone .has-test-columns :is(.pr-test-results, .pr-no-practice) { grid-column: 1 / -1; grid-row: 3; }
+.pr.is-phone .has-test-columns .pr-test-results li:not(.pr-test-extra) .pr-test-label {
+  position: static; width: auto; height: auto; margin: 0; overflow: visible; clip-path: none; white-space: normal;
+}
 
 /* Questions page */
 .pr .r4-page-lead { margin-top: 8px; }

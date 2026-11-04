@@ -18,9 +18,6 @@
     forum: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19.5v-1a4.5 4.5 0 0 1 4.5-4.5h2a4.5 4.5 0 0 1 4.5 4.5v1"/><path d="M15.5 5.6a3.2 3.2 0 0 1 0 5.8M17.5 14.2a4.5 4.5 0 0 1 3 4.3v1"/></svg>'
   };
 
-  // Sample numbers for the "Your Statistics" block of the live page: questions done out of 660, share answered right, students' average
-  var STATS = { new: null, progress: { done: 142, total: 660, correct: 74, avg: 68 }, done: { done: 634, total: 660, correct: 86, avg: 71 } };
-
   function maskIcon(id, cls) {
     return '<span class="' + cls + '" style="--ic:url(assets/sec-' + id + '.svg)" aria-hidden="true"></span>';
   }
@@ -29,8 +26,8 @@
     var v = R.state.view;
     // All lessons are a place of their own in the menu, as on the live site, not only a link from Study
     var tabs = [['study', 'Study', 'home', v === 'home'], ['lessons', 'Lessons', 'lessons', v === 'lessons' || v === 'lesson'], ['progress', 'Progress', 'progress', v === 'progress'],
-      ['questions', 'Questions', 'questions', v === 'questions']];
-    var count = m.unread ? '<span class="pr-count" aria-label="' + R.plural(m.unread, 'new answer') + '">' + m.unread + '</span>' : '';
+      ['questions', 'Comments', 'questions', v === 'questions']];
+    var count = m.unread ? '<span class="pr-count" aria-label="' + R.plural(m.unread, 'new reply', 'new replies') + '">' + m.unread + '</span>' : '';
     var links = tabs.map(function (t) {
       return '<a href="#" class="pr-tab' + (t[3] ? ' is-on' : '') + '" data-view="' + t[2] + '"' + (t[3] ? ' aria-current="page"' : '') + '>' +
         (phone ? I[t[0]] : '') + '<span>' + t[1] + '</span>' + (t[0] === 'questions' ? count : '') + '</a>';
@@ -60,7 +57,9 @@
 
   // The next step: a lesson with its video, the diagnostic quiz when it is next, or a practice test once the lessons are done
   function upNext(m, R) {
-    var S = m.S, o = { video: true };
+    var S = m.S, o = { video: true }, review = window.R4Review;
+    var nextTest = m.nf && review.practiceNext(m);
+    var lowest = m.nf && m.allLessonsDone && !nextTest && review.lowestPracticeResult(m);
     if (m.next && S.done !== 'all') {
       var s = m.next.sec, diag = s.intro && m.next.idx === 3;
       o.id = s.id; o.title = diag ? 'Diagnostic quiz' : m.next.title; o.video = !diag;
@@ -72,14 +71,17 @@
       if (m.nf && s.diag != null && s.diag <= 2) o.why = 'A weak spot on your diagnostic quiz';
       var p = m.nf ? R.pace(m) : null;
       if (p && p.perDay) o.today = 'Today: ' + R.plural(p.perDay, 'lesson') + (p.warn ? ' to catch up' : ' to stay on track');
-    } else if (m.nf && m.nextTest) {
-      var t = m.nextTest; o.id = t.sec.id; o.title = t.name; o.video = false; o.chip = t.q + ' questions';
-      o.meta = t.score != null ? 'Your best so far: ' + t.score + '%' : 'Not taken yet';
-      o.btn = t.score != null ? 'Retake the test' : 'Start the test'; o.where = 'The practice test: ' + t.name;
-      var pc = R.pace(m); if (pc) o.today = pc.text;
+    } else if (nextTest) {
+      var t = nextTest; o.id = t.sec.id; o.title = t.name; o.video = false; o.chip = t.q + ' questions';
+      o.meta = 'Up next in ' + t.sec.name; o.why = t.reason;
+      o.btn = 'Start ' + t.sec.name + ' practice'; o.where = 'The practice test: ' + t.name;
+    } else if (lowest) {
+      o.id = lowest.sec.id; o.title = 'Review ' + lowest.sec.name; o.video = false; o.chip = 'Review';
+      o.meta = 'All practice tests taken'; o.note = 'Lowest practice score: ' + lowest.score + '%.';
+      o.btn = 'Review lessons'; o.subject = lowest.sec.id;
     } else {
       o.id = 'introduction'; o.title = 'Time for the practice tests'; o.video = false; o.chip = 'Practice tests';
-      o.meta = 'All lessons are done.'; o.note = 'Score over 90%, and you\'re more than ready for the real exam!';
+      o.meta = 'All lessons are done.'; o.note = 'Review your practice results to see what needs more work.';
       o.btn = 'Go to practice tests'; o.where = 'The Practice tests page (/a2/practice_tests)';
     }
     var pct = m.total ? m.done / m.total * 100 : 0;
@@ -87,7 +89,8 @@
     var all = '<a href="#" class="pr-prog-a" data-view="lessons">See all lessons' + I.right + '</a>';
     var prog = m.left === 0 ? '<p class="pr-prog-t is-done"><span>' + I.check + 'All ' + m.total + ' lessons done</span>' + all + '</p>'
       : '<div class="pr-prog"><p class="pr-prog-t"><span><b>' + m.done + '</b> of ' + m.total + ' lessons' + (m.chosen ? ' in your plan' : '') + '</span>' + all + '</p><span class="pr-bar"><i style="width:' + pct.toFixed(1) + '%"></i></span></div>';
-    var frame = '<a href="#" class="pr-frame' + (o.video ? '' : ' is-quiz') + '"' + R.go(o.where) + ' aria-label="' + R.esc(o.btn + ': ' + o.title) + '">' +
+    var action = o.subject ? ' data-subj="' + o.subject + '"' : R.go(o.where);
+    var frame = '<a href="#" class="pr-frame' + (o.video ? '' : ' is-quiz') + '"' + action + ' aria-label="' + R.esc(o.subject ? o.title : o.btn + ': ' + o.title) + '">' +
       maskIcon(o.id, 'pr-frame-ic') + (o.video ? '<span class="pr-play">' + I.play + '</span>' : '<span class="pr-play is-q">' + I.tests + '</span>') +
       '<span class="pr-chip">' + o.chip + '</span></a>';
     return '<section class="pr-next" aria-label="Your next step">' + frame + '<div class="pr-next-t">' +
@@ -95,7 +98,7 @@
       (o.note ? '<p class="pr-note">' + o.note + '</p>' : '') +
       (o.why ? '<p class="pr-why">' + o.why + R.tag() + '</p>' : '') +
       (o.today ? '<p class="pr-today">' + o.today + (o.why ? '' : R.tag()) + '</p>' : '') +
-      prog + '<a href="#" class="pr-go"' + R.go(o.where) + '>' + o.btn + I.arrow + '</a></div></section>';
+      prog + '<a href="#" class="pr-go"' + action + '>' + o.btn + I.arrow + '</a></div></section>';
   }
 
   // Two ways to practise, as the quiz modes of an exam-prep app; each row says what is there and opens it.
@@ -110,7 +113,7 @@
         m.nf ? ' data-view="progress"' : R.go('The Score Report of your diagnostic quiz'), 'See results']);
     }
     var n = m.myTests.length, taken = m.taken.length;
-    rows.push(['tests', 'Practice tests', taken ? taken + ' of ' + n + ' taken' + (m.nf ? ', ' + m.aboveBar + ' at ' + m.bar + '% or more' : '') : n + ' tests, one or two for each subject',
+    rows.push(['tests', 'Practice tests', taken ? taken + ' of ' + n + ' taken' : n + ' tests, one or two for each subject',
       R.go('The Practice tests page (/a2/practice_tests)'), 'Open']);
     return '<section class="pr-modes" aria-label="Practice"><h2>Practice</h2><ul>' + rows.map(function (r) {
       return '<li><a href="#" class="pr-mode"' + r[3] + '><span class="pr-mode-ic">' + I[r[0]] + '</span><span class="pr-mode-t"><b>' + r[1] + '</b><span>' + r[2] + '</span></span>' +
@@ -121,73 +124,60 @@
   // Progress: the exam goal (new), the lesson quizzes against the students' average, and each subject in one row
   function goal(m, R) {
     if (!m.nf) return '';
-    var S = m.S, p = R.pace(m);
+    var S = m.S, p = m.allLessonsDone ? null : R.pace(m);
     if (!S.exam) {
       return '<a href="#" class="pr-goal is-empty" data-view="settings"><span>Add your exam date and the score your school needs. Your plan counts the days for you.</span>' + R.tag() + I.right + '</a>';
     }
     var state = m.left === 0 ? 'Lessons done' : p && p.warn ? 'Behind' : 'On track';
     return '<div class="pr-goal"><div class="pr-goal-n"><b>' + S.exam.days + '</b><span>days to your exam</span></div>' +
-      '<div class="pr-goal-t"><p>Exam on <b>' + S.exam.long + '</b>' + (S.target ? ' · your school needs <b>' + S.target + '%</b>' : '') + '</p>' +
+      '<div class="pr-goal-t"><p>Exam on <b>' + S.exam.long + '</b></p>' +
       (p ? '<p class="pr-goal-p">' + p.text + '</p>' : '') + '</div>' +
       '<span class="pr-state' + (p && p.warn ? ' is-warn' : '') + '">' + state + '</span>' +
       '<a href="#" class="pr-edit" data-view="settings">Change</a>' + R.tag() + '</div>';
   }
 
-  function scale(m, R) {
-    var st = STATS[m.key];
-    if (!st || m.done === 0) {
-      return '<section class="pr-card pr-score"><h2>Lesson quizzes</h2><p class="pr-empty">Each lesson ends with a few short questions. Answer them, and you\'ll see here how many you got right and how that compares with other students.</p></section>';
-    }
-    // You and the students' average are two bars on one 0–100 scale; the school's score is a target line across both,
-    // labelled above the bars, so marks never sit on each other however close the numbers are. One sentence says it in words.
-    var goal = m.nf && m.S.target ? m.S.target : null;
-    var d = st.correct - st.avg;
-    var say = (d > 0 ? d + ' points above' : d < 0 ? -d + ' points below' : 'The same as') + ' the students\' average' +
-      (goal ? (goal > st.correct ? ' · ' + (goal - st.correct) + ' more to reach your school\'s ' + goal + '%' : ' · already at what your school needs') : '');
-    say = say.charAt(0).toUpperCase() + say.slice(1);
-    function bar(cls, name, v) {
-      return '<span class="pr-cmp-l ' + cls + '">' + name + '</span><span class="pr-cmp-t ' + cls + '"><i style="width:' + v + '%"></i></span><b class="pr-cmp-v">' + v + '%</b>';
-    }
-    var line = goal ? '<span class="pr-cmp-goal" style="--x:' + goal + '%"><span class="pr-cmp-gl' + (goal > 72 ? ' is-end' : goal < 28 ? ' is-start' : '') + '"><i aria-hidden="true"></i>Your school needs ' + goal + '%</span></span>' : '';
-    return '<section class="pr-card pr-score"><div class="pr-score-h"><h2>Lesson quizzes</h2><p>' + st.done + ' of ' + st.total + ' questions answered</p></div>' +
-      '<p class="pr-big"><b>' + st.correct + '%</b> answered right</p><p class="pr-cmp-say">' + say + '</p>' +
-      '<div class="pr-cmp' + (goal ? ' has-goal' : '') + '" role="img" aria-label="You: ' + st.correct + '% right. Students\' average: ' + st.avg + '%' + (goal ? '. Your school needs ' + goal + '%' : '') + '.">' +
-      line + bar('is-you', 'You', st.correct) + bar('is-avg', 'Students\' average', st.avg) +
-      '<span class="pr-cmp-ax"><span>0%</span><span>50%</span><span>100%</span></span></div></section>';
+  var subjectPreview = new URLSearchParams(window.location.search).get('by-subject');
+  var subjectColumns = subjectPreview !== 'current';
+  var subjectOnly = subjectPreview === 'columns' || subjectPreview === 'current';
+
+  if (subjectOnly && window.parent !== window && window.ResizeObserver) {
+    var subjectStage = document.getElementById('stage');
+    new ResizeObserver(function () {
+      window.parent.postMessage({ type: 'by-subject-preview-height', height: Math.ceil(subjectStage.getBoundingClientRect().height) }, '*');
+    }).observe(subjectStage);
   }
 
   function subjects(m, R) {
     function row(s) {
-      var best = s.tests.reduce(function (a, t) { return t.score != null && t.score > a ? t.score : a; }, -1);
-      var tests = !s.tests.length ? '<span class="pr-muted">No test</span>'
-        : best < 0 ? '<span class="pr-muted">Not taken</span>'
-        : '<span class="pr-score-n ' + (best >= m.PASS ? 'is-ok' : 'is-low') + '">' + best + '%</span><span class="pr-muted">best of ' + R.plural(s.tests.filter(function (t) { return t.score != null; }).length, 'try', 'tries') + '</span>';
+      var tests = s.tests.map(function (t, i) {
+        var score = t.score == null ? '<span class="pr-muted">Not taken</span>' : '<strong class="pr-score-n">' + t.score + '%</strong>';
+        return '<li' + (subjectColumns && i > 1 ? ' class="pr-test-extra"' : '') + '><span class="pr-test-label">Test ' + (i + 1) + '</span>' + score + '</li>';
+      }).join('');
+      if (subjectColumns && s.tests.length === 1) {
+        tests += '<li><span class="pr-test-label">Test 2</span><span class="pr-muted" title="No test available"><span aria-hidden="true">—</span>' +
+          '<span class="pr-sr-only">No test available</span></span></li>';
+      }
       var diag = m.nf ? '<span class="pr-c pr-c-d">' + (s.intro || s.diag == null ? '' : '<span class="pr-dg' + (s.diag <= 2 ? ' is-weak' : '') + '">' + s.diag + ' of 5' + (s.diag <= 2 ? ' · needs work' : '') + '</span>') + '</span>' : '';
       var pct = s.total ? s.done / s.total * 100 : 0;
+      var lessonCount = subjectColumns ? s.done + '/' + s.total : s.done + ' of ' + s.total + ' complete';
       return '<li class="pr-r' + (s.done >= s.total ? ' is-done' : '') + '"><a href="#" class="pr-c pr-c-n" data-subj="' + s.id + '">' + maskIcon(s.id, 'pr-sic') + '<span>' + s.name + '</span></a>' +
-        '<span class="pr-c pr-c-l"><span class="pr-l-n">' + (s.done >= s.total ? 'All ' + s.total : s.done + ' of ' + s.total) + '</span><span class="pr-bar is-mini"><i style="width:' + pct.toFixed(1) + '%"></i></span></span>' +
-        '<span class="pr-c pr-c-t">' + tests + '</span>' + diag + '</li>';
+        '<span class="pr-c pr-c-l"><span class="pr-l-n">' + lessonCount + '</span><span class="pr-bar is-mini"><i style="width:' + pct.toFixed(1) + '%"></i></span></span>' +
+        (tests ? '<ul class="pr-test-results" aria-label="' + R.esc(s.name) + ' practice tests">' + tests + '</ul>'
+          : '<span class="pr-muted pr-no-practice">No practice tests</span>') + diag + '</li>';
     }
-    var head = '<li class="pr-r is-head" aria-hidden="true"><span class="pr-c">Subject</span><span class="pr-c">Lessons</span><span class="pr-c">Practice tests</span>' + (m.nf ? '<span class="pr-c">Diagnostic' + R.tag() + '</span>' : '') + '</li>';
+    var practiceHead = subjectColumns
+      ? '<span class="pr-practice-head">Practice tests<span><span>Test 1</span><span>Test 2</span></span></span>'
+      : '<span class="pr-c">Practice tests</span>';
+    var head = '<li class="pr-r is-head" aria-hidden="true"><span class="pr-c">Subject</span><span class="pr-c">Lessons</span>' + practiceHead + (m.nf ? '<span class="pr-c">Diagnostic' + R.tag() + '</span>' : '') + '</li>';
     var mine = m.secs.filter(function (s) { return s.picked; }), off = m.secs.filter(function (s) { return !s.picked; });
-    return '<section class="pr-card pr-subj' + (m.nf ? ' has-diag' : '') + '"><h2>By subject</h2><ul class="pr-tbl">' + head + mine.map(row).join('') + '</ul>' +
-      (off.length ? '<h3 class="pr-off-h">Not on your exam</h3><p class="pr-off-p">Still in Lessons if your school asks for them later.</p><ul class="pr-tbl is-off">' + off.map(row).join('') + '</ul>' : '') + '</section>';
+    var ai = m.nf && m.key === 'progress' ? window.R4Review.aiAction('weak', 'Show my weak spots', R) : '';
+    return '<section class="pr-card pr-subj' + (m.nf ? ' has-diag' : '') + (subjectColumns ? ' has-test-columns' : '') + '"><h2>By subject</h2>' + ai +
+      '<ul class="pr-tbl">' + head + mine.map(row).join('') + '</ul>' +
+      (off.length ? '<h3 class="pr-off-h">Not on your exam</h3><p class="pr-off-p">Still in Lessons if your school asks for them later. <a href="#" data-view="settings">Change your subjects</a></p><ul class="pr-tbl is-off">' + off.map(row).join('') + '</ul>' : '') + '</section>';
   }
 
   function progressView(m, R) {
-    return '<div class="pr-wrap"><h1 class="pr-h1">Your progress</h1>' + goal(m, R) + scale(m, R) + subjects(m, R) + '</div>';
-  }
-
-  // Questions: the inbox. New answers from Claire come first and are read where they are announced, then the rest
-  function questionsView(m, R) {
-    var list = m.S.comments, fresh = m.unread ? list.filter(function (c) { return c.reply && c.reply.unread; }) : [];
-    var rest = list.filter(function (c) { return fresh.indexOf(c) < 0; });
-    var lead = '<p class="r4-page-lead">You ask in the comments under a lesson. Claire answers there, and every question and answer is collected here.</p>';
-    if (!list.length) return '<div class="pr-wrap"><h1 class="pr-h1">Your questions</h1>' + lead + '<p class="r4-qa-empty">' + R.Q_EMPTY + '</p></div>';
-    var news = fresh.length ? '<section class="pr-card pr-fresh"><div class="pr-fresh-h"><h2>' + (fresh.length > 1 ? 'Claire answered ' + fresh.length + ' of your questions' : 'Claire answered your question') + R.tag() + '</h2>' +
-      '<button type="button" class="r4-btn-2" data-read>Mark as read</button></div><ul class="r4-qa-list is-chat">' + fresh.map(R.qaItem).join('') + '</ul></section>' : '';
-    return '<div class="pr-wrap"><h1 class="pr-h1">Your questions</h1>' + lead + news +
-      (rest.length ? (fresh.length ? '<h2 class="pr-h2">Earlier</h2>' : '') + '<section class="pr-card pr-thread"><ul class="r4-qa-list is-chat">' + rest.map(R.qaItem).join('') + '</ul></section>' : '') + '</div>';
+    return '<div class="pr-wrap"><h1 class="pr-h1">Your progress</h1>' + goal(m, R) + window.R4Review.progressSummary(m, R) + subjects(m, R) + '</div>';
   }
 
   function page(m, phone, R, inner) {
@@ -196,7 +186,7 @@
       return R.sideNav('pr', [{ label: 'Study', icon: I.study, attrs: ' data-view="home"', on: v === 'home' },
         { label: 'Lessons', icon: I.lessons, attrs: ' data-view="lessons"', on: v === 'lessons' || v === 'lesson' },
         { label: 'Progress', icon: I.progress, attrs: ' data-view="progress"', on: v === 'progress' },
-        { label: 'Questions', icon: I.questions, attrs: ' data-view="questions"', on: v === 'questions', count: m.unread },
+        { label: 'Comments', icon: I.questions, attrs: ' data-view="questions"', on: v === 'questions', count: m.unread },
         { label: 'Forum', icon: I.forum, attrs: R.go('The Forum (/a2/forums)') }], inner);
     }
     var h = header(m, phone, R);
@@ -204,6 +194,7 @@
   }
 
   window.R4V = {
+    callReview: true,
     // Questions show as comment threads with avatars (see chatItem in r4-core-ux.js)
     chatQA: true,
     // Home is called Study in this version's menu
@@ -217,22 +208,25 @@
     lessonPage: true,
     render: function (m, phone) {
       var R = window.R4, v = R.state.view;
-      // Skip sits in the header too: on a phone the form is two screens long, and a student without answers should not scroll it to leave
       if (v === 'setup') {
-        return '<div class="pr is-setup' + (phone ? ' is-phone' : '') + '"><header class="pr-top"><span class="pr-logo"><img src="assets/a2-logo.png" alt="Your Best Grade, HESI A2 MasterClass"></span>' +
-          '<button type="button" class="r4-btn-q r4-skip-top" data-skip>Skip for now</button></header>' + R.setupView(m) + '</div>';
+        return '<div class="pr is-setup' + (phone ? ' is-phone' : '') + '"><header class="pr-top"><span class="pr-logo"><img src="assets/a2-logo.png" alt="Your Best Grade, HESI A2 MasterClass"></span></header>' + R.setupView(m, true) + '</div>';
       }
       if (v === 'settings') return page(m, phone, R, R.settingsView(m));
       if (v === 'lessons') return page(m, phone, R, R.lessonsView(m));
       if (v === 'lesson') return page(m, phone, R, R.lessonView(m));
-      if (v === 'progress') return page(m, phone, R, progressView(m, R));
-      if (v === 'questions') return page(m, phone, R, questionsView(m, R));
+      if (v === 'progress') {
+        if (subjectOnly) return '<div class="pr is-subject-preview' + (phone ? ' is-phone' : '') + '"><div class="pr-wrap">' + subjects(m, R) + '</div></div>';
+        return page(m, phone, R, progressView(m, R));
+      }
+      if (v === 'questions') return page(m, phone, R, window.R4Review.commentsView(m, R));
+      if (v === 'practice') return page(m, phone, R, window.R4Review.practiceView(m, R));
+      if (v === 'final' || v === 'final-sample') return page(m, phone, R, window.R4Review.finalView(m, v === 'final-sample'));
       // A student who skipped the first questions is reminded on Study, not only on Progress
       var remind = m.nf && !m.S.exam && m.left > 0 ? '<p class="pr-remind"><a href="#" data-view="settings">Add your exam date</a>, and your plan shows how many lessons to do each day.' + R.tag() + '</p>' : '';
-      return page(m, phone, R, '<div class="pr-wrap">' + greet(m, R) + upNext(m, R) + remind + modes(m, R) + '</div>');
+      return page(m, phone, R, '<div class="pr-wrap">' + greet(m, R) + upNext(m, R) + remind +
+        modes(m, R) + window.R4Review.finalCourseLink(m, R) + window.R4Review.recentComments(m, R) + '</div>');
     },
     onClick: function (e, R) {
-      if (e.target.closest('[data-plan]')) { var o = R.state.open[R.state.state]; o.plan = !o.plan; R.rerender(); return true; }
       var sj = e.target.closest('[data-subj]');
       if (sj) {
         e.preventDefault(); var id = sj.getAttribute('data-subj'), lv = R.state.lvOpen[R.state.state];
