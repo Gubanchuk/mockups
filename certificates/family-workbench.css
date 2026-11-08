@@ -1,3 +1,4 @@
+html.preview-loading #app{visibility:hidden}
 .family-workbench{background:#fff;color:#193c51;border-bottom:1px solid #c6d3dd;padding:0 max(24px,calc((100% - 1000px)/2));font-size:14px;line-height:1.5}
 .fw-top{min-height:42px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid #e3e9ee}
 .fw-brand{font-size:17px;font-weight:600}.fw-tools{display:flex;align-items:center;gap:18px}.fw-tools>button{font-size:13px;border:0;padding:4px 0;background:transparent;min-height:36px}

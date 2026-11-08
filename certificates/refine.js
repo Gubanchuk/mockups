@@ -223,4 +223,11 @@ for (const preset of ["short", "long"]) document.querySelector(`#${preset}-name`
 });
 document.querySelector("#reset").addEventListener("click", () => {
   state = defaults(), document.querySelector("#student-name").value = state.name, document.querySelector("#program").value = state.program, document.querySelector("#score").value = state.score, isResult || (document.querySelector("#separate").checked = state.separate), update();
-}), fit(), document.fonts.ready.then(fit), sync();
+}), sync();
+function revealPreview() {
+  const fonts = ["400 16px Poppins", "600 16px Poppins", '700 16px "Gotham Narrow"', "400 16px Augustus"];
+  Promise.allSettled(fonts.map((font) => document.fonts.load(font))).then(() => requestAnimationFrame(() => {
+    fit(), document.documentElement.classList.remove("preview-loading");
+  }));
+}
+document.readyState !== "complete" ? document.addEventListener("DOMContentLoaded", revealPreview, { once: !0 }) : revealPreview();
