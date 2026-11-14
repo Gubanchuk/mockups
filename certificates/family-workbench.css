@@ -59,3 +59,49 @@ html.preview-loading #app{visibility:hidden}
  .has-family-workbench .paper-window{padding:12px 12px 24px}.has-family-workbench .paper-window>.stage,.has-family-workbench .paper-window>.stage.portrait{max-width:100%}
 }
 @media print{.family-workbench{display:none!important}}
+
+.fw-review .fw-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:16px 0 12px;
+}
+.fw-settings-toggle{
+  min-height:40px;
+  padding:6px 14px;
+  border-color:#a9bdcb;
+  border-radius:6px;
+  font-size:14px;
+}
+.fw-settings-toggle[aria-expanded=true]{background:#edf5fb;border-color:#1666a4}
+.fw-review .fw-choices{gap:12px;padding-bottom:16px}
+.fw-review .fw-choice-row{display:flex;flex-wrap:wrap;gap:8px 16px}
+.fw-review .fw-layouts{display:flex;flex-wrap:wrap}
+.fw-review .fw-review-designs{width:fit-content;max-width:100%}
+.fw-review .fw-layout{min-height:38px}
+.fw-review .fw-layout[aria-current]{background:#fff;border-color:#1666a4;color:#104f7e}
+.fw-review .fw-score-note{padding:8px 0 0}
+.fw-review-paper{display:grid;gap:32px;padding:16px 24px 36px}
+.fw-review-page{width:100%;max-width:1123px;margin:0 auto;scroll-margin-top:12px}
+.fw-review-page:has(.stage.portrait){max-width:794px}
+.fw-review-page h2{margin:0 0 8px;color:#385a72;font-size:14px;font-weight:600;line-height:1.4}
+.fw-review-page .stage{
+  overflow:clip;
+  box-shadow:0 8px 20px #173a5114;
+}
+@media(max-width:700px){
+  .fw-review .fw-layouts{justify-self:start}
+  .fw-review .fw-layout{flex:0 0 auto;min-height:42px;padding-inline:8px}
+  .fw-review .fw-review-designs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));width:100%}
+  .fw-review .fw-review-designs .fw-layout{white-space:nowrap;padding-inline:2px}
+  .fw-review-paper{gap:24px;padding:14px 12px 28px}
+}
+@media(max-width:360px){
+  .fw-review-designs .fw-design-prefix{display:none}
+}
+@media print{
+  .fw-review-paper{display:block;padding:0}
+  .fw-review-page h2{display:none}
+  .fw-review-page+.fw-review-page{break-before:page}
+}

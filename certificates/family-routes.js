@@ -8,6 +8,19 @@
   for (const id of ["a", "b", "c"]) families[`candidate-${id}`] = { [id]: { compact: `refine-candidate-${id}`, detailed: `refine-candidate-${id}-detailed`, results: `refine-results-candidate-${id}` } };
   const routes = {};
   for (const [family, styles] of Object.entries(families)) for (const [style, views] of Object.entries(styles)) for (const [view, route] of Object.entries(views)) routes[route] = { family, style, view };
+  const reviewDesigns = Object.freeze([
+    base.classic,
+    base.editorial,
+    base.centered,
+    families.portrait.portrait,
+    families["candidate-c"].c
+  ]), reviewAliases = /* @__PURE__ */ new Set(["refine-families", "refine-base", "refine-content", "refine-results"]);
+  function reviewSelection(page, remembered) {
+    const direct = reviewDesigns.find((design2) => Object.values(design2).includes(page));
+    if (!direct && !reviewAliases.has(page)) return null;
+    const design = direct || reviewDesigns.find((item) => [item.compact, item.detailed].includes(remembered)) || reviewDesigns[0], openResults = page === design.results || page === "refine-results", certificate = !openResults && (page === design.detailed || page !== design.compact && remembered === design.detailed) ? design.detailed : design.compact;
+    return { design, certificate, openResults, length: routes[certificate].view };
+  }
   function context(page, certificate) {
     const current = routes[page], remembered = routes[certificate];
     if (!current) {
@@ -33,6 +46,6 @@
     const certificate = targetRoute === "refine-base" && old?.family !== "base" ? base.classic.compact : old && old.view !== "results" ? currentCertificate : base.classic.compact;
     return { certificate, result: pair(certificate) };
   }
-  const api = Object.freeze({ families, routes, context, target, pair, selection });
+  const api = Object.freeze({ families, routes, context, target, pair, selection, reviewDesigns, reviewSelection });
   typeof module < "u" && module.exports ? module.exports = api : root.YBGFamilyRoutes = api;
 })(typeof window > "u" ? {} : window);

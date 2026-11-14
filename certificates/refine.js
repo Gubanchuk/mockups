@@ -1,5 +1,5 @@
 "use strict";
-const ru = !1, t = (en, local) => en, page = document.body.dataset.view, isResult = page.startsWith("refine-results"), isCompare = ["refine-families", "refine-replacements", "refine-base", "refine-content", "refine-results"].includes(page), newDirections = ["refine-portrait", "refine-portrait-detailed", "refine-program", "refine-program-detailed"], app = document.querySelector("#app"), esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]), clean = (v) => {
+const ru = !1, t = (en, local) => en, page = document.body.dataset.view, q = new URLSearchParams(location.search), review = window.YBGFamilyRoutes.reviewSelection(page, q.get("certificate") || q.get("from")), isResult = !review && page.startsWith("refine-results"), isCompare = ["refine-families", "refine-replacements", "refine-base", "refine-content", "refine-results"].includes(page), newDirections = ["refine-portrait", "refine-portrait-detailed", "refine-program", "refine-program-detailed"], app = document.querySelector("#app"), esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]), clean = (v) => {
   const value = String(v).slice(0, 80).trim().replace(/\s+/gu, " ");
   return /[^\p{Script=Latin}\p{M}\s.'’\-]/u.test(value) ? "Alexandra Morgan" : value;
 }, arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>', sampleScore = 84, methods = { none: "No score", latest: "Show score" }, programs = {
@@ -45,9 +45,9 @@ const ru = !1, t = (en, local) => en, page = document.body.dataset.view, isResul
   // Eight published disciplines; Introduction is a separate introductory section.
   // Source: beta A2 course structure, see A2-SUBJECT-SOURCE-AUDIT-2026-11-08.md.
   a2: { name: "HESI A2 MasterClass", code: "A2", subjects: ["Anatomy and Physiology", "Math", "Reading Comprehension", "Grammar", "Vocabulary", "Biology", "Chemistry", "Critical Thinking"] }
-}, names = { short: "Alex Morgan", normal: "Alexandra Morgan", long: "Alexandra Elizabeth Montgomery-Washington" }, q = new URLSearchParams(location.search), defaults = () => ({ name: names.normal, program: "rn", score: isResult ? "latest" : "none", separate: !0, zoom: !1 });
+}, names = { short: "Alex Morgan", normal: "Alexandra Morgan", long: "Alexandra Elizabeth Montgomery-Washington" }, defaults = () => ({ name: names.normal, program: "rn", score: isResult ? "latest" : "none", separate: !0, zoom: !1 });
 let state = defaults();
-q.has("name") && (state.name = clean(q.get("name"))), Object.hasOwn(programs, q.get("program")) && (state.program = q.get("program")), ["none", "first", "best", "latest"].includes(q.get("score")) && (!isResult || q.get("score") !== "none") && (state.score = q.get("score") === "none" ? "none" : "latest"), q.has("separate") && (state.separate = q.get("separate") === "1"), state.zoom = !1;
+q.has("name") && (state.name = clean(q.get("name"))), Object.hasOwn(programs, q.get("program")) && (state.program = q.get("program")), ["none", "first", "best", "latest"].includes(q.get("score")) && (!isResult || q.get("score") !== "none") && (state.score = q.get("score") === "none" ? "none" : "latest"), review?.openResults && (state.score = ["first", "best", "latest"].includes(q.get("certScore")) ? "latest" : "none"), q.has("separate") && (state.separate = q.get("separate") === "1"), state.zoom = !1;
 const resultRoutes = ["refine-results-classic", "refine-results-editorial", "refine-results-table", "refine-results-portrait", "refine-results-program", ...["a", "b", "c"].map((id) => "refine-results-candidate-" + id)], certificateDesigns = [
   { style: "classic", label: "Classic", routes: ["refine-classic-detailed", "refine-classic-compact"] },
   { style: "editorial", label: "Asymmetric", routes: ["refine-detailed", "refine-compact"] },
@@ -109,6 +109,9 @@ function subjectList(extra = "") {
 function signature() {
   return '<div class="signature"><div class="signature-space"><img class="signature-image" src="assets/claire-signature.png" width="236" height="45" alt="Claire Corter\u2019s signature"></div><strong>Claire Corter</strong><span>Signature \xB7 Your Best Grade</span></div>';
 }
+function showsCertificateScore() {
+  return state.score !== "none" && (!state.separate || review?.length === "detailed");
+}
 function certificate(route) {
   const full = route.endsWith("detailed"), design = certificateDesigns.find((d) => d.routes.includes(route)).style, p = programs[state.program];
   return `<article class="sheet revision-certificate cert-${design} ${full ? "detailed" : "concise"}" aria-label="Certificate for ${esc(visibleName())}">
@@ -116,7 +119,7 @@ function certificate(route) {
  <div class="cert-body"><p class="presented">This certifies that</p><div class="recipient">${esc(visibleName())}</div><p class="completion">has completed the Your Best Grade study program</p><div class="program-name">${p.name}</div>
  ${full && p.subjects.length ? `<div class="scope"><p>Practice exams covered the following subjects:</p>${subjectList()}</div>` : ""}</div>
  ${design === "editorial" ? `<aside class="revision-brand">${logo()}<p>${p.name}</p><span>Certificate of completion</span></aside>` : ""}
- <footer class="revision-meta"><div><span class="meta-label">Date awarded</span><strong>${date}</strong>${state.score !== "none" && !state.separate ? `<div class="certificate-score"><b>${decimal(average())}%</b><span>Average result</span></div>` : ""}</div><div><span class="meta-label">Certificate number</span><strong>${number()}</strong><span class="issuer-name">Issued by Your Best Grade</span></div>${signature()}</footer>
+ <footer class="revision-meta"><div><span class="meta-label">Date awarded</span><strong>${date}</strong>${showsCertificateScore() ? `<div class="certificate-score"><b>${decimal(average())}%</b><span>Average result</span></div>` : ""}</div><div><span class="meta-label">Certificate number</span><strong>${number()}</strong><span class="issuer-name">Issued by Your Best Grade</span></div>${signature()}</footer>
  <div class="revision-legal"><p>${legal()}</p><span>yourbestgrade.com</span></div></article>`;
 }
 function resultFooter() {
@@ -135,28 +138,18 @@ function replacementFor(route) {
   return match ? window.YBGReplacementDesigns?.[match[1]] : null;
 }
 function renderDocument(route) {
-  const info = { ru: !1, name: visibleName(), program: programs[state.program], subjects: programs[state.program].subjects, number: number(), date, variant: route.endsWith("detailed") ? "detailed" : "compact", score: state.score !== "none" && !state.separate ? { value: decimal(average()), method: "" } : null }, replacement = replacementFor(route);
+  const info = { ru: !1, name: visibleName(), program: programs[state.program], subjects: programs[state.program].subjects, number: number(), date, variant: route.endsWith("detailed") ? "detailed" : "compact", score: showsCertificateScore() ? { value: decimal(average()), method: "" } : null }, replacement = replacementFor(route);
   return replacement ? route.startsWith("refine-results-") ? replacement.results({ ...info, result: { average: decimal(average()), methodLabel: "" } }) : replacement.certificate(info) : ["refine-results-portrait", "refine-results-program"].includes(route) ? window.YBGDirections.renderResults(route.endsWith("portrait") ? "portrait" : "program", { ...info, result: { average: decimal(average()), methodLabel: "" } }) : route.startsWith("refine-results-") ? resultSheet(route) : newDirections.includes(route) ? window.YBGDirections.render(route.startsWith("refine-portrait") ? "portrait" : "program", info) : certificate(route);
 }
 function stage(route) {
   const replacement = replacementFor(route), format = replacement ? route.startsWith("refine-results-") ? replacement.resultFormat : replacement.format : null, portrait = format ? format.height > format.width : route.startsWith("refine-results-") || route.startsWith("refine-portrait");
   return `<div class="stage${portrait ? " portrait" : ""}" data-route-sheet="${route}" data-width="${format?.width || (portrait ? 794 : 1123)}">${renderDocument(route)}</div>`;
 }
-function families() {
-  return `<main class="collection family-collection"><div class="compositions family-compositions">${[
-    ["refine-base", "refine-classic-compact", "Original series", "Three layouts \xB7 two certificate lengths \xB7 matching results", "Classic, Asymmetric and Centered blue-and-white layouts."],
-    ["refine-portrait", "refine-portrait", routeTitles["refine-portrait"], "Two certificate lengths \xB7 matching result sheet", "Warm paper, expressive serif typography and a personal completion statement."],
-    ["refine-candidate-c", "refine-candidate-c", "Modern diploma", "Two certificate lengths \xB7 matching result sheet", "A white portrait sheet with a compact title, centered recipient and signature below."]
-  ].map(([route, preview, title, meta, description], i) => `<section class="composition family-card">${link(route, `<div class="family-frame ${i > 0 ? "family-frame-portrait" : ""}">${stage(preview)}</div><div class="caption"><h3>${title}</h3></div><span class="fw-open">${i === 0 ? "Open original series" : "Open direction"}${arrow}</span>`, "preview-link family-link")}<p class="family-meta">${meta}</p><p>${description}</p></section>`).join("")}</div></main>`;
-}
 function replacements() {
   return `<main class="collection family-collection replacement-collection"><div class="compositions family-compositions">${["a", "b", "c"].map((id) => {
     const design = window.YBGReplacementDesigns[id], route = "refine-candidate-" + id;
     return `<section class="composition family-card">${link(route, `<div class="family-frame ${design.format.height > design.format.width ? "family-frame-portrait" : ""}">${stage(route)}</div><div class="caption"><h3>${esc(design.label.en)}</h3></div><span class="fw-open">Open the complete set${arrow}</span>`, "preview-link family-link")}<p class="family-meta">Concise \xB7 detailed \xB7 result sheet</p><p>${esc(design.description.en)}</p></section>`;
   }).join("")}</div></main>`;
-}
-function baseSeries() {
-  return `<main class="collection base-collection"><div class="compositions">${certificateDesigns.map((d) => `<section class="composition">${link(d.routes[1], `${stage(d.routes[1])}<div class="caption"><h3>${d.label}</h3></div><span class="fw-open">Open layout${arrow}</span>`, "preview-link base-preview")}<p>Concise or detailed certificate, with a matching result sheet.</p></section>`).join("")}</div></main>`;
 }
 const option = (v, label, current) => `<option value="${v}"${v === current ? " selected" : ""}>${label}</option>`;
 function toolbar() {
@@ -172,7 +165,16 @@ function single() {
   const alternatives = isResult ? resultRoutes : certificateRoutes;
   return `<nav class="page-actions" aria-label="Preview controls">${link("refine-results", "Compare result sheets")}${isResult ? link(origin, "Back to certificate") : link(resultChoice, "Open accompanying sheet")}</nav><nav class="alternative-links" aria-label="Other versions">${alternatives.map((r) => r === page ? `<span aria-current="page">${routeTitles[r]}</span>` : link(r, routeTitles[r])).join("")}</nav><main class="paper-window revision-window${state.zoom ? " full" : ""}" tabindex="0" aria-label="Document preview">${stage(page)}</main>`;
 }
-app.innerHTML = toolbar() + (page === "refine-families" ? families() : page === "refine-replacements" ? replacements() : page === "refine-base" ? baseSeries() : isCompare ? collection() : single());
+function reviewPreview({ certificate: certificate2, design, length }) {
+  const hasResults = length === "compact", pages = [{ route: certificate2, id: "certificate-page", label: hasResults ? "Page 1 \u2014 Certificate" : "Certificate" }];
+  return hasResults && pages.push({ route: design.results, id: "results-page", label: "Page 2 \u2014 Results" }), `<main class="fw-review-paper" aria-label="Document preview">
+  ${pages.map(({ route, id, label }) => `<section class="fw-review-page" id="${id}" aria-labelledby="${id}-title">
+   <h2 id="${id}-title">${label}</h2>
+   ${stage(route)}
+  </section>`).join("")}
+ </main>`;
+}
+app.innerHTML = toolbar() + (review ? reviewPreview(review) : page === "refine-replacements" ? replacements() : isCompare ? collection() : single());
 function scopeNote() {
   document.querySelector("#scope-note").textContent = state.program === "pn" ? "PN subjects follow the beta Test Creator subject areas, checked on 8 November 2026." : state.program === "rn" ? "RN subjects follow the original certificate." : "A2 includes all eight published disciplines from the beta course structure.";
 }
@@ -227,7 +229,7 @@ document.querySelector("#reset").addEventListener("click", () => {
 function revealPreview() {
   const fonts = ["400 16px Poppins", "600 16px Poppins", '700 16px "Gotham Narrow"', "400 16px Augustus"];
   Promise.allSettled(fonts.map((font) => document.fonts.load(font))).then(() => requestAnimationFrame(() => {
-    fit(), document.documentElement.classList.remove("preview-loading");
+    fit(), document.documentElement.classList.remove("preview-loading"), review && (review.openResults || location.hash === "#results-page") && document.getElementById("results-page")?.scrollIntoView();
   }));
 }
 document.readyState !== "complete" ? document.addEventListener("DOMContentLoaded", revealPreview, { once: !0 }) : revealPreview();
