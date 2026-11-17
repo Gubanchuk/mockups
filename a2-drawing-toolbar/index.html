@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YBG-2015 · Mobile drawing toolbar</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #eaf4fc;
+      --ink: #183b65;
+      --blue: #1e5290;
+      --line: #c6d6e6;
+      --canvas-line: #9c9c9c;
+      --toolbar: #f6f9fc;
+      --selected: #e2effb;
+      font: 16px/1.5 Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--page);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main {
+      width: min(100% - 24px, 1190px);
+      margin: 26px auto 40px;
+    }
+    .page-header { margin-bottom: 20px; }
+    .issue { margin: 0 0 4px; font-size: .8125rem; font-weight: 600; }
+    h1 { margin: 0; font-size: 1.75rem; line-height: 1.15; }
+    h2 { margin: 0; font-size: 1.0625rem; line-height: 1.25; }
+    h3 { margin: 0 0 4px; font-size: 1rem; }
+    .variant-filter { display: none; }
+    .comparison { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .variant { min-width: 0; }
+    .variant-header { margin-bottom: 8px; }
+    .variant-header p { margin: 3px 0 0; color: #526781; font-size: .8125rem; }
+    .question {
+      padding: 16px 13px;
+      border: 1px solid #d8e4ef;
+      border-radius: 12px;
+      background: #fff;
+    }
+    .prompt { margin: 0 0 12px; font-size: .9375rem; }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      min-width: 0;
+      border: 1px solid var(--line);
+      background: var(--toolbar);
+    }
+    .variant--split .controls--tools { border-radius: 6px 6px 0 0; border-bottom: 0; }
+    .variant--below .controls--tools { border-top: 0; }
+    .variant--split .controls--history, .variant--below .controls--history {
+      border-radius: 0 0 6px 6px;
+      border-top: 0;
+    }
+    button, input { font: inherit; }
+    button {
+      min-height: 44px;
+      padding: 0 7px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--ink);
+      font-size: .875rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover:not(:disabled) { background: #edf4fb; }
+    button[aria-pressed="true"] { background: var(--selected); border-color: #96b9dd; }
+    button:disabled { color: #526781; cursor: default; }
+    button:focus-visible, input:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+    .controls--history button { flex: 1; }
+    .settings {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 44px;
+      font-size: .875rem;
+      font-weight: 500;
+    }
+    .settings--size { flex: 1; min-width: 0; }
+    .settings input[type="range"] { min-width: 0; width: 100%; margin: 0; accent-color: var(--blue); }
+    .settings input[type="color"] { width: 28px; height: 36px; padding: 3px; border: 0; background: transparent; cursor: pointer; }
+    .scroll-toolbar {
+      display: flex;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-bottom: 0;
+      border-radius: 6px 6px 0 0;
+      background: var(--toolbar);
+    }
+    .scroll-track { display: flex; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: thin; }
+    .scroll-track .controls { flex: none; border: 0; }
+    .scroll-track .controls--history { padding-left: 8px; border-left: 1px solid var(--line); }
+    .scroll-track .settings--size input { width: 66px; }
+    .scroll-step {
+      flex: 0 0 44px;
+      align-self: stretch;
+      padding: 0;
+      border: 0;
+      border-left: 1px solid var(--line);
+      border-radius: 0 5px 0 0;
+      background: #edf4fb;
+      font-size: 1.5rem;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 325px;
+      border: 1px solid var(--canvas-line);
+      background: #fff;
+      touch-action: none;
+      cursor: crosshair;
+    }
+    @media (max-width: 929px) {
+      main { max-width: 390px; }
+      .variant-filter { display: flex; gap: 4px; margin-bottom: 14px; }
+      .variant-filter button { flex: 1; border: 1px solid var(--line); background: var(--toolbar); }
+      .variant-filter button[aria-pressed="true"] { background: var(--selected); }
+      .comparison { display: block; }
+      .variant:not(.is-active) { display: none; }
+    }
+    @media (max-width: 350px) {
+      .question { padding-inline: 10px; }
+      .variant--split .controls--tools, .variant--below .controls--tools { flex-wrap: wrap; }
+      .variant--split .settings--size, .variant--below .settings--size { flex-basis: 62px; }
+      .settings--color span { font-size: .8125rem; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="page-header">
+      <p class="issue">YBG-2015</p>
+      <h1>Mobile drawing toolbar</h1>
+    </header>
+    <div class="variant-filter" role="group" aria-label="Choose a toolbar layout">
+      <button type="button" data-variant="split" aria-controls="split" aria-pressed="true">Variant 1</button>
+      <button type="button" data-variant="below" aria-controls="below" aria-pressed="false">Variant 2</button>
+      <button type="button" data-variant="scroll" aria-controls="scroll" aria-pressed="false">Variant 3</button>
+    </div>
+    <div class="comparison">
+      <section class="variant variant--split is-active" id="split" aria-labelledby="split-title">
+        <header class="variant-header">
+          <h2 id="split-title">Variant 1</h2>
+          <p>Drawing tools above. Undo, Redo and Clear below.</p>
+        </header>
+      </section>
+      <section class="variant variant--below" id="below" aria-labelledby="below-title">
+        <header class="variant-header">
+          <h2 id="below-title">Variant 2</h2>
+          <p>Two rows of controls under the drawing area.</p>
+        </header>
+      </section>
+      <section class="variant variant--scroll" id="scroll" aria-labelledby="scroll-title">
+        <header class="variant-header">
+          <h2 id="scroll-title">Variant 3</h2>
+          <p>One row above. Swipe or tap the arrow for more.</p>
+        </header>
+      </section>
+    </div>
+  </main>
+  <template id="drawing-question">
+    <div class="question">
+      <h3>Basic Computations I</h3>
+      <p class="prompt">Align the following numbers:<br>12.03; 1,123; 2.555; 13,098</p>
+      <div class="controls controls--tools" role="group" aria-label="Drawing tools">
+        <button type="button" data-tool="pencil" aria-pressed="true">Pencil</button>
+        <button type="button" data-tool="erase" aria-pressed="false">Erase</button>
+        <label class="settings settings--size">Size <input type="range" min="1" max="10" value="4"></label>
+        <label class="settings settings--color"><span>Color</span> <input type="color" value="#000000"></label>
+      </div>
+      <canvas aria-label="Drawing area">Use a pointer or touch to draw.</canvas>
+      <div class="controls controls--history" role="group" aria-label="Drawing history">
+        <button type="button" data-tool="undo" disabled>Undo</button>
+        <button type="button" data-tool="redo" disabled>Redo</button>
+        <button type="button" data-tool="clear" disabled>Clear</button>
+      </div>
+    </div>
+  </template>
+  <template id="scroll-toolbar">
+    <div class="scroll-toolbar">
+      <div class="scroll-track"></div>
+      <button type="button" class="scroll-step" aria-label="Show more drawing tools">›</button>
+    </div>
+  </template>
+  <script>
+    const variants = document.querySelectorAll('.variant');
+    const filterButtons = document.querySelectorAll('.variant-filter button');
+
+    function addScrollableToolbar(question, tools, canvas, history) {
+      const toolbar = document.getElementById('scroll-toolbar').content.firstElementChild.cloneNode(true);
+      const track = toolbar.querySelector('.scroll-track');
+      const step = toolbar.querySelector('.scroll-step');
+      track.append(tools, history);
+      question.insertBefore(toolbar, canvas);
+
+      const atEnd = () => track.scrollLeft >= track.scrollWidth - track.clientWidth - 1;
+      function updateStep() {
+        const showFirst = atEnd();
+        step.textContent = showFirst ? '‹' : '›';
+        step.setAttribute('aria-label', showFirst ? 'Show first drawing tools' : 'Show more drawing tools');
+      }
+      step.addEventListener('click', () => {
+        track.scrollLeft = atEnd() ? 0 : track.scrollWidth;
+      });
+      track.addEventListener('scroll', updateStep, { passive: true });
+      new ResizeObserver(updateStep).observe(track);
+    }
+
+    function mountVariant(variant) {
+      const question = document.getElementById('drawing-question').content.firstElementChild.cloneNode(true);
+      const tools = question.querySelector('.controls--tools');
+      const canvas = question.querySelector('canvas');
+      const history = question.querySelector('.controls--history');
+      if (variant.id === 'below') question.insertBefore(canvas, tools);
+      if (variant.id === 'scroll') addScrollableToolbar(question, tools, canvas, history);
+      variant.append(question);
+      initializeDrawing(question, canvas);
+    }
+
+    function initializeDrawing(question, canvas) {
+      const context = canvas.getContext('2d');
+      const pencil = question.querySelector('[data-tool="pencil"]');
+      const erase = question.querySelector('[data-tool="erase"]');
+      const size = question.querySelector('input[type="range"]');
+      const color = question.querySelector('input[type="color"]');
+      const undo = question.querySelector('[data-tool="undo"]');
+      const redo = question.querySelector('[data-tool="redo"]');
+      const clear = question.querySelector('[data-tool="clear"]');
+      const strokes = [];
+      const undone = [];
+      let mode = 'pencil';
+      let draft = null;
+
+      function selectTool(nextMode) {
+        mode = nextMode;
+        pencil.setAttribute('aria-pressed', String(mode === 'pencil'));
+        erase.setAttribute('aria-pressed', String(mode === 'erase'));
+      }
+
+      function paint(stroke, width, height) {
+        const [first, ...rest] = stroke.points;
+        context.globalCompositeOperation = stroke.erase ? 'destination-out' : 'source-over';
+        context.strokeStyle = stroke.color;
+        context.lineWidth = stroke.size;
+        context.lineCap = 'round';
+        context.lineJoin = 'round';
+        context.beginPath();
+        context.moveTo(first.x * width, first.y * height);
+        if (!rest.length) context.lineTo(first.x * width + .01, first.y * height);
+        for (const point of rest) context.lineTo(point.x * width, point.y * height);
+        context.stroke();
+      }
+
+      function render() {
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+        const scale = window.devicePixelRatio || 1;
+        const pixelWidth = Math.round(width * scale);
+        const pixelHeight = Math.round(height * scale);
+        if (canvas.width !== pixelWidth) canvas.width = pixelWidth;
+        if (canvas.height !== pixelHeight) canvas.height = pixelHeight;
+        context.setTransform(scale, 0, 0, scale, 0, 0);
+        context.clearRect(0, 0, width, height);
+        for (const stroke of strokes) paint(stroke, width, height);
+        if (draft) paint(draft, width, height);
+        undo.disabled = !strokes.length || Boolean(draft);
+        redo.disabled = !undone.length || Boolean(draft);
+        clear.disabled = (!strokes.length && !undone.length) || Boolean(draft);
+      }
+
+      function point(event) {
+        const bounds = canvas.getBoundingClientRect();
+        return {
+          x: (event.clientX - bounds.left - canvas.clientLeft) / canvas.clientWidth,
+          y: (event.clientY - bounds.top - canvas.clientTop) / canvas.clientHeight,
+        };
+      }
+
+      canvas.addEventListener('pointerdown', (event) => {
+        if (draft || event.button !== 0) return;
+        canvas.setPointerCapture(event.pointerId);
+        draft = { pointerId: event.pointerId, erase: mode === 'erase', size: Number(size.value), color: color.value, points: [point(event)] };
+        render();
+      });
+      canvas.addEventListener('pointermove', (event) => {
+        if (draft?.pointerId !== event.pointerId) return;
+        draft.points.push(point(event));
+        render();
+      });
+      canvas.addEventListener('pointerup', (event) => {
+        if (draft?.pointerId !== event.pointerId) return;
+        draft.points.push(point(event));
+        strokes.push(draft);
+        draft = null;
+        undone.length = 0;
+        render();
+      });
+      function cancelStroke(event) {
+        if (draft?.pointerId !== event.pointerId) return;
+        draft = null;
+        render();
+      }
+      canvas.addEventListener('pointercancel', cancelStroke);
+      canvas.addEventListener('lostpointercapture', cancelStroke);
+      pencil.addEventListener('click', () => selectTool('pencil'));
+      erase.addEventListener('click', () => selectTool('erase'));
+      undo.addEventListener('click', () => { undone.push(strokes.pop()); render(); });
+      redo.addEventListener('click', () => { strokes.push(undone.pop()); render(); });
+      clear.addEventListener('click', () => { strokes.length = 0; undone.length = 0; render(); });
+      new ResizeObserver(render).observe(canvas);
+      render();
+    }
+
+    for (const variant of variants) mountVariant(variant);
+    for (const button of filterButtons) {
+      button.addEventListener('click', () => {
+        for (const variant of variants) variant.classList.toggle('is-active', variant.id === button.dataset.variant);
+        for (const control of filterButtons) control.setAttribute('aria-pressed', String(control === button));
+      });
+    }
+  </script>
+</body>
+</html>
